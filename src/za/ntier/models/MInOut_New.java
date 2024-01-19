@@ -10,6 +10,10 @@ import org.compiere.model.MOrder;
 
 public class MInOut_New extends MInOut implements I_M_InOut{
 
+	private static final long serialVersionUID = 1L;
+
+
+
 	@Override
 	public void setZZ_CreateLinesFrom(String ZZ_CreateLinesFrom) {
 		// TODO Auto-generated method stub

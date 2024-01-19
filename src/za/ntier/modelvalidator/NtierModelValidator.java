@@ -11,6 +11,7 @@ import org.compiere.model.X_M_InOutLine;
 import org.compiere.util.CLogger;
 
 import za.ntier.models.MInOut_New;
+import za.ntier.models.X_M_InOut;
 import za.ntier.models.X_ZZ_StockPile;
 
 public class NtierModelValidator implements ModelValidator{
@@ -24,7 +25,7 @@ public class NtierModelValidator implements ModelValidator{
 	public void initialize(ModelValidationEngine engine, MClient client) {
 		if (client != null ) m_AD_Client_ID = client.getAD_Client_ID();
 		engine.addModelChange(X_ZZ_StockPile.Table_Name, this);
-		engine.addModelChange(X_M_InOutLine.Table_Name, this);
+		engine.addModelChange(X_M_InOut.Table_Name, this);
 		
 	}
 
@@ -45,7 +46,7 @@ public class NtierModelValidator implements ModelValidator{
 	@Override
 	public String modelChange(PO po, int type) throws Exception {
 		log.info("PO: " + po.toString() + "   - timing : " + type);
-		if (po.get_TableName().equals(X_M_InOutLine.Table_Name )) {
+		if (po.get_TableName().equals(X_M_InOut.Table_Name )) {
 			if (type == TIMING_AFTER_COMPLETE) {
 				MInOut_New mInOut = new MInOut_New(po.getCtx(), po.get_ID(), po.get_TrxName());
 				X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(po.getCtx(), mInOut.getZZ_StockPile_ID(), po.get_TrxName());
@@ -55,6 +56,7 @@ public class NtierModelValidator implements ModelValidator{
 					deliveredQty = deliveredQty.add(mInOutLine.getMovementQty());
 				}
 				x_ZZ_StockPile.setZZ_Used_Tonnage(deliveredQty);
+				x_ZZ_StockPile.saveEx();
 			}
 			
 		}
