@@ -1,0 +1,144 @@
+package za.ntier.models;
+
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.util.Properties;
+
+import org.compiere.model.MInOut;
+import org.compiere.model.MInvoice;
+import org.compiere.model.MOrder;
+
+public class MInOut_New extends MInOut implements I_M_InOut{
+
+	@Override
+	public void setZZ_CreateLinesFrom(String ZZ_CreateLinesFrom) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_CreateLinesFrom() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Mine_Ticket(String ZZ_Mine_Ticket) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_Mine_Ticket() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Rom_Type(String ZZ_Rom_Type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_Rom_Type() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_StockPile_ID(int ZZ_StockPile_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public I_ZZ_StockPile getZZ_StockPile() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_StockPile_Ref(String ZZ_StockPile_Ref) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_StockPile_Ref() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Vehicle_Reg_No(String ZZ_Vehicle_Reg_No) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_Vehicle_Reg_No() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Wet_Metric_Tons(boolean ZZ_Wet_Metric_Tons) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isZZ_Wet_Metric_Tons() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public MInOut_New(Properties ctx, String M_InOut_UU, String trxName) {
+		super(ctx, M_InOut_UU, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName) {
+		super(ctx, M_InOut_ID, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName, String... virtualColumns) {
+		super(ctx, M_InOut_ID, trxName, virtualColumns);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MOrder order, int C_DocTypeShipment_ID, Timestamp movementDate) {
+		super(order, C_DocTypeShipment_ID, movementDate);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MInvoice invoice, int C_DocTypeShipment_ID, Timestamp movementDate, int M_Warehouse_ID) {
+		super(invoice, C_DocTypeShipment_ID, movementDate, M_Warehouse_ID);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MInOut original, int C_DocTypeShipment_ID, Timestamp movementDate) {
+		super(original, C_DocTypeShipment_ID, movementDate);
+		// TODO Auto-generated constructor stub
+	}
+
+	
+
+	@Override
+	public int getZZ_StockPile_ID() {
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_StockPile_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	
+
+}
