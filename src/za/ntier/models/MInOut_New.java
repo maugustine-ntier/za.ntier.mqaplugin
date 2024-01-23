@@ -2,11 +2,15 @@ package za.ntier.models;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Properties;
 
+import org.compiere.model.I_M_InOutLine;
 import org.compiere.model.MInOut;
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
+import org.compiere.model.Query;
 
 public class MInOut_New extends MInOut implements I_M_InOut{
 
@@ -142,6 +146,15 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 			 return 0;
 		return ii.intValue();
 	}
+	
+	public MInOut_New[] getMInOutsForStockPile () {
+		
+		List<MInOutLine> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and docstatus in ('CO','CL'", get_TrxName())
+		.setParameters(getZZ_StockPile_ID())
+		.list();
+		return list.toArray(new MInOut_New[list.size()]);
+	}	
+
 
 	
 

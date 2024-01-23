@@ -16,7 +16,7 @@ public class ModelValidatorFactory implements IModelValidatorFactory {
 
 	@Override
 	public ModelValidator newModelValidatorInstance(String className) {
-		if (className.equals("MStockPile")) {
+		if (className.equals("za.ntier.modelvalidator.NtierModelValidator")) {
 			return new NtierModelValidator();
 		}
 		return null;
