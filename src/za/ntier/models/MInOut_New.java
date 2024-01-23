@@ -16,7 +16,41 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 
 	private static final long serialVersionUID = 1L;
 
+	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName) {
+		super(ctx, M_InOut_ID, trxName);
+		// TODO Auto-generated constructor stub
+	}
 
+	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName, String... virtualColumns) {
+		super(ctx, M_InOut_ID, trxName, virtualColumns);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MOrder order, int C_DocTypeShipment_ID, Timestamp movementDate) {
+		super(order, C_DocTypeShipment_ID, movementDate);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MInvoice invoice, int C_DocTypeShipment_ID, Timestamp movementDate, int M_Warehouse_ID) {
+		super(invoice, C_DocTypeShipment_ID, movementDate, M_Warehouse_ID);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(MInOut original, int C_DocTypeShipment_ID, Timestamp movementDate) {
+		super(original, C_DocTypeShipment_ID, movementDate);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MInOut_New(Properties ctx, String M_InOut_UU, String trxName) {
+		super(ctx, M_InOut_UU, trxName);
+		// TODO Auto-generated constructor stub
+	}
+	
 
 	@Override
 	public void setZZ_CreateLinesFrom(String ZZ_CreateLinesFrom) {
@@ -102,40 +136,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 		return false;
 	}
 
-	public MInOut_New(Properties ctx, String M_InOut_UU, String trxName) {
-		super(ctx, M_InOut_UU, trxName);
-		// TODO Auto-generated constructor stub
-	}
 
-	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName) {
-		super(ctx, M_InOut_ID, trxName);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MInOut_New(Properties ctx, int M_InOut_ID, String trxName, String... virtualColumns) {
-		super(ctx, M_InOut_ID, trxName, virtualColumns);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MInOut_New(Properties ctx, ResultSet rs, String trxName) {
-		super(ctx, rs, trxName);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MInOut_New(MOrder order, int C_DocTypeShipment_ID, Timestamp movementDate) {
-		super(order, C_DocTypeShipment_ID, movementDate);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MInOut_New(MInvoice invoice, int C_DocTypeShipment_ID, Timestamp movementDate, int M_Warehouse_ID) {
-		super(invoice, C_DocTypeShipment_ID, movementDate, M_Warehouse_ID);
-		// TODO Auto-generated constructor stub
-	}
-
-	public MInOut_New(MInOut original, int C_DocTypeShipment_ID, Timestamp movementDate) {
-		super(original, C_DocTypeShipment_ID, movementDate);
-		// TODO Auto-generated constructor stub
-	}
 
 	
 
@@ -149,7 +150,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	
 	public MInOut_New[] getMInOutsForStockPile () {
 		
-		List<MInOutLine> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and docstatus in ('CO','CL'", get_TrxName())
+		List<MInOut_New> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and DocStatus in ('CO','CL')", get_TrxName())
 		.setParameters(getZZ_StockPile_ID())
 		.list();
 		return list.toArray(new MInOut_New[list.size()]);

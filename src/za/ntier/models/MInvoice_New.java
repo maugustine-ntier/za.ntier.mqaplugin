@@ -17,22 +17,18 @@ public class MInvoice_New extends MInvoice implements I_C_Invoice  {
 
 	public MInvoice_New(Properties ctx, int C_Invoice_ID, String trxName) {
 		super(ctx, C_Invoice_ID, trxName);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MInvoice_New(MInOut ship, Timestamp invoiceDate) {
 		super(ship, invoiceDate);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MInvoice_New(MInvoice copy) {
 		super(copy);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MInvoice_New(MInvoiceBatch batch, MInvoiceBatchLine line) {
 		super(batch, line);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MInvoice_New(MOrder order, int C_DocTypeTarget_ID, Timestamp invoiceDate) {
