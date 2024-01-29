@@ -1,15 +1,11 @@
 package za.ntier.modelvalidator;
 
-import java.math.BigDecimal;
-
 import org.compiere.model.MClient;
-import org.compiere.model.MInOutLine;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
 
-import za.ntier.models.MInOut_New;
 import za.ntier.models.X_M_InOut;
 import za.ntier.models.X_ZZ_StockPile;
 
@@ -51,25 +47,25 @@ public class NtierModelValidator implements ModelValidator{
 
 	@Override
 	public String docValidate(PO po, int timing) {
-		log.info("PO: " + po.toString() + "   - timing : " + timing);
-		if (po.get_TableName().equals(X_M_InOut.Table_Name )) {
-			if (timing == TIMING_AFTER_COMPLETE) {
-				MInOut_New mInOut = new MInOut_New(po.getCtx(), po.get_ID(), po.get_TrxName());
-				X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(po.getCtx(), mInOut.getZZ_StockPile_ID(), po.get_TrxName());
-				BigDecimal deliveredQty = BigDecimal.ZERO;
-				MInOut_New[] m_InOuts = mInOut.getMInOutsForStockPile();
-				for (MInOut_New mInOut_New:m_InOuts) {
-					MInOutLine[] m_InOutLines = mInOut_New.getLines();
-					for (MInOutLine mInOutLine:m_InOutLines) {
-						deliveredQty = deliveredQty.add(mInOutLine.getMovementQty());
-					}
-				}
-				x_ZZ_StockPile.setZZ_Used_Tonnage(deliveredQty);
-				x_ZZ_StockPile.saveEx();
-			}
-			
-		}
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/*
+	 * @Override public String docValidate(PO po, int timing) { log.info("PO: " +
+	 * po.toString() + "   - timing : " + timing); if
+	 * (po.get_TableName().equals(X_M_InOut.Table_Name )) { if (timing ==
+	 * TIMING_AFTER_COMPLETE) { MInOut_New mInOut = new MInOut_New(po.getCtx(),
+	 * po.get_ID(), po.get_TrxName()); X_ZZ_StockPile x_ZZ_StockPile = new
+	 * X_ZZ_StockPile(po.getCtx(), mInOut.getZZ_StockPile_ID(), po.get_TrxName());
+	 * BigDecimal deliveredQty = BigDecimal.ZERO; MInOut_New[] m_InOuts =
+	 * mInOut.getMInOutsForStockPile(); for (MInOut_New mInOut_New:m_InOuts) {
+	 * MInOutLine[] m_InOutLines = mInOut_New.getLines(); for (MInOutLine
+	 * mInOutLine:m_InOutLines) { deliveredQty =
+	 * deliveredQty.add(mInOutLine.getMovementQty()); } }
+	 * x_ZZ_StockPile.setZZ_Used_Tonnage(deliveredQty); x_ZZ_StockPile.saveEx(); }
+	 * 
+	 * } return null; }
+	 */
 
 }

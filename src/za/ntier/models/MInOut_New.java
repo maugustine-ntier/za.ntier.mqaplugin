@@ -1,5 +1,6 @@
 package za.ntier.models;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.Query;
+import org.compiere.process.DocAction;
 
 public class MInOut_New extends MInOut implements I_M_InOut{
 
@@ -50,12 +52,12 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 		super(ctx, M_InOut_UU, trxName);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 
 	@Override
 	public void setZZ_CreateLinesFrom(String ZZ_CreateLinesFrom) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_Mine_Ticket(String ZZ_Mine_Ticket) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_Rom_Type(String ZZ_Rom_Type) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -91,7 +93,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_StockPile_ID(int ZZ_StockPile_ID) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_StockPile_Ref(String ZZ_StockPile_Ref) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -115,7 +117,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_Vehicle_Reg_No(String ZZ_Vehicle_Reg_No) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public void setZZ_Wet_Metric_Tons(boolean ZZ_Wet_Metric_Tons) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -138,25 +140,46 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 
 
 
-	
+
 
 	@Override
 	public int getZZ_StockPile_ID() {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_StockPile_ID);
 		if (ii == null)
-			 return 0;
+			return 0;
 		return ii.intValue();
 	}
-	
+
 	public MInOut_New[] getMInOutsForStockPile () {
-		
+
 		List<MInOut_New> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and DocStatus in ('CO','CL')", get_TrxName())
-		.setParameters(getZZ_StockPile_ID())
-		.list();
+				.setParameters(getZZ_StockPile_ID())
+				.list();
 		return list.toArray(new MInOut_New[list.size()]);
-	}	
+	}
+
+	@Override
+	public String completeIt() {
+		String msg = super.completeIt();
+		if (msg.equals(DocAction.STATUS_Completed))	{
+			X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(), getZZ_StockPile_ID(), get_TrxName());
+			BigDecimal deliveredQty = BigDecimal.ZERO;
+			MInOut_New[] m_InOuts = getMInOutsForStockPile();
+			for (MInOut_New mInOut_New:m_InOuts) {
+				MInOutLine[] m_InOutLines = mInOut_New.getLines();
+				for (MInOutLine mInOutLine:m_InOutLines) {
+					deliveredQty = deliveredQty.add(mInOutLine.getMovementQty());
+				}
+			}
+			x_ZZ_StockPile.setZZ_Used_Tonnage(deliveredQty);
+			x_ZZ_StockPile.saveEx();
+		}
+		return msg;
+	}
 
 
-	
+
+
+
 
 }
