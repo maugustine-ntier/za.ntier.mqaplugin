@@ -50,7 +50,6 @@ public class ProcessFactory extends AnnotationBasedProcessFactory {
 
 	@Override
 	protected String[] getPackages() {
-		// TODO Auto-generated method stub
-		return null;
+		return new String[] {"za.ntier.report.jasper"};
 	}
 }

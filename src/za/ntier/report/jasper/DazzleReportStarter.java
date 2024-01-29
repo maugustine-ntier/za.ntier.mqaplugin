@@ -184,6 +184,9 @@ public class DazzleReportStarter implements ProcessCall, ClientProcess
 	private FileResourceLoader fileResourceLoader;
 	private BundleResourceLoader bundleResourceLoader;
 	
+	// Martin added, so I can write to this directory 
+	private String destinationFolder;
+	
 	/**
      * Returns read only connection for reporting
      *
@@ -351,6 +354,10 @@ public class DazzleReportStarter implements ProcessCall, ClientProcess
             	} // @Trifon - end
             }
 
+            // Martin added to download the logo image to the correct directory.  Called logo.jpg
+            HeaderLogoImageLoader headerLogoImageLoader = new HeaderLogoImageLoader();
+            headerLogoImageLoader.getLogoFile(Env.getCtx(),  destinationFolder);
+            
             if (Record_ID > 0)
             	params.put("RECORD_ID", Integer.valueOf( Record_ID));
 
@@ -940,6 +947,7 @@ public class DazzleReportStarter implements ProcessCall, ClientProcess
 		try {
 			if (!Files.exists(p))
 				Files.createDirectory(p);
+			destinationFolder = path;   // Added by Martin.  We meed this to store the logo file.
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}		

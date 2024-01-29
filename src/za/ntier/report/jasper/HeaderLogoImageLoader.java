@@ -23,34 +23,27 @@ public class HeaderLogoImageLoader {
 	/**	Logger			*/
 	protected CLogger	log = CLogger.getCLogger(getClass());
 
-	public void getLogoFile( Properties ctx, String trx,String destinationFolder){
+	public void getLogoFile( Properties ctx, String destinationFolder){
 
-		try
-		{
+		MImage image=null;
 
-			MImage image=null;
+		//imageFile =  File.createTempFile("logo", "jpg");
+		//First check org level for logo
+		MOrgInfo orgInfo = MOrgInfo.get( Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), null );
+		if ( orgInfo != null && orgInfo.getLogo_ID()!= 0){
+			image = new MImage(Env.getCtx(), orgInfo.getLogo_ID(), null);
+		}
+		else {
+			MClientInfo clientInfo = MClientInfo.get(Env.getCtx(), new Integer(Env.getAD_Client_ID(Env.getCtx())), null);
 
-			imageFile =  File.createTempFile("logo", "jpg");
-			//First check org level for logo
-			MOrgInfo orgInfo = MOrgInfo.get( Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), null );
-			if ( orgInfo != null && orgInfo.getLogo_ID()!= 0){
-				image = new MImage(Env.getCtx(), orgInfo.getLogo_ID(), null);
-			}
-			else {
-				MClientInfo clientInfo = MClientInfo.get(Env.getCtx(), new Integer(Env.getAD_Client_ID(Env.getCtx())), null);
-
-				if ( clientInfo != null && clientInfo.getLogoReport_ID() != 0 ) {
-					image = new MImage(Env.getCtx(), clientInfo.getLogoReport_ID(), null);
-				}
-			}
-
-			if (image != null ) {
-				byte [] data = image.getBinaryData();
-				writeLogoFilesToTmpReportDir(data,destinationFolder);
+			if ( clientInfo != null && clientInfo.getLogoReport_ID() != 0 ) {
+				image = new MImage(Env.getCtx(), clientInfo.getLogoReport_ID(), null);
 			}
 		}
-		catch(IOException e) {
-			System.err.println("Error Writing/Reading Streams.");
+
+		if (image != null ) {
+			byte [] data = image.getBinaryData();
+			writeLogoFilesToTmpReportDir(data,destinationFolder);
 		}
 	}
 
