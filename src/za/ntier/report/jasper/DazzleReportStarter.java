@@ -61,6 +61,7 @@ import org.adempiere.report.jasper.JRViewerProviderList;
 import org.adempiere.report.jasper.MsgResourceBundle;
 import org.adempiere.report.jasper.WebResourceLoader;
 import org.adempiere.util.IProcessUI;
+import org.adempiere.util.ProcessUtil;
 import org.compiere.model.MProcess;
 import org.compiere.model.MQuery;
 import org.compiere.model.MSysConfig;
@@ -216,12 +217,26 @@ public class DazzleReportStarter implements ProcessCall, ClientProcess
     		if (!cl1.equals(cl2)) {
     			Thread.currentThread().setContextClassLoader(cl2);
     		}
+    		startProcess1(ctx, pi, trx);
     		return startProcess0(ctx, pi, trx);
     	} finally {
     		if (!cl1.equals(Thread.currentThread().getContextClassLoader())) {
     			Thread.currentThread().setContextClassLoader(cl1);
     		}
     	}
+    }
+    
+    private boolean startProcess1(Properties ctx, ProcessInfo pi, Trx trx)   {
+    	HashMap<String, Object> params = new HashMap<String, Object>();	
+    	String trxName = trx != null ? trx.getTrxName() : null;
+		addProcessParameters(pi.getAD_PInstance_ID(), params, trxName);
+		String p_RunNextJob = (String)params.get("p_RunNextJob");
+		
+    	if (p_RunNextJob != null) {
+			pi.setClassName(p_RunNextJob);
+			ProcessUtil.startJavaProcess(ctx, pi,trx );
+		}
+		return true;
     }
         
     private boolean startProcess0(Properties ctx, ProcessInfo pi, Trx trx)
