@@ -140,6 +140,7 @@ import net.sf.jasperreports.export.SimpleXmlExporterOutput;
  * @author Cristina Ghita, www.arhipac.ro
  * 			<li>BF [ 2778472 ] Subreport bug
  */
+@org.adempiere.base.annotation.Process
 public class DazzleReportStarter implements ProcessCall, ClientProcess
 {
 	public static final String IDEMPIERE_REPORT_TYPE = "IDEMPIERE_REPORT_TYPE";
@@ -230,7 +231,7 @@ public class DazzleReportStarter implements ProcessCall, ClientProcess
     	HashMap<String, Object> params = new HashMap<String, Object>();	
     	String trxName = trx != null ? trx.getTrxName() : null;
 		addProcessParameters(pi.getAD_PInstance_ID(), params, trxName);
-		String p_RunNextJob = (String)params.get("p_RunNextJob");
+		String p_RunNextJob = (String)params.get("RunNextJob");
 		
     	if (p_RunNextJob != null) {
 			pi.setClassName(p_RunNextJob);

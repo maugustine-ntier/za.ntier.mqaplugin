@@ -47,6 +47,7 @@ import org.compiere.util.TimeUtil;
  *  NCG 2014/09/19: 1000210: Allow printing of statement for zero balance
  *  	Copied from Aging.java. For modified section see comment inline
  */
+@org.adempiere.base.annotation.Process
 public class AgingDazzle extends SvrProcess
 {
 	/** The date to calculate the days due from			*/
