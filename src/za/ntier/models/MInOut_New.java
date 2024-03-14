@@ -151,9 +151,9 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	}
 
 	public MInOut_New[] getMInOutsForStockPile () {
-
-		List<MInOut_New> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and DocStatus in ('CO','CL')", get_TrxName())
-				.setParameters(getZZ_StockPile_ID())
+		// Even without the M_Inout_ID, we never get the current MInout record.  Not sure why
+		List<MInOut_New> list = new Query(getCtx(), I_M_InOut.Table_Name, "ZZ_StockPile_ID=? and DocStatus in ('CO','CL') and M_InOut_ID <> ?", get_TrxName())
+				.setParameters(getZZ_StockPile_ID(),getM_InOut_ID())
 				.list();
 		return list.toArray(new MInOut_New[list.size()]);
 	}
@@ -164,6 +164,10 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 		if (msg.equals(DocAction.STATUS_Completed))	{
 			X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(), getZZ_StockPile_ID(), get_TrxName());
 			BigDecimal deliveredQty = BigDecimal.ZERO;
+			MInOutLine[] m_InOutLines_curr = this.getLines();
+			for (MInOutLine mInOutLine:m_InOutLines_curr) {
+				deliveredQty = deliveredQty.add(mInOutLine.getMovementQty());
+			}
 			MInOut_New[] m_InOuts = getMInOutsForStockPile();
 			for (MInOut_New mInOut_New:m_InOuts) {
 				MInOutLine[] m_InOutLines = mInOut_New.getLines();
