@@ -8,7 +8,9 @@ import org.compiere.model.GridTab;
 import org.compiere.model.MYear;
 import org.compiere.util.DB;
 
+import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_StockPile;
+import za.ntier.models.X_ZZ_Truck_List;
 
 public class CalloutFromFactory implements IColumnCallout {
 
@@ -23,6 +25,20 @@ public class CalloutFromFactory implements IColumnCallout {
 			   String sql = "Select to_date('01" + mnt.getValue() + mYear.getFiscalYear() + "','ddmmyyyy')";
 			   mTab.getField(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Date).setValue(DB.getSQLValueTS(null, sql), false);			   
 		   }
+		}
+		if (mField.getColumnName().equals(X_ZZ_Truck_List.COLUMNNAME_ZZ_Horse_ID)) {
+			
+		}
+		if (mTab.getTableName().equals(X_ZZ_Driver.Table_Name) && 
+				 (mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached) || mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached))) {
+			GridField passPortAttached = mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached);
+			GridField licenseAttached = mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached);
+			if (passPortAttached.getValue() != null && ((String)passPortAttached.getValue()).equals("Y")
+					&& licenseAttached.getValue() != null && ((String)licenseAttached.getValue()).equals("Y")) {
+				mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("Y", false);
+			} else {
+				mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("N", false);
+			}
 		}
 		return null;
 	}

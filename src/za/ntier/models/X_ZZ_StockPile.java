@@ -27,7 +27,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Model for ZZ_StockPile
  *  @author iDempiere (generated)
- *  @version Release 11 - $Id$ */
+ *  @version Release 12 - $Id$ */
 @org.adempiere.base.Model(table="ZZ_StockPile")
 public class X_ZZ_StockPile extends PO implements I_ZZ_StockPile, I_Persistent
 {
@@ -35,7 +35,7 @@ public class X_ZZ_StockPile extends PO implements I_ZZ_StockPile, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240119L;
+	private static final long serialVersionUID = 20240508L;
 
     /** Standard Constructor */
     public X_ZZ_StockPile (Properties ctx, int ZZ_StockPile_ID, String trxName)
