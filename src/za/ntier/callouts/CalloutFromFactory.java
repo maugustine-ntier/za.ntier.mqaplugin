@@ -33,8 +33,8 @@ public class CalloutFromFactory implements IColumnCallout {
 				 (mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached) || mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached))) {
 			GridField passPortAttached = mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached);
 			GridField licenseAttached = mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached);
-			if (passPortAttached.getValue() != null && ((String)passPortAttached.getValue()).equals("Y")
-					&& licenseAttached.getValue() != null && ((String)licenseAttached.getValue()).equals("Y")) {
+			if (passPortAttached.getValue() != null && (Boolean)passPortAttached.getValue()
+					&& licenseAttached.getValue() != null && (Boolean)licenseAttached.getValue()) {
 				mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("Y", false);
 			} else {
 				mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("N", false);
