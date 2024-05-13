@@ -34,7 +34,7 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240513L;
 
     /** Standard Constructor */
     public X_ZZ_Transporters (Properties ctx, int ZZ_Transporters_ID, String trxName)
@@ -43,7 +43,15 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
       /** if (ZZ_Transporters_ID == 0)
         {
 			setName (null);
+			setZZ_Buckets_Are_Clean (false);
+// N
+			setZZ_Fire_Extinguisher (false);
+// N
 			setZZ_Transporters_ID (0);
+			setZZ_Truck_Covers (false);
+// N
+			setZZ_Tyres_Are_Good (false);
+// N
         } */
     }
 
@@ -54,7 +62,15 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
       /** if (ZZ_Transporters_ID == 0)
         {
 			setName (null);
+			setZZ_Buckets_Are_Clean (false);
+// N
+			setZZ_Fire_Extinguisher (false);
+// N
 			setZZ_Transporters_ID (0);
+			setZZ_Truck_Covers (false);
+// N
+			setZZ_Tyres_Are_Good (false);
+// N
         } */
     }
 
@@ -65,7 +81,15 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
       /** if (ZZ_Transporters_UU == null)
         {
 			setName (null);
+			setZZ_Buckets_Are_Clean (false);
+// N
+			setZZ_Fire_Extinguisher (false);
+// N
 			setZZ_Transporters_ID (0);
+			setZZ_Truck_Covers (false);
+// N
+			setZZ_Tyres_Are_Good (false);
+// N
         } */
     }
 
@@ -76,7 +100,15 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
       /** if (ZZ_Transporters_UU == null)
         {
 			setName (null);
+			setZZ_Buckets_Are_Clean (false);
+// N
+			setZZ_Fire_Extinguisher (false);
+// N
 			setZZ_Transporters_ID (0);
+			setZZ_Truck_Covers (false);
+// N
+			setZZ_Tyres_Are_Good (false);
+// N
         } */
     }
 
@@ -136,6 +168,34 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 		return ii.intValue();
 	}
 
+	public org.compiere.model.I_C_BPartner_Location getC_BPartner_Location() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_BPartner_Location)MTable.get(getCtx(), org.compiere.model.I_C_BPartner_Location.Table_ID)
+			.getPO(getC_BPartner_Location_ID(), get_TrxName());
+	}
+
+	/** Set Partner Location.
+		@param C_BPartner_Location_ID Identifies the (ship to) address for this Business Partner
+	*/
+	public void setC_BPartner_Location_ID (int C_BPartner_Location_ID)
+	{
+		if (C_BPartner_Location_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_Location_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_Location_ID, Integer.valueOf(C_BPartner_Location_ID));
+	}
+
+	/** Get Partner Location.
+		@return Identifies the (ship to) address for this Business Partner
+	  */
+	public int getC_BPartner_Location_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_Location_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Description.
 		@param Description Optional short description of the record
 	*/
@@ -166,6 +226,34 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 	public String getHelp()
 	{
 		return (String)get_Value(COLUMNNAME_Help);
+	}
+
+	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException
+	{
+		return (org.compiere.model.I_M_Product)MTable.get(getCtx(), org.compiere.model.I_M_Product.Table_ID)
+			.getPO(getM_Product_ID(), get_TrxName());
+	}
+
+	/** Set Product.
+		@param M_Product_ID Product, Service, Item
+	*/
+	public void setM_Product_ID (int M_Product_ID)
+	{
+		if (M_Product_ID < 1)
+			set_Value (COLUMNNAME_M_Product_ID, null);
+		else
+			set_Value (COLUMNNAME_M_Product_ID, Integer.valueOf(M_Product_ID));
+	}
+
+	/** Get Product.
+		@return Product, Service, Item
+	  */
+	public int getM_Product_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Product_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_M_Shipper getM_Shipper() throws RuntimeException
@@ -256,9 +344,31 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 		return (String)get_Value(COLUMNNAME_Value);
 	}
 
-	public I_ZZ_Cust_Dest getZZ_Cust_Dest() throws RuntimeException
+	/** Set Buckets Are Clean.
+		@param ZZ_Buckets_Are_Clean Buckets Are Clean
+	*/
+	public void setZZ_Buckets_Are_Clean (boolean ZZ_Buckets_Are_Clean)
 	{
-		return (I_ZZ_Cust_Dest)MTable.get(getCtx(), I_ZZ_Cust_Dest.Table_ID)
+		set_Value (COLUMNNAME_ZZ_Buckets_Are_Clean, Boolean.valueOf(ZZ_Buckets_Are_Clean));
+	}
+
+	/** Get Buckets Are Clean.
+		@return Buckets Are Clean	  */
+	public boolean isZZ_Buckets_Are_Clean()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Buckets_Are_Clean);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	public org.compiere.model.I_C_BPartner getZZ_Cust_Dest() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_ID)
 			.getPO(getZZ_Cust_Dest_ID(), get_TrxName());
 	}
 
@@ -281,6 +391,28 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Fire Extinguisher.
+		@param ZZ_Fire_Extinguisher Fire Extinguisher
+	*/
+	public void setZZ_Fire_Extinguisher (boolean ZZ_Fire_Extinguisher)
+	{
+		set_Value (COLUMNNAME_ZZ_Fire_Extinguisher, Boolean.valueOf(ZZ_Fire_Extinguisher));
+	}
+
+	/** Get Fire Extinguisher.
+		@return Fire Extinguisher	  */
+	public boolean isZZ_Fire_Extinguisher()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Fire_Extinguisher);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Loading Date.
@@ -350,5 +482,49 @@ public class X_ZZ_Transporters extends PO implements I_ZZ_Transporters, I_Persis
 	public String getZZ_Transporters_UU()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Transporters_UU);
+	}
+
+	/** Set Truck Covers.
+		@param ZZ_Truck_Covers Truck Covers
+	*/
+	public void setZZ_Truck_Covers (boolean ZZ_Truck_Covers)
+	{
+		set_Value (COLUMNNAME_ZZ_Truck_Covers, Boolean.valueOf(ZZ_Truck_Covers));
+	}
+
+	/** Get Truck Covers.
+		@return Truck Covers	  */
+	public boolean isZZ_Truck_Covers()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Truck_Covers);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Tyres Are Good.
+		@param ZZ_Tyres_Are_Good Tyres Are Good
+	*/
+	public void setZZ_Tyres_Are_Good (boolean ZZ_Tyres_Are_Good)
+	{
+		set_Value (COLUMNNAME_ZZ_Tyres_Are_Good, Boolean.valueOf(ZZ_Tyres_Are_Good));
+	}
+
+	/** Get Tyres Are Good.
+		@return Tyres Are Good	  */
+	public boolean isZZ_Tyres_Are_Good()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Tyres_Are_Good);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 }

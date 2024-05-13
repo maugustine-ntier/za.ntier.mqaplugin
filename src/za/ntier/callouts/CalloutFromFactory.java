@@ -5,11 +5,14 @@ import java.util.Properties;
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MYear;
 import org.compiere.util.DB;
 
 import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_StockPile;
+import za.ntier.models.X_ZZ_Transporters;
 import za.ntier.models.X_ZZ_Truck_List;
 
 public class CalloutFromFactory implements IColumnCallout {
@@ -18,32 +21,43 @@ public class CalloutFromFactory implements IColumnCallout {
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 		System.out.println("Callout : " + mField.getColumnName() + " Value : " + value);
 		if (mField.getColumnName().equals(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Month) || mField.getColumnName().equals(X_ZZ_StockPile.COLUMNNAME_C_Year_ID)) {
-		   GridField mnt = mTab.getField(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Month);
-		   GridField year = mTab.getField(X_ZZ_StockPile.COLUMNNAME_C_Year_ID);
-		   if (mnt.getValue() != null && year.getValue() != null) {
-			   MYear mYear = new MYear(ctx, (Integer)year.getValue(), null);
-			   String sql = "Select to_date('01" + mnt.getValue() + mYear.getFiscalYear() + "','ddmmyyyy')";
-			   mTab.getField(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Date).setValue(DB.getSQLValueTS(null, sql), false);			   
-		   }
+			GridField mnt = mTab.getField(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Month);
+			GridField year = mTab.getField(X_ZZ_StockPile.COLUMNNAME_C_Year_ID);
+			if (mnt.getValue() != null && year.getValue() != null) {
+				MYear mYear = new MYear(ctx, (Integer)year.getValue(), null);
+				String sql = "Select to_date('01" + mnt.getValue() + mYear.getFiscalYear() + "','ddmmyyyy')";
+				//mTab.getField(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Date).setValue(DB.getSQLValueTS(null, sql), false);		
+				mTab.setValue(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Date, DB.getSQLValueTS(null, sql));
+			}
 		}
 		if (mField.getColumnName().equals(X_ZZ_Truck_List.COLUMNNAME_ZZ_Horse_ID)) {
-			
+
 		}
-		/*
-		 * if (mTab.getTableName().equals(X_ZZ_Driver.Table_Name) &&
-		 * (mField.getColumnName().equals(X_ZZ_Driver.
-		 * COLUMNNAME_ZZ_ID_Passport_Attached) ||
-		 * mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached))) {
-		 * GridField passPortAttached =
-		 * mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached); GridField
-		 * licenseAttached = mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached);
-		 * if (passPortAttached.getValue() != null &&
-		 * (Boolean)passPortAttached.getValue() && licenseAttached.getValue() != null &&
-		 * (Boolean)licenseAttached.getValue()) {
-		 * mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("Y", false); }
-		 * else { mTab.getField(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid).setValue("N",
-		 * false); } }
-		 */
+
+		if (mTab.getTableName().equals(X_ZZ_Driver.Table_Name) && (mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached) ||
+				mField.getColumnName().equals(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached))) {
+			if ((Boolean)mTab.getValue(X_ZZ_Driver.COLUMNNAME_ZZ_ID_Passport_Attached) && (Boolean)mTab.getValue(X_ZZ_Driver.COLUMNNAME_ZZ_License_Attached)) {
+				mTab.setValue(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid, "Y");
+			} else {
+				mTab.setValue(X_ZZ_Driver.COLUMNNAME_ZZ_Is_Valid, "N");
+			}
+		}
+		
+		if (mField.getColumnName().equals(X_ZZ_Transporters.COLUMNNAME_C_BPartner_ID)) {
+			if (mField.getValue() != null) {
+				MBPartner cust = MBPartner.get(ctx, (Integer)mField.getValue(), null);
+				MBPartnerLocation[] locs = cust.getLocations(false);
+				if (locs != null && locs.length > 0) {
+					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, cust.getC_BPartner_ID());
+				} else {
+					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
+				}
+			} else {
+				mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
+			}
+		}
+			
+
 		return null;
 	}
 

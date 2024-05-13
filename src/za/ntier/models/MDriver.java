@@ -33,9 +33,9 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 	@Override
 	protected boolean beforeSave(boolean newRecord) {
 		if (isZZ_ID_Passport_Attached() && isZZ_License_Attached()) {
-			setZZ_Is_Valid(true);
+			//setZZ_Is_Valid(true);
 		} else {
-			setZZ_Is_Valid(false);
+			//setZZ_Is_Valid(false);
 		}
 		return super.beforeSave(newRecord);
 	}

@@ -32,7 +32,7 @@ public interface I_ZZ_Transporters
     /** TableName=ZZ_Transporters */
     public static final String Table_Name = "ZZ_Transporters";
 
-    /** AD_Table_ID=1000008 */
+    /** AD_Table_ID=1000017 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -78,6 +78,21 @@ public interface I_ZZ_Transporters
 	public int getC_BPartner_ID();
 
 	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
+
+    /** Column name C_BPartner_Location_ID */
+    public static final String COLUMNNAME_C_BPartner_Location_ID = "C_BPartner_Location_ID";
+
+	/** Set Partner Location.
+	  * Identifies the (ship to) address for this Business Partner
+	  */
+	public void setC_BPartner_Location_ID (int C_BPartner_Location_ID);
+
+	/** Get Partner Location.
+	  * Identifies the (ship to) address for this Business Partner
+	  */
+	public int getC_BPartner_Location_ID();
+
+	public org.compiere.model.I_C_BPartner_Location getC_BPartner_Location() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -133,6 +148,21 @@ public interface I_ZZ_Transporters
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name M_Product_ID */
+    public static final String COLUMNNAME_M_Product_ID = "M_Product_ID";
+
+	/** Set Product.
+	  * Product, Service, Item
+	  */
+	public void setM_Product_ID (int M_Product_ID);
+
+	/** Get Product.
+	  * Product, Service, Item
+	  */
+	public int getM_Product_ID();
+
+	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException;
 
     /** Column name M_Shipper_ID */
     public static final String COLUMNNAME_M_Shipper_ID = "M_Shipper_ID";
@@ -206,6 +236,15 @@ public interface I_ZZ_Transporters
 	  */
 	public String getValue();
 
+    /** Column name ZZ_Buckets_Are_Clean */
+    public static final String COLUMNNAME_ZZ_Buckets_Are_Clean = "ZZ_Buckets_Are_Clean";
+
+	/** Set Buckets Are Clean	  */
+	public void setZZ_Buckets_Are_Clean (boolean ZZ_Buckets_Are_Clean);
+
+	/** Get Buckets Are Clean	  */
+	public boolean isZZ_Buckets_Are_Clean();
+
     /** Column name ZZ_Cust_Dest_ID */
     public static final String COLUMNNAME_ZZ_Cust_Dest_ID = "ZZ_Cust_Dest_ID";
 
@@ -215,7 +254,16 @@ public interface I_ZZ_Transporters
 	/** Get Customer Destinations	  */
 	public int getZZ_Cust_Dest_ID();
 
-	public I_ZZ_Cust_Dest getZZ_Cust_Dest() throws RuntimeException;
+	public org.compiere.model.I_C_BPartner getZZ_Cust_Dest() throws RuntimeException;
+
+    /** Column name ZZ_Fire_Extinguisher */
+    public static final String COLUMNNAME_ZZ_Fire_Extinguisher = "ZZ_Fire_Extinguisher";
+
+	/** Set Fire Extinguisher	  */
+	public void setZZ_Fire_Extinguisher (boolean ZZ_Fire_Extinguisher);
+
+	/** Get Fire Extinguisher	  */
+	public boolean isZZ_Fire_Extinguisher();
 
     /** Column name ZZ_Loading_Date */
     public static final String COLUMNNAME_ZZ_Loading_Date = "ZZ_Loading_Date";
@@ -252,4 +300,22 @@ public interface I_ZZ_Transporters
 
 	/** Get ZZ_Transporters_UU	  */
 	public String getZZ_Transporters_UU();
+
+    /** Column name ZZ_Truck_Covers */
+    public static final String COLUMNNAME_ZZ_Truck_Covers = "ZZ_Truck_Covers";
+
+	/** Set Truck Covers	  */
+	public void setZZ_Truck_Covers (boolean ZZ_Truck_Covers);
+
+	/** Get Truck Covers	  */
+	public boolean isZZ_Truck_Covers();
+
+    /** Column name ZZ_Tyres_Are_Good */
+    public static final String COLUMNNAME_ZZ_Tyres_Are_Good = "ZZ_Tyres_Are_Good";
+
+	/** Set Tyres Are Good	  */
+	public void setZZ_Tyres_Are_Good (boolean ZZ_Tyres_Are_Good);
+
+	/** Get Tyres Are Good	  */
+	public boolean isZZ_Tyres_Are_Good();
 }
