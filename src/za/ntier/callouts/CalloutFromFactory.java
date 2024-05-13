@@ -13,6 +13,7 @@ import org.compiere.util.DB;
 import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_StockPile;
 import za.ntier.models.X_ZZ_Transporters;
+import za.ntier.models.X_ZZ_Truck;
 import za.ntier.models.X_ZZ_Truck_List;
 
 public class CalloutFromFactory implements IColumnCallout {
@@ -48,7 +49,7 @@ public class CalloutFromFactory implements IColumnCallout {
 				MBPartner cust = MBPartner.get(ctx, (Integer)mField.getValue(), null);
 				MBPartnerLocation[] locs = cust.getLocations(false);
 				if (locs != null && locs.length > 0) {
-					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, cust.getC_BPartner_ID());
+					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, locs[0].getC_BPartner_Location_ID());
 				} else {
 					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
 				}
@@ -57,7 +58,14 @@ public class CalloutFromFactory implements IColumnCallout {
 			}
 		}
 			
-
+		if (mField.getColumnName().equals(X_ZZ_Truck_List.COLUMNNAME_ZZ_Horse_ID)) {
+			if (mField.getValue() != null) {
+				X_ZZ_Truck truck = new X_ZZ_Truck(ctx, (Integer)mField.getValue(), null);
+				mTab.setValue(X_ZZ_Truck.COLUMNNAME_ZZ_Fleet_No, truck.getZZ_Fleet_No());
+			} else {
+				mTab.setValue(X_ZZ_Truck.COLUMNNAME_ZZ_Fleet_No, null);
+			}
+		}
 		return null;
 	}
 

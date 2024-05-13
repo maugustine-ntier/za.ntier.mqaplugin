@@ -10,6 +10,8 @@ import org.osgi.service.component.annotations.Component;
 
 import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_StockPile;
+import za.ntier.models.X_ZZ_Transporters;
+import za.ntier.models.X_ZZ_Truck_List;
 
 @Component(
 
@@ -24,7 +26,7 @@ public class CalloutFactory implements IColumnCalloutFactory {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
 		if ((tableName.equals(X_ZZ_StockPile.Table_Name) && (columnName.equals(X_ZZ_StockPile.COLUMNNAME_ZZ_Mined_Month)
 				|| columnName.equals(X_ZZ_StockPile.COLUMNNAME_C_Year_ID))) ||
-		(tableName.equals(X_ZZ_Driver.Table_Name)))
+		(tableName.equals(X_ZZ_Driver.Table_Name) || tableName.equals(X_ZZ_Transporters.Table_Name) || tableName.equals(X_ZZ_Truck_List.Table_Name)))
 		
 		{
 			list.add(new CalloutFromFactory());
