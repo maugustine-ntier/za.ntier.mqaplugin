@@ -25,6 +25,9 @@ public class MyModelFactory implements IModelFactory {
 		if (tableName.equals(X_ZZ_Driver.Table_Name)) {
 			return MDriver.class;
 		}
+		if (tableName.equals(X_ZZ_Truck_List.Table_Name)) {
+			return MTruckList.class;
+		}
 			
 		return null;
 	}
@@ -40,6 +43,9 @@ public class MyModelFactory implements IModelFactory {
 		if (tableName.equals(X_ZZ_Driver.Table_Name)) {
 			return new MDriver(Env.getCtx(),Record_ID,trxName);
 		}
+		if (tableName.equals(X_ZZ_Truck_List.Table_Name)) {
+			return new MTruckList(Env.getCtx(),Record_ID,trxName);
+		}
 		
 		return null;
 	}
@@ -54,6 +60,9 @@ public class MyModelFactory implements IModelFactory {
 		}
 		if (tableName.equals(X_ZZ_Driver.Table_Name)) {
 			return new MDriver(Env.getCtx(),rs,trxName);
+		}
+		if (tableName.equals(X_ZZ_Truck_List.Table_Name)) {
+			return new MTruckList(Env.getCtx(),rs,trxName);
 		}
 			
 		return null;
