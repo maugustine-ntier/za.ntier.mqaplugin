@@ -45,6 +45,10 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 			}
 			
 		}
+		if (getZZ_Trailer1_ID() > 0 && getZZ_Trailer2_ID() > 0 && getZZ_Trailer1_ID() == getZZ_Trailer2_ID()) {
+			log.saveError("Error", "Trailers 1 and 2 should be different"); 
+			return false;
+		}
 		return super.beforeSave(newRecord);
 	}
 
