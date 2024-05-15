@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.util.DB;
+import org.compiere.util.Msg;
 
 public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 
@@ -40,13 +41,13 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 			String SQL = "Select count(*) from ZZ_Truck_List tl where tl.ZZ_Transporters_ID = " + getZZ_Transporters_ID() 
 			+ " and tl." + this.COLUMNNAME_ZZ_Driver_ID + " = " + getZZ_Driver_ID() + " and tl.isActive = 'Y' and (" + getZZ_Truck_List_ID() + " <= 0 or tl.ZZ_Truck_List_ID <> " + getZZ_Truck_List_ID() + ")";
 			if (DB.getSQLValue(get_TrxName(), SQL) > 0) {
-				log.saveError("Error", "Under this transporter,Cannot have multiple truck lists with the same driver"); 
+				log.saveError("Error", Msg.getMsg(getCtx(), "CannotHaveMultipleTruckListsWithTheSameDriver")); 
 				return false;
 			}
 
 		}
 		if (getZZ_Trailer1_ID() > 0 && getZZ_Trailer2_ID() > 0 && getZZ_Trailer1_ID() == getZZ_Trailer2_ID()) {
-			log.saveError("Error", "Trailers 1 and 2 should be different"); 
+			log.saveError("Error", Msg.getMsg(getCtx(), "Trailers1and2Different")); 
 			return false;
 		}
 
@@ -55,7 +56,7 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 			+ " and tl.ZZ_Horse_ID" + " = " + getZZ_Horse_ID()
 			+ " and tl.isActive = 'Y' and (" + getZZ_Truck_List_ID() + " <= 0 or tl.ZZ_Truck_List_ID <> " + getZZ_Truck_List_ID() + ")";
 			if (DB.getSQLValue(get_TrxName(), SQL) > 0) {
-				log.saveError("Error", "Under this transporter,this horse has already been listed"); 
+				log.saveError("Error", Msg.getMsg(getCtx(), "HorseHasAlreadyBeenListed")); 
 				return false;
 			}
 		}
@@ -65,7 +66,7 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 			+ " and (tl.ZZ_Trailer1_ID " + " = " + getZZ_Trailer1_ID() + " OR tl.ZZ_Trailer2_ID " + " = " + getZZ_Trailer1_ID() + ")"
 			+ " and tl.isActive = 'Y' and (" + getZZ_Truck_List_ID() + " <= 0 or tl.ZZ_Truck_List_ID <> " + getZZ_Truck_List_ID() + ")";
 			if (DB.getSQLValue(get_TrxName(), SQL) > 0) {
-				log.saveError("Error", "Under this transporter,Trailer 1 has already been listed"); 
+				log.saveError("Error", Msg.getMsg(getCtx(), "Trailer1HasAlreadyBeenListed")); 
 				return false;
 			}
 		}
@@ -75,7 +76,7 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 			+ " and (tl.ZZ_Trailer1_ID " + " = " + getZZ_Trailer2_ID() + " OR tl.ZZ_Trailer2_ID " + " = " + getZZ_Trailer2_ID() + ")"
 			+ " and tl.isActive = 'Y' and (" + getZZ_Truck_List_ID() + " <= 0 or tl.ZZ_Truck_List_ID <> " + getZZ_Truck_List_ID() + ")";
 			if (DB.getSQLValue(get_TrxName(), SQL) > 0) {
-				log.saveError("Error", "Under this transporter,Trailer 2 has already been listed"); 
+				log.saveError("Error", Msg.getMsg(getCtx(), "Trailer2HasAlreadyBeenListed")); 
 				return false;
 			}
 		}
