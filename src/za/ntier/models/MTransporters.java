@@ -1,0 +1,54 @@
+package za.ntier.models;
+
+import java.sql.ResultSet;
+import java.util.Properties;
+
+import org.compiere.util.DB;
+import org.compiere.util.Msg;
+
+public class MTransporters extends X_ZZ_Transporters implements I_ZZ_Transporters {
+
+	private static final long serialVersionUID = -9220800794049773657L;
+
+	public MTransporters(Properties ctx, int ZZ_Transporters_ID, String trxName, String... virtualColumns) {
+		super(ctx, ZZ_Transporters_ID, trxName, virtualColumns);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MTransporters(Properties ctx, int ZZ_Transporters_ID, String trxName) {
+		super(ctx, ZZ_Transporters_ID, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MTransporters(Properties ctx, ResultSet rs, String trxName) {
+		super(ctx, rs, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MTransporters(Properties ctx, String ZZ_Transporters_UU, String trxName, String... virtualColumns) {
+		super(ctx, ZZ_Transporters_UU, trxName, virtualColumns);
+		// TODO Auto-generated constructor stub
+	}
+
+	public MTransporters(Properties ctx, String ZZ_Transporters_UU, String trxName) {
+		super(ctx, ZZ_Transporters_UU, trxName);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		if (getC_BPartner_ID() > 0 && getM_Product_ID() > 0 && getZZ_Loading_Date() != null) {
+			String SQL = "Select count(*) from ZZ_Transporters tr where "
+			+ " tr.C_BPartner_ID" + " = ?" 
+			+ " and tr.M_Product_ID" + " = ?" 
+			+ " and date(tr.ZZ_Loading_Date)" + " = date(?)" 
+			+ " and (" + getZZ_Transporters_ID() + " <= 0 or tr.ZZ_Transporters_ID <> " + getZZ_Transporters_ID() + ")";
+			if (DB.getSQLValueEx(get_TrxName(), SQL, getC_BPartner_ID(),getM_Product_ID(),getZZ_Loading_Date()) > 0) {
+				log.saveError("Error", Msg.getMsg(getCtx(), "TransportListAlreadyExistsForThatDate")); 
+				return false;
+			}
+		}
+		return super.beforeSave(newRecord);
+	}
+
+}
