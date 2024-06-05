@@ -3,6 +3,8 @@ package za.ntier.models;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.compiere.util.DB;
+
 public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 
 	public MDriver(Properties ctx, int ZZ_Driver_ID, String trxName, String... virtualColumns) {
@@ -38,6 +40,15 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 			//setZZ_Is_Valid(false);
 		}
 		return super.beforeSave(newRecord);
+	}
+	public static MDriver getDriver(Properties ctx,String ZZ_ID_Passport_No) {
+		MDriver mDriver = null;
+		String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
+		int zz_Driver_ID = DB.getSQLValue(null, SQL, ZZ_ID_Passport_No.trim());
+		if (zz_Driver_ID > 0) {
+			mDriver = new MDriver(ctx, zz_Driver_ID, null);
+		}
+		return mDriver;
 	}
 
 }

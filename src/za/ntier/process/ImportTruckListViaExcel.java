@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -15,24 +14,27 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.compiere.model.MInventoryLine;
-import org.compiere.model.MLocator;
-import org.compiere.model.MProduct;
-import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 
+import za.ntier.models.MDriver;
+import za.ntier.models.MTruck;
 import za.ntier.models.MTruckList;
 
 
 
-public class UpdateInventoryLineByExcel extends SvrProcess {
+public class ImportTruckListViaExcel extends SvrProcess {
 
 
 
 	Map<String, Integer> columnmap = new HashMap<String,Integer>(); 
 	String p_FileName = "";
+	private String p_horse = "Horse";
+	private String p_trailer1 = "Trailer1";
+	private String p_trailer2 = "Trailer2";
+	private String p_driver = "Driver";
+	private String p_loads = "Loads";
 
 
 	private int counter = 0;
@@ -53,16 +55,6 @@ public class UpdateInventoryLineByExcel extends SvrProcess {
 		} 
 	}
 
-	/*
-	 * AD_Language = getCtx().getProperty("#AD_Language"); inventory = new
-	 * MInventoryTG(getCtx(), getRecord_ID(), get_TrxName());
-	 * if(!inventory.getDocStatus().equals(DocAction.STATUS_Drafted) &&
-	 * !inventory.getDocStatus().equals(DocAction.STATUS_InProgress)) throw new
-	 * AdempiereUserError("草稿狀態才能更新盤點數量");
-	 * 
-	 * if(inventory.getAttachment(true) == null) throw new
-	 * AdempiereUserError("未上傳Excel File"); }
-	 */
 
 	@Override
 	protected String doIt() throws Exception {
@@ -71,15 +63,15 @@ public class UpdateInventoryLineByExcel extends SvrProcess {
 		return "Count of Records imported: " + counter ;
 	}
 
-	private void updateByExcel(File importFile) {
+	private String updateByExcel(File importFile) {
 		int zz_Transporters_ID = getRecord_ID();
 		FileInputStream file;
-		//System.out.println(getCtx());
-		//System.out.println("AD_Language:" + AD_Language);
+		String msg = null;
 		try {
 			file = new FileInputStream(importFile);
 			XSSFWorkbook workbook = new XSSFWorkbook(file);
 			XSSFSheet sheet = workbook.getSheetAt(0);
+			setColumnName(sheet);
 			Iterator<Row> rowIterator = sheet.iterator();
 			// pass first row
 			rowIterator.next();
@@ -98,8 +90,21 @@ public class UpdateInventoryLineByExcel extends SvrProcess {
 					driver_IDNo =   row.getCell(columnmap.get(4)).getStringCellValue();                    
 					no_Of_Loads =   row.getCell(columnmap.get(5)).getNumericCellValue();
 					MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
-
-					counter++;
+					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
+					MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1);
+					MTruck mTruck_trailer2 = MTruck.getTruck(getCtx(), trailer_2);
+					MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo);
+					mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
+					mTruckList.setZZ_Horse_ID(mTruck_horse.getZZ_Truck_ID());
+					mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
+					mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
+					mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+					mTruckList.setZZ_No_Of_Loads(BigDecimal.valueOf(no_Of_Loads));
+					if (mTruckList.save()) {
+						counter++;
+					} else {
+						msg = "Could not save trucklist : Driver = " + driver_IDNo;
+					}
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					System.out.println();
@@ -116,17 +121,58 @@ public class UpdateInventoryLineByExcel extends SvrProcess {
 			e.printStackTrace();
 		}		
 
-
+		return msg;
 	}
 
 
-
-
-
-
-	public static void main(String[] args) {
+	private void setColumnName(XSSFSheet sheet) {
 		// TODO Auto-generated method stub
+		Row row = sheet.getRow(0); //Get first row
+		Iterator<Cell> cellIterator = row.cellIterator();
+		while (cellIterator.hasNext()) 
+		{
+			Cell cell = cellIterator.next();
+			String columnname = null;
+			//Check the cell type and format accordingly
+			switch (cell.getCellType().toString()) 
+			{
+			case "STRING":
+				columnname = cell.getStringCellValue();
+				break;
+			case "NUMERIC":
+				columnname = String.valueOf(cell.getNumericCellValue()) ;
+				break;                    			
+
+			default:
+				columnname=  "Unknown";
+				System.out.println("Unknown Cell type:" +  cell.getCellType());	
+				break;
+			}
+			columnmap.put(columnname,cell.getColumnIndex()) ;
+		}
+
+		Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_loads};
+
+
+		for (Object field : fields) {
+
+			try {
+
+				if(row.getCell(columnmap.get(field.toString())) == null)
+					throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
+			} catch (Exception e) {
+				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
+			}
+
+		}	 
+
 
 	}
+
+
+
+
+
+
 
 }
