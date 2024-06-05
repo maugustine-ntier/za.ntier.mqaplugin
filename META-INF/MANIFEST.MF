@@ -11,7 +11,9 @@ Require-Bundle: org.osgi.service.component.annotations;bundle-version="1.5.1",
  net.sf.jasperreports.engine,
  org.adempiere.report.jasper;bundle-version="11.0.0",
  org.adempiere.ui;bundle-version="11.0.0",
- com.github.librepdf.openpdf;bundle-version="1.3.26"
+ com.github.librepdf.openpdf;bundle-version="1.3.26",
+ wrapped.org.apache.poi.poi;bundle-version="5.2.2",
+ wrapped.org.apache.poi.poi-ooxml;bundle-version="5.2.2"
 Service-Component: OSGI-INF/za.ntier.callouts.CalloutFactory.xml,
  OSGI-INF/za.ntier.models.ModelValidatorFactory.xml,
  OSGI-INF/za.ntier.models.MyModelFactory.xml,

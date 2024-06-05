@@ -42,8 +42,9 @@ public class MTransporters extends X_ZZ_Transporters implements I_ZZ_Transporter
 			+ " tr.C_BPartner_ID" + " = ?" 
 			+ " and tr.M_Product_ID" + " = ?" 
 			+ " and date(tr.ZZ_Loading_Date)" + " = date(?)" 
-			+ " and (" + getZZ_Transporters_ID() + " <= 0 or tr.ZZ_Transporters_ID <> " + getZZ_Transporters_ID() + ")";
-			if (DB.getSQLValueEx(get_TrxName(), SQL, getC_BPartner_ID(),getM_Product_ID(),getZZ_Loading_Date()) > 0) {
+			+ " and (" + getZZ_Transporters_ID() + " <= 0 or tr.ZZ_Transporters_ID <> " + getZZ_Transporters_ID() + ")"
+			+ " and tr.m_Shipper_ID = ?";
+			if (DB.getSQLValueEx(get_TrxName(), SQL, getC_BPartner_ID(),getM_Product_ID(),getZZ_Loading_Date(),getM_Shipper_ID()) > 0) {
 				log.saveError("Error", Msg.getMsg(getCtx(), "TransportListAlreadyExistsForThatDate")); 
 				return false;
 			}
