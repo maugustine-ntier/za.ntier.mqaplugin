@@ -23,18 +23,18 @@ import za.ntier.models.MTruck;
 import za.ntier.models.MTruckList;
 
 
-
+@org.adempiere.base.annotation.Process
 public class ImportTruckListViaExcel extends SvrProcess {
 
 
 
 	Map<String, Integer> columnmap = new HashMap<String,Integer>(); 
 	String p_FileName = "";
-	private String p_horse = "Horse";
-	private String p_trailer1 = "Trailer1";
-	private String p_trailer2 = "Trailer2";
-	private String p_driver = "Driver";
-	private String p_loads = "Loads";
+	private String p_horse = "HORSE";
+	private String p_trailer1 = "TRAILER1";
+	private String p_trailer2 = "TRAILER2";
+	private String p_driver = "DRIVER";
+	private String p_loads = "LOADS";
 
 
 	private int counter = 0;
@@ -84,11 +84,11 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				String driver_IDNo = null;
 				Double no_Of_Loads = null;
 				try {
-					horse =   row.getCell(columnmap.get(0)).getStringCellValue();
-					trailer_1 =   row.getCell(columnmap.get(1)).getStringCellValue();
-					trailer_2 =   row.getCell(columnmap.get(2)).getStringCellValue();
-					driver_IDNo =   row.getCell(columnmap.get(4)).getStringCellValue();                    
-					no_Of_Loads =   row.getCell(columnmap.get(5)).getNumericCellValue();
+					horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
+					trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
+					trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
+					driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue();                    
+					no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
 					MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
 					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
 					MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1);
@@ -127,42 +127,63 @@ public class ImportTruckListViaExcel extends SvrProcess {
 
 	private void setColumnName(XSSFSheet sheet) {
 		// TODO Auto-generated method stub
-		Row row = sheet.getRow(0); //Get first row
-		Iterator<Cell> cellIterator = row.cellIterator();
-		while (cellIterator.hasNext()) 
-		{
-			Cell cell = cellIterator.next();
-			String columnname = null;
-			//Check the cell type and format accordingly
-			switch (cell.getCellType().toString()) 
+		boolean headerNotFound = false;
+		int i = 0;
+		Row row = null;
+		while (headerNotFound) {
+			row = sheet.getRow(i); 
+			Iterator<Cell> cellIterator = row.cellIterator();
+			while (cellIterator.hasNext()) 
 			{
-			case "STRING":
-				columnname = cell.getStringCellValue();
-				break;
-			case "NUMERIC":
-				columnname = String.valueOf(cell.getNumericCellValue()) ;
-				break;                    			
+				Cell cell = cellIterator.next();
+				String columnname = null;
+				//Check the cell type and format accordingly
+				switch (cell.getCellType().toString()) 
+				{
+				case "STRING":
+					columnname = cell.getStringCellValue().replaceAll("\\w", "").toUpperCase();
+					if (columnname.contains(p_loads)) {
+						columnname = p_loads;
+					} else if (columnname.contains(p_driver) && columnname.contains("ID")) {
+						columnname = p_driver;
+					}
+					break;
+				case "NUMERIC":
+					columnname = String.valueOf(cell.getNumericCellValue()) ;
+					break;                    			
 
-			default:
-				columnname=  "Unknown";
-				System.out.println("Unknown Cell type:" +  cell.getCellType());	
-				break;
+				default:
+					columnname=  "Unknown";
+					System.out.println("Unknown Cell type:" +  cell.getCellType());	
+					break;
+				}
+				columnmap.put(columnname,cell.getColumnIndex()) ;
 			}
-			columnmap.put(columnname,cell.getColumnIndex()) ;
+			if (columnmap.size() >= 3) {
+				headerNotFound = true;
+			}
+			i++;
 		}
+		
 
 		Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_loads};
 
 
 		for (Object field : fields) {
-
 			try {
-
-				if(row.getCell(columnmap.get(field.toString())) == null)
-					throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
+			if (columnmap.get(field.toString()) == null) {
+				throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
+			}
 			} catch (Exception e) {
 				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
 			}
+			/*try {
+
+				if (row.getCell(columnmap.get(field.toString().trim().strip())) == null)
+					throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
+			} catch (Exception e) {
+				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
+			}*/
 
 		}	 
 
