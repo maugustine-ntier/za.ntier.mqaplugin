@@ -7,13 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +22,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
+import org.idempiere.ui.zk.media.Medias;
+import org.zkoss.util.media.AMedia;
+import org.zkoss.zul.Filedownload;
 
 import za.ntier.models.MDriver;
 import za.ntier.models.MTruck;
@@ -371,7 +372,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					break;                    			
 
 				default:
-					
+
 					System.out.println("Unknown Cell type:" +  cell.getCellType());	
 					break;
 				}
@@ -390,15 +391,26 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	}
 
 
-	private String writeOutErrorLogFile(Sheet sheet) throws Exception {
+	private String writeOutErrorLogFile(Sheet sheet) {
 		for (int i = 0; i <= maxCols; i++) {
 			sheet.autoSizeColumn(i); 
 		}
 		String logFileName = importFile.getAbsolutePath() + "_Error_Log.xlsx";
+		
 		try (OutputStream fileOut = new FileOutputStream(logFileName)) {
 			errorWb.write(fileOut);
-			return logFileName;
+		//	AMedia aMedia = new AMedia("Prefix" +"."+Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_MIME_TYPE, new File(logFileName), true);
+		//	Filedownload.save(logFileName, Medias.EXCEL_XML_MIME_TYPE);
+			//Filedownload.save(aMedia, logFileName);
+			//ExportExcel exportExcel = new ExportExcel();
+			//if ( Ini.isClient())
+			//	Env.startBrowser(new File(logFileName).toURI().toString());
+			//errorWb.write(fileOut);
+
+		}  catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
+		return logFileName;
 	}
 
 
