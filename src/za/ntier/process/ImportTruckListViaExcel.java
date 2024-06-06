@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,9 +42,11 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private String p_trailer2 = "TRAILER2";
 	private String p_driver = "DRIVER";
 	private String p_loads = "LOADS";
-
-
 	private int counter = 0;
+	private Workbook errorWb = null;
+	private FileInputStream file = null;
+	private File importFile = null;
+	private Sheet errorSheet = null;
 
 	@Override
 	protected void prepare() {
@@ -64,21 +67,29 @@ public class ImportTruckListViaExcel extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		File importFile = new File(p_FileName);
-		updateByExcel(importFile);
-		return "Count of Records imported: " + counter ;
+		importFile = new File(p_FileName);
+
+		String msg = updateByExcel(importFile);
+		
+		return msg ;
 	}
 
 	private String updateByExcel(File importFile) throws Exception {
 		XSSFWorkbook workbook  = null;
 		int zz_Transporters_ID = getRecord_ID();
-		FileInputStream file = null;
+		
 		String msg = null;
 		try {
 			file = new FileInputStream(importFile);
 			workbook = new XSSFWorkbook(file);
-			msg = loadTruckList(workbook, zz_Transporters_ID, msg);
-			
+			int noOfErrorLines = checkTruckList(workbook,zz_Transporters_ID);
+			if (noOfErrorLines <= 0) {
+				msg = loadTruckList(workbook, zz_Transporters_ID);
+			} else {
+				String fileName = writeOutErrorLogFile(errorSheet);
+				msg = "There are errors on the file.  Please check the error Log file : " + fileName;
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
@@ -92,11 +103,13 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		return msg;
 	}
 
-	private String checkTruckList(XSSFWorkbook workbook, int zz_Transporters_ID, String msg) throws Exception {
+	private int checkTruckList(XSSFWorkbook workbook, int zz_Transporters_ID) throws Exception {
+		errorSheet = createErrorXLS();
 		XSSFSheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
 		rowIterator.next();
+		int rowNoToWrite = 1;
 		while (rowIterator.hasNext()) 
 		{
 			Row row = rowIterator.next();
@@ -107,40 +120,103 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			String trailer_1 = null;
 			String trailer_2 = null;
 			String driver_IDNo = null;
-			Double no_Of_Loads = null;
+			//Double no_Of_Loads = null;
 			try {
-				horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
-				trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
-				trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
-				driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue();                    
-				no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
-				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
-				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
-				
-				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1);
-				MTruck mTruck_trailer2 = MTruck.getTruck(getCtx(), trailer_2);
-				MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo);
-				mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
-				mTruckList.setZZ_Horse_ID(mTruck_horse.getZZ_Truck_ID());
-				mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
-				mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
-				mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
-				mTruckList.setZZ_No_Of_Loads(BigDecimal.valueOf(no_Of_Loads));
-				if (mTruckList.save()) {
-					counter++;
-				} else {
-					msg = "Could not save trucklist : Driver = " + driver_IDNo;
+				try {
+					horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
+					trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
+					trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
+					driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue();    
+
+					//	no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
+				} catch(Exception e) {
+					System.out.println("getCell is null");
+					continue;
 				}
+				if ((horse == null || horse.trim().equals(""))
+						&& (trailer_1 == null || trailer_1.trim().equals(""))
+						&& (trailer_2 == null || trailer_2.trim().equals(""))
+						&& (driver_IDNo == null|| driver_IDNo.trim().equals(""))) {
+					continue;
+				}
+				//	MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
+				if (horse == null) {
+					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Missing");
+					rowNoToWrite++;
+				} else {
+					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
+					if (mTruck_horse == null) {
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Does not exist");
+						rowNoToWrite++;
+					} else {
+						if (!mTruck_horse.getZZ_Truck_Type().equals("H")) {
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse on the database is marked as a Trailer");
+							rowNoToWrite++;
+						}
+					}
+				}
+
+				if (trailer_1 == null) {
+					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing");
+					rowNoToWrite++;
+				} else {
+					MTruck mTruck_Trailer_1 = MTruck.getTruck(getCtx(), trailer_1);
+					if (mTruck_Trailer_1 == null) {
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Does not exist");
+						rowNoToWrite++;
+					} else {
+						if (!mTruck_Trailer_1.getZZ_Truck_Type().equals("T")) {
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 on the database is marked as a Horse");
+							rowNoToWrite++;
+						}
+					}
+				}
+
+				if (trailer_2 == null) {
+					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing");
+					rowNoToWrite++;
+				} else {
+					MTruck mTruck_Trailer_2 = MTruck.getTruck(getCtx(), trailer_2);
+					if (mTruck_Trailer_2 == null) {
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 Does not exist");
+						rowNoToWrite++;
+					} else {
+						if (!mTruck_Trailer_2.getZZ_Truck_Type().equals("T")) {
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 on the database is marked as a Horse");
+							rowNoToWrite++;
+						}
+					}
+				}
+
+				if (driver_IDNo == null) {
+					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver ID is Missing");
+					rowNoToWrite++;
+				} else {
+					MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo);
+					if (mDriver == null) {
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver does not Exist on the database");
+						rowNoToWrite++;
+					} else {
+						if (!mDriver.isZZ_Is_Valid()) {
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database");
+							rowNoToWrite++;
+						}
+					}
+				}
+
+
+
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 				System.out.println();
 				throw e;
 			}
 		}
-		return msg;
+		return rowNoToWrite;
 	}
 
-	private String loadTruckList(XSSFWorkbook workbook, int zz_Transporters_ID, String msg) throws Exception {
+	private String loadTruckList(XSSFWorkbook workbook, int zz_Transporters_ID) throws Exception {
+		String msg = null;
 		XSSFSheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
@@ -184,6 +260,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				System.out.println();
 				throw e;
 			}
+		}
+		if (msg == null) {
+			msg = "Count of Records imported: " + counter;
 		}
 		return msg;
 	}
@@ -261,32 +340,35 @@ public class ImportTruckListViaExcel extends SvrProcess {
 
 
 	}
-	
+
 	private Sheet createErrorXLS() throws Exception {
-		
-		Workbook wb = new HSSFWorkbook();  // or new XSSFWorkbook();
-		CreationHelper createHelper = wb.getCreationHelper();
-		Sheet sheet1 = wb.createSheet("Import Errors");
+
+		errorWb= new XSSFWorkbook();  // or new XSSFWorkbook();
+		CreationHelper createHelper = errorWb.getCreationHelper();
+		Sheet sheet1 = errorWb.createSheet("Import Errors");
 		Row row = sheet1.createRow(0);
-		row.createCell(1).setCellValue(createHelper.createRichTextString("ROW"));
-		row.createCell(2).setCellValue(createHelper.createRichTextString("Error Message"));
+		row.createCell(0).setCellValue(createHelper.createRichTextString("ROW"));
+		row.createCell(1).setCellValue(createHelper.createRichTextString("Error Message"));
 
-		return shee1;
+		return sheet1;
 	}
-	
-	private void writeErrorToXLS(Workbook wb ,Sheet sheet,int rowNoToWrite,int rowNoOriginalFile, String errorMsg) throws Exception {
-		CreationHelper createHelper = wb.getCreationHelper();
+
+	private void writeErrorToXLS(Sheet sheet,int rowNoToWrite,int rowNoOriginalFile, String errorMsg) throws Exception {
+		CreationHelper createHelper = errorWb.getCreationHelper();
 		Row row = sheet.createRow(rowNoToWrite);
-		row.createCell(1).setCellValue((rowNoOriginalFile));
-		row.createCell(2).setCellValue(createHelper.createRichTextString(errorMsg));
+		row.createCell(0).setCellValue((rowNoOriginalFile));
+		row.createCell(1).setCellValue(createHelper.createRichTextString(errorMsg));
 
 	}
 
 
-	private void writeOutErrorLogFile(Workbook wb) throws Exception {
-		String tmpdir = System.getProperty("java.io.tmpdir");
-		try (OutputStream fileOut = new FileOutputStream(tmpdir + "Truck_List_Import_Error_List.xls")) {
-		    wb.write(fileOut);
+	private String writeOutErrorLogFile(Sheet sheet) throws Exception {
+		sheet.autoSizeColumn(0); 
+		sheet.autoSizeColumn(1); 
+		String logFileName = importFile.getAbsolutePath() + "_Error_Log.xlsx";
+		try (OutputStream fileOut = new FileOutputStream(logFileName)) {
+			errorWb.write(fileOut);
+			return logFileName;
 		}
 	}
 
