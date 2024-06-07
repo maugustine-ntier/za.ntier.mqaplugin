@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.adempiere.webui.window.MultiFileDownloadDialog;
+import org.adempiere.webui.window.ZkReportViewerProviderRGN;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +26,10 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 import org.idempiere.ui.zk.media.Medias;
 import org.zkoss.util.media.AMedia;
+import org.zkoss.zk.ui.Desktop;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Filedownload;
 
 import za.ntier.models.MDriver;
@@ -399,6 +405,10 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		
 		try (OutputStream fileOut = new FileOutputStream(logFileName)) {
 			errorWb.write(fileOut);
+			File[] file = { new File(logFileName)};
+			ZkReportViewerProviderRGN zkReportViewerProviderRGN = new ZkReportViewerProviderRGN();
+			zkReportViewerProviderRGN.setFile(file[0]);
+			zkReportViewerProviderRGN.openViewer(null);
 		//	AMedia aMedia = new AMedia("Prefix" +"."+Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_MIME_TYPE, new File(logFileName), true);
 		//	Filedownload.save(logFileName, Medias.EXCEL_XML_MIME_TYPE);
 			//Filedownload.save(aMedia, logFileName);
@@ -406,6 +416,10 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			//if ( Ini.isClient())
 			//	Env.startBrowser(new File(logFileName).toURI().toString());
 			//errorWb.write(fileOut);
+			//MultiFileDownloadDialog multiFileDownloadDialog = new MultiFileDownloadDialog(file);
+			//multiFileDownloadDialog.setPage(getPage());
+			//downloadDialog.setTitle(m_pi.getTitle());
+			//Events.postEvent(multiFileDownloadDialog, new Event(MultiFileDownloadDialog.ON_SHOW));
 
 		}  catch (Exception e) {
 			System.out.println(e.getMessage());
