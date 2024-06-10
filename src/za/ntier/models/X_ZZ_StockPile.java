@@ -35,7 +35,7 @@ public class X_ZZ_StockPile extends PO implements I_ZZ_StockPile, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240610L;
 
     /** Standard Constructor */
     public X_ZZ_StockPile (Properties ctx, int ZZ_StockPile_ID, String trxName)

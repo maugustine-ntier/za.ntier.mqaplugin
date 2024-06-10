@@ -18,6 +18,7 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 
@@ -31,7 +32,7 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240610L;
 
     /** Standard Constructor */
     public X_ZZ_Truck (Properties ctx, int ZZ_Truck_ID, String trxName)
@@ -39,7 +40,7 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
       super (ctx, ZZ_Truck_ID, trxName);
       /** if (ZZ_Truck_ID == 0)
         {
-			setName (null);
+			setZZ_Registration_No (null);
 			setZZ_Truck_ID (0);
 			setZZ_Truck_Type (null);
         } */
@@ -51,7 +52,7 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
       super (ctx, ZZ_Truck_ID, trxName, virtualColumns);
       /** if (ZZ_Truck_ID == 0)
         {
-			setName (null);
+			setZZ_Registration_No (null);
 			setZZ_Truck_ID (0);
 			setZZ_Truck_Type (null);
         } */
@@ -63,7 +64,7 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
       super (ctx, ZZ_Truck_UU, trxName);
       /** if (ZZ_Truck_UU == null)
         {
-			setName (null);
+			setZZ_Registration_No (null);
 			setZZ_Truck_ID (0);
 			setZZ_Truck_Type (null);
         } */
@@ -75,7 +76,7 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
       super (ctx, ZZ_Truck_UU, trxName, virtualColumns);
       /** if (ZZ_Truck_UU == null)
         {
-			setName (null);
+			setZZ_Registration_No (null);
 			setZZ_Truck_ID (0);
 			setZZ_Truck_Type (null);
         } */
@@ -139,6 +140,34 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
 	public String getHelp()
 	{
 		return (String)get_Value(COLUMNNAME_Help);
+	}
+
+	public org.compiere.model.I_M_Shipper getM_Shipper() throws RuntimeException
+	{
+		return (org.compiere.model.I_M_Shipper)MTable.get(getCtx(), org.compiere.model.I_M_Shipper.Table_ID)
+			.getPO(getM_Shipper_ID(), get_TrxName());
+	}
+
+	/** Set Shipper.
+		@param M_Shipper_ID Method or manner of product delivery
+	*/
+	public void setM_Shipper_ID (int M_Shipper_ID)
+	{
+		if (M_Shipper_ID < 1)
+			set_Value (COLUMNNAME_M_Shipper_ID, null);
+		else
+			set_Value (COLUMNNAME_M_Shipper_ID, Integer.valueOf(M_Shipper_ID));
+	}
+
+	/** Get Shipper.
+		@return Method or manner of product delivery
+	  */
+	public int getM_Shipper_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Shipper_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Name.
@@ -243,5 +272,41 @@ public class X_ZZ_Truck extends PO implements I_ZZ_Truck, I_Persistent
 	public String getZZ_Truck_UU()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Truck_UU);
+	}
+
+	/** Set Vehicle License Expiry Date.
+		@param ZZ_Vehicle_License_Expiry Vehicle License Expiry Date
+	*/
+	public void setZZ_Vehicle_License_Expiry (Timestamp ZZ_Vehicle_License_Expiry)
+	{
+		set_Value (COLUMNNAME_ZZ_Vehicle_License_Expiry, ZZ_Vehicle_License_Expiry);
+	}
+
+	/** Get Vehicle License Expiry Date.
+		@return Vehicle License Expiry Date	  */
+	public Timestamp getZZ_Vehicle_License_Expiry()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Vehicle_License_Expiry);
+	}
+
+	/** Set Vehicle License.
+		@param ZZ_Vehicle_License_ID Vehicle License
+	*/
+	public void setZZ_Vehicle_License_ID (int ZZ_Vehicle_License_ID)
+	{
+		if (ZZ_Vehicle_License_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Vehicle_License_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Vehicle_License_ID, Integer.valueOf(ZZ_Vehicle_License_ID));
+	}
+
+	/** Get Vehicle License.
+		@return Vehicle License	  */
+	public int getZZ_Vehicle_License_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Vehicle_License_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }

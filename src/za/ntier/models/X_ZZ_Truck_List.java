@@ -33,7 +33,7 @@ public class X_ZZ_Truck_List extends PO implements I_ZZ_Truck_List, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240610L;
 
     /** Standard Constructor */
     public X_ZZ_Truck_List (Properties ctx, int ZZ_Truck_List_ID, String trxName)

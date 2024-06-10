@@ -34,19 +34,35 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 
 	@Override
 	protected boolean beforeSave(boolean newRecord) {
-		if (isZZ_ID_Passport_Attached() && isZZ_License_Attached()) {
-			//setZZ_Is_Valid(true);
+
+		if (getZZ_License_ID() > 0) {
+			setZZ_License_Attached(true);
+
 		} else {
-			//setZZ_Is_Valid(false);
+			setZZ_License_Attached(false);
 		}
+
+		if (getZZ_ID_Passport_ID() > 0) {
+			setZZ_ID_Passport_Attached(true);
+		} else {
+			setZZ_ID_Passport_Attached(false);
+		}
+		if (isZZ_ID_Passport_Attached() && isZZ_License_Attached()) {
+			setZZ_Is_Valid(true);
+		} else {
+			setZZ_Is_Valid(false);
+		}
+
 		return super.beforeSave(newRecord);
 	}
 	public static MDriver getDriver(Properties ctx,String ZZ_ID_Passport_No) {
 		MDriver mDriver = null;
-		String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
-		int zz_Driver_ID = DB.getSQLValue(null, SQL, ZZ_ID_Passport_No.trim());
-		if (zz_Driver_ID > 0) {
-			mDriver = new MDriver(ctx, zz_Driver_ID, null);
+		if (ZZ_ID_Passport_No != null) {
+			String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
+			int zz_Driver_ID = DB.getSQLValue(null, SQL, ZZ_ID_Passport_No.trim());
+			if (zz_Driver_ID > 0) {
+				mDriver = new MDriver(ctx, zz_Driver_ID, null);
+			}
 		}
 		return mDriver;
 	}

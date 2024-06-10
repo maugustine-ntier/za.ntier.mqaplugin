@@ -119,6 +119,21 @@ public interface I_ZZ_Truck
 	  */
 	public boolean isActive();
 
+    /** Column name M_Shipper_ID */
+    public static final String COLUMNNAME_M_Shipper_ID = "M_Shipper_ID";
+
+	/** Set Shipper.
+	  * Method or manner of product delivery
+	  */
+	public void setM_Shipper_ID (int M_Shipper_ID);
+
+	/** Get Shipper.
+	  * Method or manner of product delivery
+	  */
+	public int getM_Shipper_ID();
+
+	public org.compiere.model.I_M_Shipper getM_Shipper() throws RuntimeException;
+
     /** Column name Name */
     public static final String COLUMNNAME_Name = "Name";
 
@@ -200,4 +215,22 @@ public interface I_ZZ_Truck
 
 	/** Get ZZ_Truck_UU	  */
 	public String getZZ_Truck_UU();
+
+    /** Column name ZZ_Vehicle_License_Expiry */
+    public static final String COLUMNNAME_ZZ_Vehicle_License_Expiry = "ZZ_Vehicle_License_Expiry";
+
+	/** Set Vehicle License Expiry Date	  */
+	public void setZZ_Vehicle_License_Expiry (Timestamp ZZ_Vehicle_License_Expiry);
+
+	/** Get Vehicle License Expiry Date	  */
+	public Timestamp getZZ_Vehicle_License_Expiry();
+
+    /** Column name ZZ_Vehicle_License_ID */
+    public static final String COLUMNNAME_ZZ_Vehicle_License_ID = "ZZ_Vehicle_License_ID";
+
+	/** Set Vehicle License	  */
+	public void setZZ_Vehicle_License_ID (int ZZ_Vehicle_License_ID);
+
+	/** Get Vehicle License	  */
+	public int getZZ_Vehicle_License_ID();
 }

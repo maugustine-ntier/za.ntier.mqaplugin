@@ -32,7 +32,7 @@ public class X_ZZ_Driver extends PO implements I_ZZ_Driver, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240610L;
 
     /** Standard Constructor */
     public X_ZZ_Driver (Properties ctx, int ZZ_Driver_ID, String trxName)
@@ -174,6 +174,34 @@ public class X_ZZ_Driver extends PO implements I_ZZ_Driver, I_Persistent
 		return (String)get_Value(COLUMNNAME_Help);
 	}
 
+	public org.compiere.model.I_M_Shipper getM_Shipper() throws RuntimeException
+	{
+		return (org.compiere.model.I_M_Shipper)MTable.get(getCtx(), org.compiere.model.I_M_Shipper.Table_ID)
+			.getPO(getM_Shipper_ID(), get_TrxName());
+	}
+
+	/** Set Shipper.
+		@param M_Shipper_ID Method or manner of product delivery
+	*/
+	public void setM_Shipper_ID (int M_Shipper_ID)
+	{
+		if (M_Shipper_ID < 1)
+			set_Value (COLUMNNAME_M_Shipper_ID, null);
+		else
+			set_Value (COLUMNNAME_M_Shipper_ID, Integer.valueOf(M_Shipper_ID));
+	}
+
+	/** Get Shipper.
+		@return Method or manner of product delivery
+	  */
+	public int getM_Shipper_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Shipper_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Name.
 		@param Name Alphanumeric identifier of the entity
 	*/
@@ -265,6 +293,27 @@ public class X_ZZ_Driver extends PO implements I_ZZ_Driver, I_Persistent
 		return false;
 	}
 
+	/** Set ID / Passport.
+		@param ZZ_ID_Passport_ID ID / Passport
+	*/
+	public void setZZ_ID_Passport_ID (int ZZ_ID_Passport_ID)
+	{
+		if (ZZ_ID_Passport_ID < 1)
+			set_Value (COLUMNNAME_ZZ_ID_Passport_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_ID_Passport_ID, Integer.valueOf(ZZ_ID_Passport_ID));
+	}
+
+	/** Get ID / Passport.
+		@return ID / Passport	  */
+	public int getZZ_ID_Passport_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_ID_Passport_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set ID/Passport No.
 		@param ZZ_ID_Passport_No ID/Passport No
 	*/
@@ -337,6 +386,41 @@ public class X_ZZ_Driver extends PO implements I_ZZ_Driver, I_Persistent
 	public Timestamp getZZ_License_Expiry_Date()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_License_Expiry_Date);
+	}
+
+	/** Set License.
+		@param ZZ_License_ID License
+	*/
+	public void setZZ_License_ID (int ZZ_License_ID)
+	{
+		if (ZZ_License_ID < 1)
+			set_Value (COLUMNNAME_ZZ_License_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_License_ID, Integer.valueOf(ZZ_License_ID));
+	}
+
+	/** Get License.
+		@return License	  */
+	public int getZZ_License_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_License_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set First Name And Surname.
+		@param ZZ_Name_Surname First Name And Surname
+	*/
+	public void setZZ_Name_Surname (String ZZ_Name_Surname)
+	{
+		throw new IllegalArgumentException ("ZZ_Name_Surname is virtual column");	}
+
+	/** Get First Name And Surname.
+		@return First Name And Surname	  */
+	public String getZZ_Name_Surname()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Name_Surname);
 	}
 
 	/** Set Surname.

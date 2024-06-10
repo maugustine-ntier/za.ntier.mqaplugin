@@ -31,7 +31,7 @@ public class X_ZZ_Cust_Dest extends PO implements I_ZZ_Cust_Dest, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240508L;
+	private static final long serialVersionUID = 20240610L;
 
     /** Standard Constructor */
     public X_ZZ_Cust_Dest (Properties ctx, int ZZ_Cust_Dest_ID, String trxName)
@@ -135,6 +135,21 @@ public class X_ZZ_Cust_Dest extends PO implements I_ZZ_Cust_Dest, I_Persistent
 	public String getHelp()
 	{
 		return (String)get_Value(COLUMNNAME_Help);
+	}
+
+	/** Set Import Truck List Via Excel.
+		@param ImportTruckListViaExcel Import Truck List Via Excel
+	*/
+	public void setImportTruckListViaExcel (String ImportTruckListViaExcel)
+	{
+		set_Value (COLUMNNAME_ImportTruckListViaExcel, ImportTruckListViaExcel);
+	}
+
+	/** Get Import Truck List Via Excel.
+		@return Import Truck List Via Excel	  */
+	public String getImportTruckListViaExcel()
+	{
+		return (String)get_Value(COLUMNNAME_ImportTruckListViaExcel);
 	}
 
 	/** Set Name.

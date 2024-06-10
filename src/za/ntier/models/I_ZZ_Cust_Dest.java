@@ -106,6 +106,15 @@ public interface I_ZZ_Cust_Dest
 	  */
 	public String getHelp();
 
+    /** Column name ImportTruckListViaExcel */
+    public static final String COLUMNNAME_ImportTruckListViaExcel = "ImportTruckListViaExcel";
+
+	/** Set Import Truck List Via Excel	  */
+	public void setImportTruckListViaExcel (String ImportTruckListViaExcel);
+
+	/** Get Import Truck List Via Excel	  */
+	public String getImportTruckListViaExcel();
+
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
 

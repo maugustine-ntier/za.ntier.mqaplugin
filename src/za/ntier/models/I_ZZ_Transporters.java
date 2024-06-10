@@ -32,7 +32,7 @@ public interface I_ZZ_Transporters
     /** TableName=ZZ_Transporters */
     public static final String Table_Name = "ZZ_Transporters";
 
-    /** AD_Table_ID=1000017 */
+    /** AD_Table_ID=1000008 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -135,6 +135,15 @@ public interface I_ZZ_Transporters
 	  * Comment or Hint
 	  */
 	public String getHelp();
+
+    /** Column name ImportTruckListViaExcel */
+    public static final String COLUMNNAME_ImportTruckListViaExcel = "ImportTruckListViaExcel";
+
+	/** Set Import Truck List Via Excel	  */
+	public void setImportTruckListViaExcel (String ImportTruckListViaExcel);
+
+	/** Get Import Truck List Via Excel	  */
+	public String getImportTruckListViaExcel();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -240,10 +249,10 @@ public interface I_ZZ_Transporters
     public static final String COLUMNNAME_ZZ_Buckets_Are_Clean = "ZZ_Buckets_Are_Clean";
 
 	/** Set Buckets Are Clean	  */
-	public void setZZ_Buckets_Are_Clean (boolean ZZ_Buckets_Are_Clean);
+	public void setZZ_Buckets_Are_Clean (String ZZ_Buckets_Are_Clean);
 
 	/** Get Buckets Are Clean	  */
-	public boolean isZZ_Buckets_Are_Clean();
+	public String getZZ_Buckets_Are_Clean();
 
     /** Column name ZZ_Cust_Dest_ID */
     public static final String COLUMNNAME_ZZ_Cust_Dest_ID = "ZZ_Cust_Dest_ID";
@@ -260,10 +269,10 @@ public interface I_ZZ_Transporters
     public static final String COLUMNNAME_ZZ_Fire_Extinguisher = "ZZ_Fire_Extinguisher";
 
 	/** Set Fire Extinguisher	  */
-	public void setZZ_Fire_Extinguisher (boolean ZZ_Fire_Extinguisher);
+	public void setZZ_Fire_Extinguisher (String ZZ_Fire_Extinguisher);
 
 	/** Get Fire Extinguisher	  */
-	public boolean isZZ_Fire_Extinguisher();
+	public String getZZ_Fire_Extinguisher();
 
     /** Column name ZZ_Loading_Date */
     public static final String COLUMNNAME_ZZ_Loading_Date = "ZZ_Loading_Date";
@@ -305,17 +314,17 @@ public interface I_ZZ_Transporters
     public static final String COLUMNNAME_ZZ_Truck_Covers = "ZZ_Truck_Covers";
 
 	/** Set Truck Covers	  */
-	public void setZZ_Truck_Covers (boolean ZZ_Truck_Covers);
+	public void setZZ_Truck_Covers (String ZZ_Truck_Covers);
 
 	/** Get Truck Covers	  */
-	public boolean isZZ_Truck_Covers();
+	public String getZZ_Truck_Covers();
 
     /** Column name ZZ_Tyres_Are_Good */
     public static final String COLUMNNAME_ZZ_Tyres_Are_Good = "ZZ_Tyres_Are_Good";
 
 	/** Set Tyres Are Good	  */
-	public void setZZ_Tyres_Are_Good (boolean ZZ_Tyres_Are_Good);
+	public void setZZ_Tyres_Are_Good (String ZZ_Tyres_Are_Good);
 
 	/** Get Tyres Are Good	  */
-	public boolean isZZ_Tyres_Are_Good();
+	public String getZZ_Tyres_Are_Good();
 }

@@ -20,7 +20,8 @@ Require-Bundle: org.osgi.service.component.annotations;bundle-version="1.5.1",
  org.adempiere.ui.zk,
  zk,
  org.eclipse.jetty.servlet-api,
- com.sun.activation.jakarta.activation
+ com.sun.activation.jakarta.activation,
+ wrapped.org.apache.poi.poi-ooxml-lite;bundle-version="5.2.2"
 Service-Component: OSGI-INF/za.ntier.callouts.CalloutFactory.xml,
  OSGI-INF/za.ntier.models.ModelValidatorFactory.xml,
  OSGI-INF/za.ntier.models.MyModelFactory.xml,

@@ -119,6 +119,21 @@ public interface I_ZZ_Driver
 	  */
 	public boolean isActive();
 
+    /** Column name M_Shipper_ID */
+    public static final String COLUMNNAME_M_Shipper_ID = "M_Shipper_ID";
+
+	/** Set Shipper.
+	  * Method or manner of product delivery
+	  */
+	public void setM_Shipper_ID (int M_Shipper_ID);
+
+	/** Get Shipper.
+	  * Method or manner of product delivery
+	  */
+	public int getM_Shipper_ID();
+
+	public org.compiere.model.I_M_Shipper getM_Shipper() throws RuntimeException;
+
     /** Column name Name */
     public static final String COLUMNNAME_Name = "Name";
 
@@ -192,6 +207,15 @@ public interface I_ZZ_Driver
 	/** Get ID/Passport attached	  */
 	public boolean isZZ_ID_Passport_Attached();
 
+    /** Column name ZZ_ID_Passport_ID */
+    public static final String COLUMNNAME_ZZ_ID_Passport_ID = "ZZ_ID_Passport_ID";
+
+	/** Set ID / Passport	  */
+	public void setZZ_ID_Passport_ID (int ZZ_ID_Passport_ID);
+
+	/** Get ID / Passport	  */
+	public int getZZ_ID_Passport_ID();
+
     /** Column name ZZ_ID_Passport_No */
     public static final String COLUMNNAME_ZZ_ID_Passport_No = "ZZ_ID_Passport_No";
 
@@ -227,6 +251,24 @@ public interface I_ZZ_Driver
 
 	/** Get License Expiry Date	  */
 	public Timestamp getZZ_License_Expiry_Date();
+
+    /** Column name ZZ_License_ID */
+    public static final String COLUMNNAME_ZZ_License_ID = "ZZ_License_ID";
+
+	/** Set License	  */
+	public void setZZ_License_ID (int ZZ_License_ID);
+
+	/** Get License	  */
+	public int getZZ_License_ID();
+
+    /** Column name ZZ_Name_Surname */
+    public static final String COLUMNNAME_ZZ_Name_Surname = "ZZ_Name_Surname";
+
+	/** Set First Name And Surname	  */
+	public void setZZ_Name_Surname (String ZZ_Name_Surname);
+
+	/** Get First Name And Surname	  */
+	public String getZZ_Name_Surname();
 
     /** Column name ZZ_Surname */
     public static final String COLUMNNAME_ZZ_Surname = "ZZ_Surname";

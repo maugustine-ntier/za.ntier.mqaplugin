@@ -7,30 +7,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.adempiere.webui.window.MultiFileDownloadDialog;
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.webui.window.ZkReportViewerProviderRGN;
+import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbookFactory;
+import org.compiere.model.MImportTemplate;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
-import org.idempiere.ui.zk.media.Medias;
-import org.zkoss.util.media.AMedia;
-import org.zkoss.zk.ui.Desktop;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Filedownload;
 
 import za.ntier.models.MDriver;
 import za.ntier.models.MTruck;
@@ -51,7 +49,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private String p_loads = "LOADS";
 	private int counter = 0;
 	private Workbook errorWb = null;
-	private FileInputStream file = null;
+	private FileInputStream inp = null;
 	private File importFile = null;
 	private Sheet errorSheet = null;
 	private int maxCols = 0;
@@ -83,13 +81,24 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	}
 
 	private String updateByExcel(File importFile) throws Exception {
-		XSSFWorkbook workbook  = null;
+		Workbook workbook  = null;
 		int zz_Transporters_ID = getRecord_ID();
 
 		String msg = null;
 		try {
-			file = new FileInputStream(importFile);
-			workbook = new XSSFWorkbook(file);
+			inp = new FileInputStream(importFile);
+			ZipSecureFile.setMinInflateRatio(-1.0d);
+			if (importFile.getName().toUpperCase().endsWith(MImportTemplate.IMPORTTEMPLATETYPE_XLS)) {
+				HSSFWorkbookFactory xlsWbf = new HSSFWorkbookFactory();
+				workbook = xlsWbf.create(inp);
+			} else if (importFile.getName().toUpperCase().endsWith(MImportTemplate.IMPORTTEMPLATETYPE_XLSX)) {
+				XSSFWorkbookFactory xlsxWbf = new XSSFWorkbookFactory();
+				workbook = xlsxWbf.create(inp);
+			} else {
+				// unexpected error
+				throw new AdempiereException("Wrong template type -> " + importFile.getName());
+			}
+
 			int noOfErrorLines = checkTruckList(workbook,zz_Transporters_ID);
 			if (noOfErrorLines <= 0) {
 				msg = loadTruckList(workbook, zz_Transporters_ID);
@@ -102,8 +111,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			e.printStackTrace();
 		}	
 		finally {
-			if (file != null)
-				file.close();
+			if (inp != null)
+				inp.close();
 			if (workbook != null)
 				workbook.close();
 		}
@@ -111,9 +120,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		return msg;
 	}
 
-	private int checkTruckList(XSSFWorkbook workbook, int zz_Transporters_ID) throws Exception {
+	private int checkTruckList(Workbook workbook, int zz_Transporters_ID) throws Exception {
 		errorSheet = createErrorXLS();
-		XSSFSheet sheet = workbook.getSheetAt(0);
+		Sheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
 		int rowNoToWrite = 0;
@@ -121,23 +130,40 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		{
 			Row row = rowIterator.next();
 			if (row.getRowNum() < data_start_row) {
-				writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), null,row);
-				rowNoToWrite++;
+		//		writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), null,row);
+		//		rowNoToWrite++;
 				continue;
 			}
 			String horse = null;
 			String trailer_1 = null;
 			String trailer_2 = null;
 			String driver_IDNo = null;
-			//Double no_Of_Loads = null;
 			try {
 				try {
-					horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
-					trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
-					trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
-					driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue();    
-
+					if (row.getCell(columnmap.get(p_horse)).getCellType().equals(CellType.STRING)) {
+						horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
+					} else if (row.getCell(columnmap.get(p_horse)).getCellType().equals(CellType.NUMERIC)) {
+						horse =   row.getCell(columnmap.get(p_horse)).getNumericCellValue() + "";
+					}
+					if (row.getCell(columnmap.get(p_trailer1)).getCellType().equals(CellType.STRING)) {
+						trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
+					} else if (row.getCell(columnmap.get(p_trailer1)).getCellType().equals(CellType.NUMERIC)){
+						trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getNumericCellValue() + "";
+					}
+					if (row.getCell(columnmap.get(p_trailer2)).getCellType().equals(CellType.STRING)) {
+						trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
+					} else if (row.getCell(columnmap.get(p_trailer2)).getCellType().equals(CellType.NUMERIC)){
+						trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getNumericCellValue() + "";
+					}
+					if (row.getCell(columnmap.get(p_driver)).getCellType().equals(CellType.STRING)) {
+						driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue(); 
+					} else if (row.getCell(columnmap.get(p_driver)).getCellType().equals(CellType.NUMERIC)){
+						BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_driver)).getNumericCellValue()).toBigInteger() ;
+						driver_IDNo =   bint.toString();
+					}
+				//	if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
 					//	no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
+					//}
 				} catch(Exception e) {
 					System.out.println("getCell is null");
 					continue;
@@ -149,7 +175,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					continue;
 				}
 				//	MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
-				if (horse == null) {
+				if (horse == null || horse.trim().equals("")) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Missing",row);
 					rowNoToWrite++;
 				} else {
@@ -165,7 +191,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					}
 				}
 
-				if (trailer_1 == null) {
+				if (trailer_1 == null  || trailer_1.trim().equals("")) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing",row);
 					rowNoToWrite++;
 				} else {
@@ -181,7 +207,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					}
 				}
 
-				if (trailer_2 == null) {
+				if (trailer_2 == null || trailer_2.trim().equals("")) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing",row);
 					rowNoToWrite++;
 				} else {
@@ -197,7 +223,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					}
 				}
 
-				if (driver_IDNo == null) {
+				if (driver_IDNo == null || driver_IDNo.trim().equals("")) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver ID is Missing",row);
 					rowNoToWrite++;
 				} else {
@@ -224,9 +250,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		return rowNoToWrite;
 	}
 
-	private String loadTruckList(XSSFWorkbook workbook, int zz_Transporters_ID) throws Exception {
+	private String loadTruckList(Workbook workbook, int zz_Transporters_ID) throws Exception {
 		String msg = null;
-		XSSFSheet sheet = workbook.getSheetAt(0);
+		Sheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
 		// pass first row
@@ -243,11 +269,39 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			String driver_IDNo = null;
 			Double no_Of_Loads = null;
 			try {
-				horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
-				trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
-				trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
-				driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue();                    
-				no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
+				if (row.getCell(columnmap.get(p_horse)) == null) {
+					continue;
+				}
+				if (row.getCell(columnmap.get(p_horse)).getCellType().equals(CellType.STRING)) {
+					horse =   row.getCell(columnmap.get(p_horse)).getStringCellValue();
+				} else if (row.getCell(columnmap.get(p_horse)).getCellType().equals(CellType.NUMERIC)) {
+					horse =   row.getCell(columnmap.get(p_horse)).getNumericCellValue() + "";
+				}
+				if (row.getCell(columnmap.get(p_trailer1)).getCellType().equals(CellType.STRING)) {
+					trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getStringCellValue();
+				} else if (row.getCell(columnmap.get(p_trailer1)).getCellType().equals(CellType.NUMERIC)){
+					trailer_1 =   row.getCell(columnmap.get(p_trailer1)).getNumericCellValue() + "";
+				}
+				if (row.getCell(columnmap.get(p_trailer2)).getCellType().equals(CellType.STRING)) {
+					trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getStringCellValue();
+				} else if (row.getCell(columnmap.get(p_trailer2)).getCellType().equals(CellType.NUMERIC)){
+					trailer_2 =   row.getCell(columnmap.get(p_trailer2)).getNumericCellValue() + "";
+				}
+				if (row.getCell(columnmap.get(p_driver)).getCellType().equals(CellType.STRING)) {
+					driver_IDNo =   row.getCell(columnmap.get(p_driver)).getStringCellValue(); 
+				} else if (row.getCell(columnmap.get(p_driver)).getCellType().equals(CellType.NUMERIC)){
+					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_driver)).getNumericCellValue()).toBigInteger() ;
+					driver_IDNo =   bint.toString();
+				}
+				if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
+					no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue(); 
+				}
+				if ((horse == null || horse.trim().equals(""))
+						&& (trailer_1 == null || trailer_1.trim().equals(""))
+						&& (trailer_2 == null || trailer_2.trim().equals(""))
+						&& (driver_IDNo == null|| driver_IDNo.trim().equals(""))) {
+					continue;
+				}
 				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
 				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
 				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1);
@@ -258,7 +312,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
 				mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
 				mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
-				mTruckList.setZZ_No_Of_Loads(BigDecimal.valueOf(no_Of_Loads));
+				mTruckList.setZZ_No_Of_Loads((no_Of_Loads == null) ? null :BigDecimal.valueOf(no_Of_Loads));
 				if (mTruckList.save()) {
 					counter++;
 				} else {
@@ -277,8 +331,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	}
 
 
-	private int setColumnName(XSSFSheet sheet) {
-		// TODO Auto-generated method stub
+	private int setColumnName(Sheet sheet) {
+		columnmap =  new HashMap<String,Integer>();
 		boolean headerNotFound = false;
 		int i = 0;
 		Row row = null;
@@ -298,6 +352,12 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						columnname = p_loads;
 					} else if (columnname.contains(p_driver) && columnname.contains("ID")) {
 						columnname = p_driver;
+					} else if (columnname.contains(p_horse)) {
+						columnname = p_horse;
+					} else if (columnname.contains(p_trailer1)) {
+						columnname = p_trailer1;
+					} else if (columnname.contains(p_trailer2)) {
+						columnname = p_trailer2;
 					}
 					break;
 				case "NUMERIC":
@@ -336,13 +396,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			} catch (Exception e) {
 				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
 			}
-			/*try {
-
-				if (row.getCell(columnmap.get(field.toString().trim().strip())) == null)
-					throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
-			} catch (Exception e) {
-				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
-			}*/
+			
 
 		}	 
 		return i;
@@ -409,17 +463,6 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			ZkReportViewerProviderRGN zkReportViewerProviderRGN = new ZkReportViewerProviderRGN();
 			zkReportViewerProviderRGN.setFile(file[0]);
 			zkReportViewerProviderRGN.openViewer(null);
-		//	AMedia aMedia = new AMedia("Prefix" +"."+Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_FILE_EXT, Medias.EXCEL_XML_MIME_TYPE, new File(logFileName), true);
-		//	Filedownload.save(logFileName, Medias.EXCEL_XML_MIME_TYPE);
-			//Filedownload.save(aMedia, logFileName);
-			//ExportExcel exportExcel = new ExportExcel();
-			//if ( Ini.isClient())
-			//	Env.startBrowser(new File(logFileName).toURI().toString());
-			//errorWb.write(fileOut);
-			//MultiFileDownloadDialog multiFileDownloadDialog = new MultiFileDownloadDialog(file);
-			//multiFileDownloadDialog.setPage(getPage());
-			//downloadDialog.setTitle(m_pi.getTitle());
-			//Events.postEvent(multiFileDownloadDialog, new Event(MultiFileDownloadDialog.ON_SHOW));
 
 		}  catch (Exception e) {
 			System.out.println(e.getMessage());
