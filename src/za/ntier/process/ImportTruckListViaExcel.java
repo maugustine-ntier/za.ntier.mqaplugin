@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,17 +20,21 @@ import org.adempiere.webui.window.ZkReportViewerProviderRGN;
 import org.apache.poi.hssf.usermodel.HSSFWorkbookFactory;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellCopyContext;
+import org.apache.poi.ss.usermodel.CellCopyPolicy;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbookFactory;
 import org.compiere.model.MImportTemplate;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
+import org.compiere.util.DB;
 
 import za.ntier.models.MDriver;
 import za.ntier.models.MTruck;
@@ -130,8 +136,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		{
 			Row row = rowIterator.next();
 			if (row.getRowNum() < data_start_row) {
-		//		writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), null,row);
-		//		rowNoToWrite++;
+				writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), null,row);
+				rowNoToWrite++;
 				continue;
 			}
 			String horse = null;
@@ -234,6 +240,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					} else {
 						if (!mDriver.isZZ_Is_Valid()) {
 							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database",row);
+							rowNoToWrite++;
+						}
+						if (mDriver.getZZ_License_Expiry_Date() == null || (DB.TO_DATE(mDriver.getZZ_License_Expiry_Date()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
+							String stringDt = "";
+							if (mDriver.getZZ_License_Expiry_Date() != null) {
+								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mDriver.getZZ_License_Expiry_Date()); 
+							}
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver has a expired Driver's License : " + stringDt,row);
 							rowNoToWrite++;
 						}
 					}
@@ -409,10 +423,6 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		errorWb= new XSSFWorkbook();  // or new XSSFWorkbook();
 		CreationHelper createHelper = errorWb.getCreationHelper();
 		Sheet sheet1 = errorWb.createSheet("Import Errors");
-		// Row row = sheet1.createRow(0);
-		//row.createCell(0).setCellValue(createHelper.createRichTextString("ROW"));
-		//row.createCell(1).setCellValue(createHelper.createRichTextString("Error Message"));
-
 		return sheet1;
 	}
 
@@ -422,22 +432,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		int col = 0;
 		if (fromRow != null) {
 			for (Cell cell : fromRow) {
-				switch (cell.getCellType().toString()) 
-				{
-				case "STRING":
-					row.createCell(col).setCellValue((cell.getStringCellValue()));
-					break;
-				case "NUMERIC":
-					row.createCell(col).setCellValue((cell.getNumericCellValue()));
-					break;                    			
-
-				default:
-
-					System.out.println("Unknown Cell type:" +  cell.getCellType());	
-					break;
-				}
+				CellUtil.copyCell(cell, row.createCell(col), new CellCopyPolicy(), new CellCopyContext());
 				col++;
-
 			}
 		}
 		if (errorMsg != null && !errorMsg.trim().equals("")) {
@@ -449,6 +445,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		}
 
 	}
+	
 
 
 	private String writeOutErrorLogFile(Sheet sheet) {
