@@ -59,6 +59,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private File importFile = null;
 	private Sheet errorSheet = null;
 	private int maxCols = 0;
+	private boolean header = true;
 
 	@Override
 	protected void prepare() {
@@ -106,7 +107,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			}
 
 			int noOfErrorLines = checkTruckList(workbook,zz_Transporters_ID);
-			if (noOfErrorLines <= 0) {
+			if (noOfErrorLines <= 0) {  // dont display if we just have headers
 				msg = loadTruckList(workbook, zz_Transporters_ID);
 			} else {
 				String fileName = writeOutErrorLogFile(errorSheet);
@@ -128,6 +129,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 
 	private int checkTruckList(Workbook workbook, int zz_Transporters_ID) throws Exception {
 		errorSheet = createErrorXLS();
+		int noOfHeaderLines = 0;
 		Sheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
@@ -138,8 +140,10 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			if (row.getRowNum() < data_start_row) {
 				writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), null,row);
 				rowNoToWrite++;
+				noOfHeaderLines++;
 				continue;
 			}
+			
 			String horse = null;
 			String trailer_1 = null;
 			String trailer_2 = null;
@@ -167,7 +171,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_driver)).getNumericCellValue()).toBigInteger() ;
 						driver_IDNo =   bint.toString();
 					}
-				//	if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
+					//	if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
 					//	no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue();
 					//}
 				} catch(Exception e) {
@@ -252,6 +256,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						}
 					}
 				}
+				
 
 
 
@@ -261,11 +266,16 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				throw e;
 			}
 		}
-		return rowNoToWrite;
+		if (rowNoToWrite > noOfHeaderLines) {
+			return rowNoToWrite;
+		} else {
+			return 0;
+		}
 	}
 
 	private String loadTruckList(Workbook workbook, int zz_Transporters_ID) throws Exception {
 		String msg = null;
+		int rowNoToWrite = 0;
 		Sheet sheet = workbook.getSheetAt(0);
 		int data_start_row = setColumnName(sheet);
 		Iterator<Row> rowIterator = sheet.iterator();
@@ -327,10 +337,16 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
 				mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
 				mTruckList.setZZ_No_Of_Loads((no_Of_Loads == null) ? null :BigDecimal.valueOf(no_Of_Loads));
-				if (mTruckList.save()) {
-					counter++;
+				String errMessage = mTruckList.doChecks(true);
+				if (errMessage != null) {
+					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), errMessage,row);
+					rowNoToWrite++;
 				} else {
-					msg = "Could not save trucklist : Driver = " + driver_IDNo;
+					if (mTruckList.save()) {
+						counter++;
+					} else {
+						msg = "Could not save trucklist : Driver = " + driver_IDNo;
+					}
 				}
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
@@ -410,7 +426,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			} catch (Exception e) {
 				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
 			}
-			
+
 
 		}	 
 		return i;
@@ -445,7 +461,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		}
 
 	}
-	
+
 
 
 	private String writeOutErrorLogFile(Sheet sheet) {
@@ -453,7 +469,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			sheet.autoSizeColumn(i); 
 		}
 		String logFileName = importFile.getAbsolutePath() + "_Error_Log.xlsx";
-		
+
 		try (OutputStream fileOut = new FileOutputStream(logFileName)) {
 			errorWb.write(fileOut);
 			File[] file = { new File(logFileName)};
