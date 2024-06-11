@@ -52,6 +52,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private String p_trailer1 = "TRAILER1";
 	private String p_trailer2 = "TRAILER2";
 	private String p_driver = "DRIVER";
+	private String p_driver_name = "DriverName";
 	private String p_loads = "LOADS";
 	private int counter = 0;
 	private Workbook errorWb = null;
@@ -107,9 +108,10 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			}
 
 			int noOfErrorLines = checkTruckList(workbook,zz_Transporters_ID);
+
+			msg = loadTruckList(workbook, zz_Transporters_ID);
+
 			if (noOfErrorLines <= 0) {  // dont display if we just have headers
-				msg = loadTruckList(workbook, zz_Transporters_ID);
-			} else {
 				String fileName = writeOutErrorLogFile(errorSheet);
 				msg = "There are errors on the file.  Please check the error Log file : " + fileName;
 			}
@@ -143,7 +145,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				noOfHeaderLines++;
 				continue;
 			}
-			
+
 			String horse = null;
 			String trailer_1 = null;
 			String trailer_2 = null;
@@ -189,7 +191,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Missing",row);
 					rowNoToWrite++;
 				} else {
-					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
+					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
 					if (mTruck_horse == null) {
 						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Does not exist",row);
 						rowNoToWrite++;
@@ -205,7 +207,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing",row);
 					rowNoToWrite++;
 				} else {
-					MTruck mTruck_Trailer_1 = MTruck.getTruck(getCtx(), trailer_1);
+					MTruck mTruck_Trailer_1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
 					if (mTruck_Trailer_1 == null) {
 						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Does not exist",row);
 						rowNoToWrite++;
@@ -221,7 +223,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Missing",row);
 					rowNoToWrite++;
 				} else {
-					MTruck mTruck_Trailer_2 = MTruck.getTruck(getCtx(), trailer_2);
+					MTruck mTruck_Trailer_2 = MTruck.getTruck(getCtx(), trailer_2,get_TrxName());
 					if (mTruck_Trailer_2 == null) {
 						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 Does not exist",row);
 						rowNoToWrite++;
@@ -237,7 +239,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver ID is Missing",row);
 					rowNoToWrite++;
 				} else {
-					MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo);
+					MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo,get_TrxName());
 					if (mDriver == null) {
 						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver does not Exist on the database",row);
 						rowNoToWrite++;
@@ -256,7 +258,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						}
 					}
 				}
-				
+
 
 
 
@@ -320,6 +322,20 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
 					no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue(); 
 				}
+				String driversName = null;
+				if (row.getCell(columnmap.get(p_driver_name)).getCellType().equals(CellType.STRING)) {
+					driversName =   row.getCell(columnmap.get(p_driver_name)).getStringCellValue(); 
+				} else if (row.getCell(columnmap.get(p_driver_name)).getCellType().equals(CellType.NUMERIC)){
+					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_driver_name)).getNumericCellValue()).toBigInteger() ;
+					driversName =   bint.toString();
+				}
+				String name = null;
+				String surname = null;
+				if (driversName != null) {
+					surname = driversName.substring(driversName.lastIndexOf(' ') + 1);
+					name = driversName.substring(0,driversName.lastIndexOf(' ') - 1);
+				}
+
 				if ((horse == null || horse.trim().equals(""))
 						&& (trailer_1 == null || trailer_1.trim().equals(""))
 						&& (trailer_2 == null || trailer_2.trim().equals(""))
@@ -327,15 +343,31 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					continue;
 				}
 				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
-				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse);
-				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1);
-				MTruck mTruck_trailer2 = MTruck.getTruck(getCtx(), trailer_2);
-				MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo);
+				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
+				if (mTruck_horse == null) {
+					mTruck_horse = MTruck.createTruck(getCtx(), horse, "H",get_TrxName());
+				}
+				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
+				if (mTruck_trailer1 == null) {
+					mTruck_trailer1 = MTruck.createTruck(getCtx(), trailer_1, "T",get_TrxName());
+				}
+				MTruck mTruck_trailer2 = MTruck.getTruck(getCtx(), trailer_2,get_TrxName());
+				if (mTruck_trailer2 == null) {
+					mTruck_trailer2 = MTruck.createTruck(getCtx(), trailer_2, "T",get_TrxName());
+				}
+				MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo,get_TrxName());
+				if (mDriver == null) {
+					mDriver = mDriver.createDriver(getCtx(), driver_IDNo, name, surname, get_TrxName());
+				} 
 				mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
-				mTruckList.setZZ_Horse_ID(mTruck_horse.getZZ_Truck_ID());
-				mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
-				mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
-				mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+				if (mTruck_horse != null)
+					mTruckList.setZZ_Horse_ID(mTruck_horse.getZZ_Truck_ID());
+				if (mTruck_trailer1 != null)
+					mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
+				if (mTruck_trailer2 != null)
+					mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
+				if (mDriver != null)
+					mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
 				mTruckList.setZZ_No_Of_Loads((no_Of_Loads == null) ? null :BigDecimal.valueOf(no_Of_Loads));
 				String errMessage = mTruckList.doChecks(true);
 				if (errMessage != null) {
@@ -388,6 +420,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						columnname = p_trailer1;
 					} else if (columnname.contains(p_trailer2)) {
 						columnname = p_trailer2;
+					} else if (columnname.contains("DRIVER") && columnname.contains("NAME")) {
+						columnname = p_driver_name;
 					}
 					break;
 				case "NUMERIC":
@@ -400,7 +434,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					break;
 				}
 				if (!columnname.equals("Unknown")) {
-					Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_loads};
+					Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads};
 					for (Object field : fields) {
 						if (field.toString().equals(columnname)) {
 							columnmap.put(columnname,cell.getColumnIndex()) ;
@@ -415,20 +449,18 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		}
 
 
-		Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_loads};
+		Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads};
 
 
-		for (Object field : fields) {
-			try {
-				if (columnmap.get(field.toString()) == null) {
-					throw new AdempiereUserError("Excel " + field.toString() +"Column not found" );
-				}
-			} catch (Exception e) {
-				throw new AdempiereUserError("Excel " + field.toString() +" Column not found" );
-			}
-
-
-		}	 
+		/*
+		 * for (Object field : fields) { try { if (columnmap.get(field.toString()) ==
+		 * null) { throw new AdempiereUserError("Excel " + field.toString()
+		 * +"Column not found" ); } } catch (Exception e) { throw new
+		 * AdempiereUserError("Excel " + field.toString() +" Column not found" ); }
+		 * 
+		 * 
+		 * }
+		 */
 		return i;
 
 
@@ -437,7 +469,6 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private Sheet createErrorXLS() throws Exception {
 
 		errorWb= new XSSFWorkbook();  // or new XSSFWorkbook();
-		CreationHelper createHelper = errorWb.getCreationHelper();
 		Sheet sheet1 = errorWb.createSheet("Import Errors");
 		return sheet1;
 	}

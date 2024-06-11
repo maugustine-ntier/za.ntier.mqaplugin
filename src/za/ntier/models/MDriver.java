@@ -55,16 +55,28 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 
 		return super.beforeSave(newRecord);
 	}
-	public static MDriver getDriver(Properties ctx,String ZZ_ID_Passport_No) {
+	public static MDriver getDriver(Properties ctx,String zz_ID_Passport_No,String trxName) {
 		MDriver mDriver = null;
-		if (ZZ_ID_Passport_No != null) {
+		if (zz_ID_Passport_No != null) {
 			String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
-			int zz_Driver_ID = DB.getSQLValue(null, SQL, ZZ_ID_Passport_No.trim());
+			int zz_Driver_ID = DB.getSQLValue(trxName, SQL, zz_ID_Passport_No.trim());
 			if (zz_Driver_ID > 0) {
-				mDriver = new MDriver(ctx, zz_Driver_ID, null);
+				mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
 			}
 		}
 		return mDriver;
 	}
+
+	public static MDriver createDriver(Properties ctx,String zz_ID_Passport_No,String name, String surname, String trxName) {
+		MDriver mDriver = new MDriver(ctx, 0, trxName);
+		mDriver.setZZ_ID_Passport_No(zz_ID_Passport_No);
+		mDriver.setName(name);
+		mDriver.setZZ_Surname(surname);
+		if (mDriver.save()) {
+			return mDriver;
+		}
+		return null;
+	}
+
 
 }
