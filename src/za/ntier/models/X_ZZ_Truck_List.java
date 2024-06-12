@@ -33,7 +33,7 @@ public class X_ZZ_Truck_List extends PO implements I_ZZ_Truck_List, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240610L;
+	private static final long serialVersionUID = 20240612L;
 
     /** Standard Constructor */
     public X_ZZ_Truck_List (Properties ctx, int ZZ_Truck_List_ID, String trxName)
@@ -187,6 +187,21 @@ public class X_ZZ_Truck_List extends PO implements I_ZZ_Truck_List, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Import Errors.
+		@param ZZ_Import_Errors Import Errors
+	*/
+	public void setZZ_Import_Errors (String ZZ_Import_Errors)
+	{
+		set_Value (COLUMNNAME_ZZ_Import_Errors, ZZ_Import_Errors);
+	}
+
+	/** Get Import Errors.
+		@return Import Errors	  */
+	public String getZZ_Import_Errors()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Import_Errors);
 	}
 
 	/** Set No Of Loads.

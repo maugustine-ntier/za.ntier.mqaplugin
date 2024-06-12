@@ -157,6 +157,15 @@ public interface I_ZZ_Truck_List
 
 	public I_ZZ_Truck getZZ_Horse() throws RuntimeException;
 
+    /** Column name ZZ_Import_Errors */
+    public static final String COLUMNNAME_ZZ_Import_Errors = "ZZ_Import_Errors";
+
+	/** Set Import Errors	  */
+	public void setZZ_Import_Errors (String ZZ_Import_Errors);
+
+	/** Get Import Errors	  */
+	public String getZZ_Import_Errors();
+
     /** Column name ZZ_No_Of_Loads */
     public static final String COLUMNNAME_ZZ_No_Of_Loads = "ZZ_No_Of_Loads";
 

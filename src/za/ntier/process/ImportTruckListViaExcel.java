@@ -60,7 +60,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private File importFile = null;
 	private Sheet errorSheet = null;
 	private int maxCols = 0;
-	private boolean header = true;
+	private Map<Integer, String> errorMsgs = new HashMap<>();
 
 	@Override
 	protected void prepare() {
@@ -193,7 +193,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				} else {
 					MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
 					if (mTruck_horse == null) {
-						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Does not exist",row);
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Does not exist (Will be Created)",row);
 						rowNoToWrite++;
 					} else {
 						if (!mTruck_horse.getZZ_Truck_Type().equals("H")) {
@@ -209,7 +209,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				} else {
 					MTruck mTruck_Trailer_1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
 					if (mTruck_Trailer_1 == null) {
-						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Does not exist",row);
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 Does not exist (Will be Created)",row);
 						rowNoToWrite++;
 					} else {
 						if (!mTruck_Trailer_1.getZZ_Truck_Type().equals("T")) {
@@ -225,7 +225,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				} else {
 					MTruck mTruck_Trailer_2 = MTruck.getTruck(getCtx(), trailer_2,get_TrxName());
 					if (mTruck_Trailer_2 == null) {
-						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 Does not exist",row);
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 Does not exist (Will be Created)",row);
 						rowNoToWrite++;
 					} else {
 						if (!mTruck_Trailer_2.getZZ_Truck_Type().equals("T")) {
@@ -241,7 +241,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				} else {
 					MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo,get_TrxName());
 					if (mDriver == null) {
-						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver does not Exist on the database",row);
+						writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver does not Exist on the database (Will be Created)",row);
 						rowNoToWrite++;
 					} else {
 						if (!mDriver.isZZ_Is_Valid()) {
@@ -357,7 +357,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				}
 				MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo,get_TrxName());
 				if (mDriver == null) {
-					mDriver = mDriver.createDriver(getCtx(), driver_IDNo, name, surname, get_TrxName());
+					mDriver = MDriver.createDriver(getCtx(), driver_IDNo, name, surname, get_TrxName());
 				} 
 				mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
 				if (mTruck_horse != null)
@@ -369,6 +369,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				if (mDriver != null)
 					mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
 				mTruckList.setZZ_No_Of_Loads((no_Of_Loads == null) ? null :BigDecimal.valueOf(no_Of_Loads));
+				mTruckList.setZZ_Import_Errors(errorMsgs.get(row.getRowNum()));
 				String errMessage = mTruckList.doChecks(true);
 				if (errMessage != null) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), errMessage,row);
@@ -449,7 +450,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		}
 
 
-		Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads};
+		//Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads};
 
 
 		/*
@@ -486,12 +487,22 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		if (errorMsg != null && !errorMsg.trim().equals("")) {
 			row.createCell(col).setCellValue(createHelper.createRichTextString(errorMsg));
 			col++;
+			String oldMsg = errorMsgs.get(rowNoOriginalFile);
+			String newMsg = "";
+			if (oldMsg != null && !oldMsg.trim().equals("") ) {
+				newMsg = oldMsg + "\n" + errorMsg;
+			} else {
+				newMsg = errorMsg;
+			}
+			errorMsgs.put(rowNoOriginalFile, newMsg);
 		}
 		if (col > maxCols) {
 			maxCols = col - 1;
 		}
 
 	}
+	
+	
 
 
 
