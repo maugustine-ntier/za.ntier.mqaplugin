@@ -111,7 +111,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 
 			msg = loadTruckList(workbook, zz_Transporters_ID);
 
-			if (noOfErrorLines <= 0) {  // dont display if we just have headers
+			if (noOfErrorLines > 0) {  // dont display if we just have headers
 				String fileName = writeOutErrorLogFile(errorSheet);
 				msg = "There are errors on the file.  Please check the error Log file : " + fileName;
 			}
@@ -333,7 +333,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				String surname = null;
 				if (driversName != null) {
 					surname = driversName.substring(driversName.lastIndexOf(' ') + 1);
-					name = driversName.substring(0,driversName.lastIndexOf(' ') - 1);
+					name = driversName.substring(0,driversName.lastIndexOf(' '));
 				}
 
 				if ((horse == null || horse.trim().equals(""))
