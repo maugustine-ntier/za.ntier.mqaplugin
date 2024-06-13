@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,6 +19,8 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MImage;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
+
+import za.ntier.models.MDriver;
 
 /*Scanning of Driver licenses and ID/passports.
 
@@ -32,12 +36,13 @@ ID_<ID/Passport no>_<1st Name>_<2nd Name>
 Each transporter should have their own folder to keep these images.
 When Jane's team starts on this task, they would need to do a couple of scans and send to Yogan for verification
 and a go-ahead.
-*/
+ */
 @org.adempiere.base.annotation.Process
 public class LoadDriverLicenseAndIdImages extends SvrProcess {
 
 
 	String p_path = null;
+	Map errorMap = new HashMap();
 
 
 	@Override
@@ -105,9 +110,28 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 		}
 	}
 
-	
-	private void createDriverWithImage (MImage mImage, boolean isLicense) {
-		
+
+	private void createDriverWithImage (MImage mImage,String fileName) {
+		String words[] = fileName.split("_");
+		if (words != null && words.length >= 3) {
+			if (words[1].toUpperCase() != null) {
+				MDriver mDriver = MDriver.getDriver(getCtx(), words[1].toUpperCase(),get_TrxName()); 
+				if (mDriver == null) {
+					mDriver = MDriver.createDriver(getCtx(), words[1].toUpperCase(), fileName, fileName, get_TrxName());
+				}
+				if (words[0].toUpperCase().equals("L") ) {
+
+				} else if (words[0].toUpperCase().equals("ID") ) {
+
+				} else {
+					errorMap.put(fileName, "Filename does not start with L or ID");
+				}
+			} else {
+				errorMap.put(fileName, "Filename does not contain a ID no or Passport No");
+			}
+		}
+
+
 	}
 
 
