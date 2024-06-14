@@ -357,7 +357,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				}
 				MDriver mDriver = MDriver.getDriver(getCtx(), driver_IDNo,get_TrxName());
 				if (mDriver == null) {
-					mDriver = MDriver.createDriver(getCtx(), driver_IDNo, name, surname, get_TrxName());
+					mDriver = MDriver.createDriver(getCtx(), driver_IDNo, name, surname, null, get_TrxName());
 				} 
 				mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
 				if (mTruck_horse != null)

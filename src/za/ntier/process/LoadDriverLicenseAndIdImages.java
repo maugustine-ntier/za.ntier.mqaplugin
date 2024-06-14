@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,27 +114,42 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 	}
 
 
-	private void createDriverWithImage (MImage mImage,String fileName) {
+	private MDriver createDriverWithImage (MImage mImage,String fileName) {
+		MDriver mDriver = null;
 		String words[] = fileName.split("_");
+		String name = null;
+		String surname = null;		
+		Timestamp licenseExpiryDt = null;
 		if (words != null && words.length >= 3) {
 			if (words[1].toUpperCase() != null) {
-				MDriver mDriver = MDriver.getDriver(getCtx(), words[1].toUpperCase(),get_TrxName()); 
-				if (mDriver == null) {
-					mDriver = MDriver.createDriver(getCtx(), words[1].toUpperCase(), fileName, fileName, get_TrxName());
-				}
+
 				if (words[0].toUpperCase().equals("L") ) {
+					if (words[2] != null) {
+						try {
+							String pattern = "dd/MM/yyyy";  
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);  
+							Instant instant = Instant.from(formatter.parse(words[2]));  
+							licenseExpiryDt = Timestamp.from(instant); 
+						} catch (IllegalArgumentException e)	{
+							errorMap.put(fileName, "Filename does not contain a valid expiry date");
+						}
 
-				} else if (words[0].toUpperCase().equals("ID") ) {
-
+					} else if (words[0].toUpperCase().equals("ID") ) {
+						name = words[2].trim();
+						surname = words[3].trim();
+					} else {
+						errorMap.put(fileName, "Filename does not start with L or ID");
+					}
+					mDriver = MDriver.getDriver(getCtx(), words[1].toUpperCase(),get_TrxName()); 
+					if (mDriver == null) {
+						mDriver = MDriver.createDriver(getCtx(), words[1].toUpperCase(), name, surname, licenseExpiryDt, get_TrxName());
+					}
 				} else {
-					errorMap.put(fileName, "Filename does not start with L or ID");
+					errorMap.put(fileName, "Filename does not contain a ID no or Passport No");
 				}
-			} else {
-				errorMap.put(fileName, "Filename does not contain a ID no or Passport No");
 			}
 		}
-
-
+		return mDriver;
 	}
 
 

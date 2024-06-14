@@ -1,6 +1,8 @@
 package za.ntier.models;
 
+
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.compiere.util.DB;
@@ -67,12 +69,14 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 		return mDriver;
 	}
 
-	public static MDriver createDriver(Properties ctx,String zz_ID_Passport_No,String name, String surname, String trxName) {
+	public static MDriver createDriver(Properties ctx,String zz_ID_Passport_No,String name, String surname, Timestamp expiryDt, String trxName) {
 		MDriver mDriver = new MDriver(ctx, 0, trxName);
 		mDriver.setZZ_ID_Passport_No(zz_ID_Passport_No);
 		mDriver.setName(name);
 		mDriver.setZZ_Surname(surname);
-		mDriver.setZZ_License_Expiry_Date(DB.getSQLValueTS(trxName,"select to_Date('01011960','ddmmyyyy')"));
+		if (expiryDt == null) {
+			mDriver.setZZ_License_Expiry_Date(DB.getSQLValueTS(trxName,"select to_Date('01011960','ddmmyyyy')"));
+		}
 		if (mDriver.save()) {
 			return mDriver;
 		}
