@@ -9,8 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MImage;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 
 import za.ntier.models.MDriver;
 
@@ -57,7 +59,7 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 			String name = para[i].getParameterName();
 			if (para[i].getParameter() == null)
 				;
-			else if (name.equals("FileName"))
+			else if (name.equals("FileDirectory"))
 				p_path = para[i].getParameterAsString();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
@@ -68,7 +70,7 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		int cnt = 0;
-		Path path = Paths.get("C:\\test\\");
+		Path path = Paths.get(p_path);
 		List<Path> paths = listFiles(path);
 		paths.forEach(x -> processFile(x));
 
@@ -91,7 +93,7 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 	private void processFile(Path pathToFile) throws AdempiereException {
 		File file = pathToFile.toFile();
 		if (file.exists()) {
-			// read files into byte[]
+			// read files into byte[] 
 			final byte[] dataEntry = new byte[(int) file.length()];
 			try {
 				final FileInputStream fileInputStream = new FileInputStream(file);
@@ -100,13 +102,14 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 				MImage mImage = new MImage(getCtx(), 0, get_TrxName());
 				mImage.setBinaryData(dataEntry);
 				mImage.saveEx();
+				createDriverWithImage(mImage,file.getName());
 			} catch (FileNotFoundException e) {
 				log.severe("File Not Found.");
 				e.printStackTrace();
 			} catch (IOException e1) {
 				log.severe("Error Reading The File.");
 				e1.printStackTrace();
-			}
+			} 
 		} else {
 			log.severe("file not found: " + file.getAbsolutePath());
 			return;
@@ -114,40 +117,57 @@ public class LoadDriverLicenseAndIdImages extends SvrProcess {
 	}
 
 
-	private MDriver createDriverWithImage (MImage mImage,String fileName) {
+	private MDriver createDriverWithImage (MImage mImage,String fileName) throws AdempiereException{
 		MDriver mDriver = null;
-		String words[] = fileName.split("_");
+		String words[] = fileName.split("_|\\.");
 		String name = null;
 		String surname = null;		
 		Timestamp licenseExpiryDt = null;
+		int licenseImage_ID = -1;
+		int IDPassportImage_ID = -1;
 		if (words != null && words.length >= 3) {
 			if (words[1].toUpperCase() != null) {
 
 				if (words[0].toUpperCase().equals("L") ) {
 					if (words[2] != null) {
 						try {
-							String pattern = "dd/MM/yyyy";  
-							DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);  
-							Instant instant = Instant.from(formatter.parse(words[2]));  
-							licenseExpiryDt = Timestamp.from(instant); 
-						} catch (IllegalArgumentException e)	{
+							SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+							Date date = formatter.parse(words[2]);
+							licenseExpiryDt = new Timestamp(date.getTime());  
+						} catch (ParseException e)	{
 							errorMap.put(fileName, "Filename does not contain a valid expiry date");
 						}
+					}
+					licenseImage_ID = mImage.getAD_Image_ID();
 
-					} else if (words[0].toUpperCase().equals("ID") ) {
-						name = words[2].trim();
-						surname = words[3].trim();
-					} else {
-						errorMap.put(fileName, "Filename does not start with L or ID");
-					}
-					mDriver = MDriver.getDriver(getCtx(), words[1].toUpperCase(),get_TrxName()); 
-					if (mDriver == null) {
-						mDriver = MDriver.createDriver(getCtx(), words[1].toUpperCase(), name, surname, licenseExpiryDt, get_TrxName());
-					}
+				} else if (words[0].toUpperCase().equals("ID") ) {
+					name = words[2].trim();
+					surname = words[3].trim();
+					IDPassportImage_ID = mImage.getAD_Image_ID();
 				} else {
-					errorMap.put(fileName, "Filename does not contain a ID no or Passport No");
+					errorMap.put(fileName, "Filename does not start with L or ID");
 				}
+				mDriver = MDriver.getDriver(getCtx(), words[1].toUpperCase(),get_TrxName()); 
+				if (mDriver == null) {
+					mDriver = MDriver.createDriver(getCtx(), words[1].toUpperCase(), name, surname, licenseExpiryDt, get_TrxName());
+				} else {
+					if (licenseExpiryDt != null && 
+							(mDriver.getZZ_License_Expiry_Date() == null || mDriver.getZZ_License_Expiry_Date().equals(DB.getSQLValueTS(get_TrxName(),"select to_Date('01011960','ddmmyyyy')")))) {
+						mDriver.setZZ_License_Expiry_Date(licenseExpiryDt);
+					}
+				}
+				if (mDriver != null) {
+					if (licenseImage_ID > 0) {
+						mDriver.setZZ_License_ID(licenseImage_ID);
+					} else if (IDPassportImage_ID > 0){
+						mDriver.setZZ_ID_Passport_ID(IDPassportImage_ID);
+					}
+					mDriver.saveEx();
+				}
+			} else {
+				errorMap.put(fileName, "Filename does not contain a ID no or Passport No");
 			}
+
 		}
 		return mDriver;
 	}
