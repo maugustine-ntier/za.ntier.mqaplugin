@@ -270,8 +270,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						rowNoToWrite++;
 					} else {
 						if (!mDriver.isZZ_Is_Valid()) {
-							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database",row);
-							rowNoToWrite++;
+						//	writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database",row);
+						//	rowNoToWrite++;
 						}
 						if (mDriver.getZZ_License_Expiry_Date() == null || (DB.TO_DATE(mDriver.getZZ_License_Expiry_Date()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
 							String stringDt = "";
