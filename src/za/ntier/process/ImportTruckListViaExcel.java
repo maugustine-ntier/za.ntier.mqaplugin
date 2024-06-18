@@ -206,7 +206,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 							if (mTruck_horse.getZZ_Vehicle_License_Expiry() != null) {
 								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_horse.getZZ_Vehicle_License_Expiry()); 
 							}
-							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse's License has expired: " + stringDt,row);
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse's License has expired or is missing: " + stringDt,row);
 							rowNoToWrite++;
 						}
 					}
@@ -230,7 +230,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 							if (mTruck_Trailer_1.getZZ_Vehicle_License_Expiry() != null) {
 								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_Trailer_1.getZZ_Vehicle_License_Expiry()); 
 							}
-							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1's License has expired: " + stringDt,row);
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1's License has expired or is missing: " + stringDt,row);
 							rowNoToWrite++;
 						}
 					}
@@ -254,7 +254,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 							if (mTruck_Trailer_2.getZZ_Vehicle_License_Expiry() != null) {
 								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_Trailer_2.getZZ_Vehicle_License_Expiry()); 
 							}
-							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2's License has expired: " + stringDt,row);
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2's License has expired or is missing: " + stringDt,row);
 							rowNoToWrite++;
 						}
 					}
