@@ -54,6 +54,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	private String p_driver = "DRIVER";
 	private String p_driver_name = "DriverName";
 	private String p_loads = "LOADS";
+	private String p_fleet = "FLEET";
 	private int counter = 0;
 	private Workbook errorWb = null;
 	private FileInputStream inp = null;
@@ -200,6 +201,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse on the database is marked as a Trailer",row);
 							rowNoToWrite++;
 						}
+						if (mTruck_horse.getZZ_Vehicle_License_Expiry() == null || (DB.TO_DATE(mTruck_horse.getZZ_Vehicle_License_Expiry()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
+							String stringDt = "";
+							if (mTruck_horse.getZZ_Vehicle_License_Expiry() != null) {
+								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_horse.getZZ_Vehicle_License_Expiry()); 
+							}
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse's License has expired: " + stringDt,row);
+							rowNoToWrite++;
+						}
 					}
 				}
 
@@ -216,6 +225,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1 on the database is marked as a Horse",row);
 							rowNoToWrite++;
 						}
+						if (mTruck_Trailer_1.getZZ_Vehicle_License_Expiry() == null || (DB.TO_DATE(mTruck_Trailer_1.getZZ_Vehicle_License_Expiry()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
+							String stringDt = "";
+							if (mTruck_Trailer_1.getZZ_Vehicle_License_Expiry() != null) {
+								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_Trailer_1.getZZ_Vehicle_License_Expiry()); 
+							}
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 1's License has expired: " + stringDt,row);
+							rowNoToWrite++;
+						}
 					}
 				}
 
@@ -230,6 +247,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					} else {
 						if (!mTruck_Trailer_2.getZZ_Truck_Type().equals("T")) {
 							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2 on the database is marked as a Horse",row);
+							rowNoToWrite++;
+						}
+						if (mTruck_Trailer_2.getZZ_Vehicle_License_Expiry() == null || (DB.TO_DATE(mTruck_Trailer_2.getZZ_Vehicle_License_Expiry()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
+							String stringDt = "";
+							if (mTruck_Trailer_2.getZZ_Vehicle_License_Expiry() != null) {
+								stringDt = new SimpleDateFormat("dd/MM/yyyy").format(mTruck_Trailer_2.getZZ_Vehicle_License_Expiry()); 
+							}
+							writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Trailer 2's License has expired: " + stringDt,row);
 							rowNoToWrite++;
 						}
 					}
@@ -342,10 +367,21 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						&& (driver_IDNo == null|| driver_IDNo.trim().equals(""))) {
 					continue;
 				}
+				String fleetNO = null;
+				if (row.getCell(columnmap.get(p_fleet)).getCellType().equals(CellType.STRING)) {
+					fleetNO =   row.getCell(columnmap.get(p_fleet)).getStringCellValue(); 
+				} else if (row.getCell(columnmap.get(p_fleet)).getCellType().equals(CellType.NUMERIC)){
+					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_fleet)).getNumericCellValue()).toBigInteger() ;
+					fleetNO =   bint.toString();
+				}
 				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
 				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
 				if (mTruck_horse == null) {
 					mTruck_horse = MTruck.createTruck(getCtx(), horse, "H",get_TrxName());
+				}
+				if (mTruck_horse != null && (mTruck_horse.getZZ_Fleet_No() == null || mTruck_horse.getZZ_Fleet_No().equals(fleetNO))) {
+					mTruck_horse.setZZ_Fleet_No(fleetNO);
+					mTruck_horse.saveEx();
 				}
 				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
 				if (mTruck_trailer1 == null) {
@@ -368,6 +404,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
 				if (mDriver != null)
 					mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+				if (fleetNO != null) {
+					mTruckList.setZZ_Fleet_No(fleetNO);
+				}
 				mTruckList.setZZ_No_Of_Loads((no_Of_Loads == null) ? null :BigDecimal.valueOf(no_Of_Loads));
 				mTruckList.setZZ_Import_Errors(errorMsgs.get(row.getRowNum()));
 				String errMessage = mTruckList.doChecks(true);
@@ -423,6 +462,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						columnname = p_trailer2;
 					} else if (columnname.contains("DRIVER") && columnname.contains("NAME")) {
 						columnname = p_driver_name;
+					} else if (columnname.contains("FLEET") && columnname.contains("NO")) {
+						columnname = p_fleet;
 					}
 					break;
 				case "NUMERIC":
@@ -435,7 +476,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					break;
 				}
 				if (!columnname.equals("Unknown")) {
-					Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads};
+					Object[] fields =  new Object[] {p_horse,p_trailer1,p_trailer2,p_driver,p_driver_name,p_loads,p_fleet};
 					for (Object field : fields) {
 						if (field.toString().equals(columnname)) {
 							columnmap.put(columnname,cell.getColumnIndex()) ;
