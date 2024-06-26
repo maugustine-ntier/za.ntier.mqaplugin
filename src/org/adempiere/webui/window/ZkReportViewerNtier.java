@@ -118,7 +118,7 @@ import org.idempiere.print.renderer.XLSReportRendererConfiguration;
 import org.idempiere.print.renderer.XLSXReportRendererConfiguration;
 import org.idempiere.ui.zk.media.IMediaView;
 import org.idempiere.ui.zk.media.WMediaOptions;
-import org.idempiere.ui.zk.report.XLSXReportViewerRendererRGN;
+import org.idempiere.ui.zk.report.IReportViewerRenderer;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.au.out.AuScript;
@@ -169,7 +169,7 @@ import net.sf.jasperreports.engine.JasperPrint;
  *
  * @author Low Heng Sin
  */
-public class ZkReportViewerRGN extends Window implements EventListener<Event>, IReportViewerExportSource {
+public class ZkReportViewerNtier extends Window implements EventListener<Event>, IReportViewerExportSource {
 	/**
 	 * generated serial id
 	 */
@@ -201,7 +201,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	private Menuitem 	m_daM = null;
 
 	/**	Logger			*/
-	private static final CLogger log = CLogger.getCLogger(ZkReportViewerRGN.class);
+	private static final CLogger log = CLogger.getCLogger(ZkReportViewerNtier.class);
 
 	//
 	private StatusBarPanel statusBar = new StatusBarPanel();
@@ -245,7 +245,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	private Label rowCount;
 	
 	private final Map<ExportFormat, String> exportMap = new LinkedHashMap<>();
-	private final Map<String, IReportViewerRendererRGN> rendererMap = new TreeMap<>();
+	private final Map<String, IReportViewerRenderer> rendererMap = new TreeMap<>();
 
 	private Center center;
 
@@ -261,30 +261,31 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	 * @param re
 	 * @param title
 	 */
-	public ZkReportViewerRGN(File file, String title) {		
+	public ZkReportViewerNtier(ReportEngine re, String title) {		
 		super();
 
-		/* Martin
-		 * init = false; m_WindowNo =
-		 * SessionManager.getAppDesktop().registerWindow(this);
-		 * setAttribute(IDesktop.WINDOWNO_ATTRIBUTE, m_WindowNo);
-		 * Env.setContext(re.getCtx(), m_WindowNo, "_WinInfo_IsReportViewer", "Y");
-		 * m_reportEngine = re; m_AD_Table_ID = re.getPrintFormat().getAD_Table_ID(); if
-		 * (!MRole.getDefault().isCanReport(m_AD_Table_ID)) { Dialog.error(m_WindowNo,
-		 * "AccessCannotReport", m_reportEngine.getName()); this.onClose(); }
-		 * m_isCanExport = MRole.getDefault().isCanExport(m_AD_Table_ID);
-		 * 
-		 * setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Report") + ": " +
-		 * m_reportEngine.getPrintFormat().get_Translation(MPrintFormat.COLUMNNAME_Name)
-		 * ));
-		 */
+		init = false;
+		m_WindowNo = SessionManager.getAppDesktop().registerWindow(this);
+		setAttribute(IDesktop.WINDOWNO_ATTRIBUTE, m_WindowNo);
+		Env.setContext(re.getCtx(), m_WindowNo, "_WinInfo_IsReportViewer", "Y");
+		m_reportEngine = re;
+		m_AD_Table_ID = re.getPrintFormat().getAD_Table_ID();
+		if (!MRole.getDefault().isCanReport(m_AD_Table_ID))
+		{
+			Dialog.error(m_WindowNo, "AccessCannotReport", m_reportEngine.getName());
+			this.onClose();
+		}
+		m_isCanExport = MRole.getDefault().isCanExport(m_AD_Table_ID);
+		
+		setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Report") + ": " +
+				m_reportEngine.getPrintFormat().get_Translation(MPrintFormat.COLUMNNAME_Name)));
 		
 		addEventListener(ON_RENDER_REPORT_EVENT, this);
 		addEventListener("onPostInit", e -> {
 			postRenderReportEvent();
 		});
 		
-		initMediaSuppliers(file);
+		initMediaSuppliers();
 	}
 
 	/**
@@ -303,16 +304,21 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	/**
 	 * Create media supplier for supported format (pdf, html, etc)
 	 */
-	private void initMediaSuppliers(File file) {
-	    IReportViewerRendererRGN renderer = new XLSXReportViewerRendererRGN(file);
-		
-		
+	private void initMediaSuppliers() {
+		List<IReportViewerRenderer> renderers = Extensions.getReportViewerRenderers();
+		Collections.sort(renderers, new Comparator<IReportViewerRenderer>() {
+			@Override
+			public int compare(IReportViewerRenderer r1, IReportViewerRenderer r2) {
+				return r1.getExportLabel().compareTo(r2.getExportLabel());
+			}
+		});
+		for(IReportViewerRenderer renderer : renderers) {
 			if (renderer.isExport()) { 
 				ExportFormat exportFormat = new ExportFormat(renderer.getExportLabel(), renderer.getFileExtension(), renderer.getContentType());
 				exportMap.put(exportFormat, renderer.getId());
 			}
 			rendererMap.put(renderer.getId(), renderer);
-		
+		}
 	}
 
 	@Override
@@ -321,7 +327,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		if (newpage != null && !init) {
 			try
 			{
-				m_ctx = Env.getCtx(); // .getCtx();
+				m_ctx = m_reportEngine.getCtx();
 				init();
 				dynInit();
 				SessionManager.getSessionApplication().getKeylistener().addEventListener(Events.ON_CTRL_KEY, this);
@@ -369,8 +375,8 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		
 		toolBar.appendChild(new Separator("vertical"));
 		
-		String type = XLSX_OUTPUT_TYPE;
-		/*if (m_reportEngine.getReportType() != null)
+		String type = null;
+		if (m_reportEngine.getReportType() != null)
 		{
 			type = m_reportEngine.getReportType();
 		}
@@ -380,7 +386,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
     		type = m_reportEngine.getPrintFormat().isForm() || m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0
     				? MSysConfig.getValue(MSysConfig.ZK_REPORT_FORM_OUTPUT_TYPE,PDF_OUTPUT_TYPE,Env.getAD_Client_ID(m_ctx),Env.getAD_Org_ID(m_ctx))
     				: MSysConfig.getValue(MSysConfig.ZK_REPORT_TABLE_OUTPUT_TYPE,PDF_OUTPUT_TYPE,Env.getAD_Client_ID(m_ctx),Env.getAD_Org_ID(m_ctx));    
-		}*/
+		}
 
 		int defaultIndex = -1;
 		for(int i = 0; i < previewType.getItemCount(); i++) {
@@ -392,9 +398,9 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 				defaultIndex = i;
 			}
 		}
-		//if (previewType.getSelectedIndex() < 0) {
-		//	previewType.setSelectedIndex(defaultIndex >= 0 ? defaultIndex : 0);
-		//}
+		if (previewType.getSelectedIndex() < 0) {
+			previewType.setSelectedIndex(defaultIndex >= 0 ? defaultIndex : 0);
+		}
 		
 		Vlayout toolbarPopupLayout = null;
 		if (ClientInfo.maxWidth(ClientInfo.SMALL_WIDTH-1))
@@ -434,15 +440,16 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 				{
 					toolBar.appendChild(wLanguage.getComponent());
 				}
-				/*
-				 * // Init Language from Printformat int languageID = 0;
-				 * if(m_reportEngine.getPrintFormat() != null &&
-				 * m_reportEngine.getPrintFormat().getLanguage() != null) { MLanguage language =
-				 * MLanguage.get(m_ctx, m_reportEngine.getPrintFormat().getLanguage());
-				 * if(language != null) languageID = language.getAD_Language_ID(); }
-				 * if(m_reportEngine.getLanguageID() > 0) languageID =
-				 * m_reportEngine.getLanguageID(); wLanguage.setValue(languageID);
-				 */
+				// Init Language from Printformat
+				int languageID = 0;
+				if(m_reportEngine.getPrintFormat() != null && m_reportEngine.getPrintFormat().getLanguage() != null) {
+					MLanguage language = MLanguage.get(m_ctx, m_reportEngine.getPrintFormat().getLanguage());
+					if(language != null)
+						languageID = language.getAD_Language_ID();
+				}
+				if(m_reportEngine.getLanguageID() > 0)
+					languageID = m_reportEngine.getLanguageID();
+				wLanguage.setValue(languageID);
 				wLanguage.getComponent().addEventListener(Events.ON_SELECT, this);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, e.getLocalizedMessage());
@@ -453,7 +460,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			toolBar.appendChild(new Separator("vertical"));
 		
 		summary.setText(Msg.getMsg(Env.getCtx(), "Summary"));		
-		//summary.setChecked(m_reportEngine.isSummary());
+		summary.setChecked(m_reportEngine.isSummary());
 		if (toolbarPopup != null)
 		{
 			toolbarPopupLayout.appendChild(summary);
@@ -488,10 +495,9 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			bFind.setImage(ThemeManager.getThemeResource("images/Find24.png"));
 		bFind.setTooltiptext(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Find")));		
 		bFind.addEventListener(Events.ON_CLICK, this);
-		/*
-		 * if (getAD_Tab_ID(m_reportEngine.getPrintFormat().getAD_Table_ID()) <= 0) {
-		 * bFind.setVisible(false); // IDEMPIERE-1185 }
-		 */
+		if (getAD_Tab_ID(m_reportEngine.getPrintFormat().getAD_Table_ID()) <= 0) {
+			bFind.setVisible(false); // IDEMPIERE-1185
+		}
 		
 		if (toolbarPopup != null)
 		{
@@ -540,9 +546,9 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		if (ThemeManager.isUseFontIconForImage())
 			LayoutUtils.addSclass("medium-toolbarbutton", bArchive);
 
-	//	int tableId = m_reportEngine.getPrintInfo().getAD_Table_ID();
-	//	int recordId = m_reportEngine.getPrintInfo().getRecord_ID();
-		//if (tableId > 0 && recordId > 0) {
+		int tableId = m_reportEngine.getPrintInfo().getAD_Table_ID();
+		int recordId = m_reportEngine.getPrintInfo().getRecord_ID();
+		if (tableId > 0 && recordId > 0) {
 			bAttachment.setName("Attachment");
 			if (ThemeManager.isUseFontIconForImage())
 				bAttachment.setIconSclass("z-icon-Attachment");
@@ -559,7 +565,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			bAttachment.addEventListener(Events.ON_CLICK, this);
 			if (ThemeManager.isUseFontIconForImage())
 				LayoutUtils.addSclass("medium-toolbarbutton", bAttachment);
-		//}
+		}
 
 		if ( m_isCanExport )
 		{
@@ -601,7 +607,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		if (ThemeManager.isUseFontIconForImage())
 			LayoutUtils.addSclass("medium-toolbarbutton", bRefresh);
 		
-		MPrintFormat pf = null; // m_reportEngine.getPrintFormat();
+		MPrintFormat pf = m_reportEngine.getPrintFormat();
 		if (pf != null) {
 			if((!pf.isForm()) && (pf.getAD_ReportView_ID() > 0)) {
 				bReRun.setName("ReRun");
@@ -701,17 +707,17 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		rowCount = new Label();
 		rowCount.setStyle("float: right;");		
 		linkDiv.appendChild(rowCount);
-		//if (m_reportEngine.getPrintData() != null)
-		//	rowCount.setText(Msg.getMsg(m_ctx, "RowCount", new Object[] {m_reportEngine.getPrintData().getRowCount(false)}));
+		if (m_reportEngine.getPrintData() != null)
+			rowCount.setText(Msg.getMsg(m_ctx, "RowCount", new Object[] {m_reportEngine.getPrintData().getRowCount(false)}));
 		
 		south.appendChild(linkDiv);		
 		
 		//m_WindowNo
-		int AD_Window_ID = 0; // Env.getContextAsInt(Env.getCtx(), m_reportEngine.getWindowNo(), "_WinInfo_AD_Window_ID", true);
-	//	if (AD_Window_ID == 0)
-	//		AD_Window_ID = Env.getZoomWindowID(m_reportEngine.getQuery());
-		//m_AD_Process_ID = m_reportEngine.getPrintInfo() != null ? m_reportEngine.getPrintInfo().getAD_Process_ID() : 0;
-	//	updateToolbarAccess(AD_Window_ID, m_AD_Process_ID);
+		int AD_Window_ID = Env.getContextAsInt(Env.getCtx(), m_reportEngine.getWindowNo(), "_WinInfo_AD_Window_ID", true);
+		if (AD_Window_ID == 0)
+			AD_Window_ID = Env.getZoomWindowID(m_reportEngine.getQuery());
+		m_AD_Process_ID = m_reportEngine.getPrintInfo() != null ? m_reportEngine.getPrintInfo().getAD_Process_ID() : 0;
+		updateToolbarAccess(AD_Window_ID, m_AD_Process_ID);
 
 		this.setBorder("normal");
 
@@ -774,20 +780,26 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			}
 			previewType.getChildren().clear();
 		}
-		/*
-		 * if (m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0) { for
-		 * (ValueNamePair vnp : JasperPrintRenderer.getPreviewType(m_isCanExport)) {
-		 * ListItem li = previewType.appendItem(vnp.getName(), vnp.getValue()); if
-		 * (selectedValue != null && selectedValue.equals(li.getValue()))
-		 * previewType.setSelectedItem(li); } if (summary != null)
-		 * summary.setVisible(false); } else { for(String id : rendererMap.keySet()) {
-		 * IReportViewerRendererRGN renderer = rendererMap.get(id); if
-		 * (!renderer.isPreview(m_isCanExport)) continue; ListItem li =
-		 * previewType.appendItem(renderer.getPreviewLabel(), renderer.getId()); if
-		 * (selectedValue != null && selectedValue.equals(li.getValue()))
-		 * previewType.setSelectedItem(li); } if (summary != null)
-		 * summary.setVisible(true); }
-		 */
+		if (m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0) {
+			for (ValueNamePair vnp : JasperPrintRenderer.getPreviewType(m_isCanExport)) {
+				ListItem li = previewType.appendItem(vnp.getName(), vnp.getValue());
+				if (selectedValue != null && selectedValue.equals(li.getValue()))
+					previewType.setSelectedItem(li);
+			}
+			if (summary != null)
+				summary.setVisible(false);
+		} else {
+			for(String id : rendererMap.keySet()) {
+				IReportViewerRenderer renderer = rendererMap.get(id);
+				if (!renderer.isPreview(m_isCanExport))
+					continue;
+				ListItem li = previewType.appendItem(renderer.getPreviewLabel(), renderer.getId());
+				if (selectedValue != null && selectedValue.equals(li.getValue()))
+					previewType.setSelectedItem(li);
+			}
+			if (summary != null)
+				summary.setVisible(true);
+		}		
 	}
 
 	/**
@@ -827,8 +839,8 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	 */
 	private void renderReport() {
 		media = null;
-		//Listitem selected = previewType.getSelectedItem();
-		new RendererRunnable(this, XLSX_OUTPUT_TYPE).run();
+		Listitem selected = previewType.getSelectedItem();
+		new RendererRunnable(this, selected.getValue()).run();
 	}
 	
 	/**
@@ -855,10 +867,13 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			reportLink.setHref(url);
 			reportLink.setLabel(media.getName());			
 			
-			Listitem selected = null ; // previewType.getSelectedItem();
-			String outputType = XLSX_OUTPUT_TYPE; // previewType.getSelectedItem().getValue();
+			Listitem selected = previewType.getSelectedItem();
+			String outputType = previewType.getSelectedItem().getValue();
 			if (ClientInfo.isMobile()) {				
-				if (HTML_OUTPUT_TYPE.equals(outputType)) {
+				if (selected == null || PDF_OUTPUT_TYPE.equals(selected.getValue())) {
+					attachIFrame();
+					iframe.setSrc(pdfJsUrl);
+				} else if (HTML_OUTPUT_TYPE.equals(outputType)) {
 					attachIFrame();
 					iframe.setSrc(null);
 					iframe.setContent(media);
@@ -891,7 +906,11 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 					}
 				}
 			} else {
-				{
+				if (MSysConfig.getBooleanValue(MSysConfig.ZK_USE_PDF_JS_VIEWER, false, Env.getAD_Client_ID(Env.getCtx())) 
+						&& (selected == null || PDF_OUTPUT_TYPE.equals(selected.getValue()))) {
+					attachIFrame();
+					iframe.setSrc(pdfJsUrl);
+				} else {
 					IMediaView view = null;
 					boolean showOptions = false;
 					if (XLS_OUTPUT_TYPE.equals(outputType) || XLSX_OUTPUT_TYPE.equals(outputType)) {						
@@ -950,15 +969,16 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		summary.addActionListener(this);
 		summary.setStyle("font-size: 14px");
 		
-	//	fillComboReport(m_reportEngine.getPrintFormat().get_ID());
-//
+		fillComboReport(m_reportEngine.getPrintFormat().get_ID());
+
 		revalidate();
 		
-		/*
-		 * if (Window.REPLACE.equals(getAttribute(Window.INSERT_POSITION_KEY))) { if
-		 * (m_reportEngine != null && m_reportEngine.getProcessInfo() != null) {
-		 * ProcessInfo pi = m_reportEngine.getProcessInfo(); checkProcessInfo(pi); } }
-		 */
+		if (Window.REPLACE.equals(getAttribute(Window.INSERT_POSITION_KEY))) {
+			if (m_reportEngine != null && m_reportEngine.getProcessInfo() != null) {
+				ProcessInfo pi = m_reportEngine.getProcessInfo();
+				checkProcessInfo(pi);
+			}
+		}
 	}	//	dynInit
 
 	/**
@@ -1062,23 +1082,22 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	private void revalidate()
 	{
 		//	Report Info
-		/*
-		 * setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Report") + ": " +
-		 * m_reportEngine.getName())); StringBuilder sb = new StringBuilder ();
-		 * sb.append(Msg.getMsg(Env.getCtx(), "DataCols")).append("=")
-		 * .append(m_reportEngine.getColumnCount())
-		 * .append(", ").append(Msg.getMsg(Env.getCtx(), "DataRows")).append("=")
-		 * .append(m_reportEngine.getRowCount());
-		 * statusBar.setStatusLine(sb.toString()); // bWizard.setDisabled( (
-		 * m_reportEngine.getPrintFormat() == null ||
-		 * (m_reportEngine.getPrintFormat().getAD_Client_ID() == 0 &&
-		 * Env.getAD_Client_ID(Env.getCtx()) != 0) ||
-		 * m_reportEngine.getPrintFormat().isForm()));
-		 * 
-		 * updateRowCount();
-		 * 
-		 * this.invalidate();
-		 */
+		setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Report") + ": " + m_reportEngine.getName()));
+		StringBuilder sb = new StringBuilder ();
+		sb.append(Msg.getMsg(Env.getCtx(), "DataCols")).append("=")
+			.append(m_reportEngine.getColumnCount())
+			.append(", ").append(Msg.getMsg(Env.getCtx(), "DataRows")).append("=")
+			.append(m_reportEngine.getRowCount());
+		statusBar.setStatusLine(sb.toString());
+		//
+		bWizard.setDisabled(
+				(   m_reportEngine.getPrintFormat() == null
+				 || (m_reportEngine.getPrintFormat().getAD_Client_ID() == 0 && Env.getAD_Client_ID(Env.getCtx()) != 0)
+				 || m_reportEngine.getPrintFormat().isForm()));
+		
+		updateRowCount();
+		
+		this.invalidate();
 	}	//	revalidate
 
 	/**
@@ -1516,7 +1535,9 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			} else {
 				m_reportEngine.setPrintFormat(pf);
 			}
-			m_reportEngine.initName();
+			if (m_reportEngine.getName() == null || m_reportEngine.getName().trim().equals("")) {  // Martin 20/06/2024
+				m_reportEngine.initName();
+			}
 			postRenderReportEvent();
 		}
 		setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "Report") + ": " + m_reportEngine.getName()));
@@ -1586,9 +1607,9 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		if (MClient.get(m_ctx).isMultiLingualDocument() && wLanguage != null && wLanguage.getValue() != null){
 			MLanguage language = new MLanguage (m_ctx, (int)wLanguage.getValue(), null);
 			Language lang = new Language(language.getName(), language.getAD_Language(), language.getLocale());
-		//	m_reportEngine.setLanguageID(language.getAD_Language_ID());
-		//	m_reportEngine.getPrintFormat().setLanguage(lang);
-		//	m_reportEngine.getPrintFormat().setTranslationLanguage(lang);
+			m_reportEngine.setLanguageID(language.getAD_Language_ID());
+			m_reportEngine.getPrintFormat().setLanguage(lang);
+			m_reportEngine.getPrintFormat().setTranslationLanguage(lang);
 		}
 	}
 	
@@ -1596,7 +1617,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	 * Set preview type to {@link #m_reportEngine}
 	 */
 	protected void setPreviewType() {
-		String type = XLSX_OUTPUT_TYPE; // .toString(previewType.getValue());
+		String type = Objects.toString(previewType.getValue());
 		
 		// get default from SysConfig
 		if(type == null) {
@@ -1604,7 +1625,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 				? MSysConfig.getValue(MSysConfig.ZK_REPORT_FORM_OUTPUT_TYPE,PDF_OUTPUT_TYPE,Env.getAD_Client_ID(m_ctx),Env.getAD_Org_ID(m_ctx))
 				: MSysConfig.getValue(MSysConfig.ZK_REPORT_TABLE_OUTPUT_TYPE,PDF_OUTPUT_TYPE,Env.getAD_Client_ID(m_ctx),Env.getAD_Org_ID(m_ctx));
 		}
-		//m_reportEngine.setReportType(type);
+		m_reportEngine.setReportType(type);
 	}
 
 	/**
@@ -1888,10 +1909,10 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 
 	private static class RendererRunnable extends ZkContextRunnable implements IServerPushCallback {
 
-		private ZkReportViewerRGN viewer;
+		private ZkReportViewerNtier viewer;
 		private String rendererId;
 
-		public RendererRunnable(ZkReportViewerRGN viewer, String rendererId) {
+		public RendererRunnable(ZkReportViewerNtier viewer, String rendererId) {
 			this.viewer = viewer;
 			this.rendererId = rendererId;
 		}
@@ -1904,36 +1925,36 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		@Override
 		protected void doRun() {
 			try {
-				/*
-				 * if (viewer.m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0) { if
-				 * (viewer.jasperPrintRenderer == null) { MPrintFormat format =
-				 * viewer.m_reportEngine.getPrintFormat(); PrintInfo printInfo =
-				 * viewer.m_reportEngine.getPrintInfo(); ProcessInfo jasperProcessInfo = new
-				 * ProcessInfo (viewer.getTitle(), format.getJasperProcess_ID());
-				 * jasperProcessInfo.setRecord_ID (printInfo.getRecord_ID());
-				 * jasperProcessInfo.setTable_ID(printInfo.getAD_Table_ID());
-				 * jasperProcessInfo.setSerializableObject(format);
-				 * ArrayList<ProcessInfoParameter> jasperPrintParams = new
-				 * ArrayList<ProcessInfoParameter>(); ProcessInfoParameter pip = new
-				 * ProcessInfoParameter(ServerReportCtl.PARAM_PRINT_FORMAT, format, null, null,
-				 * null); jasperPrintParams.add(pip); pip = new
-				 * ProcessInfoParameter(ServerReportCtl.PARAM_PRINT_INFO, printInfo, null, null,
-				 * null); jasperPrintParams.add(pip);
-				 * jasperProcessInfo.setParameter(jasperPrintParams.toArray(new
-				 * ProcessInfoParameter[]{})); jasperProcessInfo.setExport(true);
-				 * jasperProcessInfo.setExportFileExtension("JasperPrint"); ProcessCall pc =
-				 * Core.getProcess("org.adempiere.report.jasper.ReportStarter");
-				 * pc.startProcess(Env.getCtx(), jasperProcessInfo, null); JasperPrint
-				 * jasperPrint = (JasperPrint) jasperProcessInfo.getInternalReportObject();
-				 * viewer.jasperPrintRenderer = new JasperPrintRenderer(jasperPrint,
-				 * viewer.getTitle());
-				 * viewer.jasperPrintRenderer.setRowCount(jasperProcessInfo.getRowCount()); } }
-				 * else { viewer.m_reportEngine.initName(); List<String> archiveList =
-				 * Arrays.asList(PDF_OUTPUT_TYPE, HTML_OUTPUT_TYPE, XLS_OUTPUT_TYPE,
-				 * XLSX_OUTPUT_TYPE); if (archiveList.contains(rendererId)) { if
-				 * (!ArchiveEngine.isValid(viewer.m_reportEngine.getLayout()))
-				 * log.warning("Cannot archive Document"); } }
-				 */
+				if (viewer.m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0) {
+					if (viewer.jasperPrintRenderer == null) {
+						MPrintFormat format = viewer.m_reportEngine.getPrintFormat();
+						PrintInfo printInfo = viewer.m_reportEngine.getPrintInfo();
+						ProcessInfo jasperProcessInfo = new ProcessInfo (viewer.getTitle(), format.getJasperProcess_ID());
+						jasperProcessInfo.setRecord_ID (printInfo.getRecord_ID());
+						jasperProcessInfo.setTable_ID(printInfo.getAD_Table_ID());
+						jasperProcessInfo.setSerializableObject(format);
+						ArrayList<ProcessInfoParameter> jasperPrintParams = new ArrayList<ProcessInfoParameter>();
+						ProcessInfoParameter pip = new ProcessInfoParameter(ServerReportCtl.PARAM_PRINT_FORMAT, format, null, null, null);
+						jasperPrintParams.add(pip);
+						pip = new ProcessInfoParameter(ServerReportCtl.PARAM_PRINT_INFO, printInfo, null, null, null);
+						jasperPrintParams.add(pip);						
+						jasperProcessInfo.setParameter(jasperPrintParams.toArray(new ProcessInfoParameter[]{}));
+						jasperProcessInfo.setExport(true);
+						jasperProcessInfo.setExportFileExtension("JasperPrint");
+						ProcessCall pc = Core.getProcess("org.adempiere.report.jasper.ReportStarter");
+						pc.startProcess(Env.getCtx(), jasperProcessInfo, null);						
+						JasperPrint jasperPrint = (JasperPrint) jasperProcessInfo.getInternalReportObject();
+						viewer.jasperPrintRenderer = new JasperPrintRenderer(jasperPrint, viewer.getTitle());
+						viewer.jasperPrintRenderer.setRowCount(jasperProcessInfo.getRowCount());
+					}
+				} else {
+					viewer.m_reportEngine.initName();
+					List<String> archiveList = Arrays.asList(PDF_OUTPUT_TYPE, HTML_OUTPUT_TYPE, XLS_OUTPUT_TYPE, XLSX_OUTPUT_TYPE);
+					if (archiveList.contains(rendererId)) {
+						if (!ArchiveEngine.isValid(viewer.m_reportEngine.getLayout()))
+							log.warning("Cannot archive Document");
+					}
+				}
 				viewer.createNewMedia(rendererId);
 			} catch (Exception e) {
 				if (e instanceof RuntimeException)
@@ -1961,12 +1982,12 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 			return jasperPrintRenderer.getMedia(contentType, fileExtension);
 		}
 		
-		IReportViewerRendererRGN renderer = rendererMap.get(toRendererId(contentType, fileExtension));
+		IReportViewerRenderer renderer = rendererMap.get(toRendererId(contentType, fileExtension));
 		
 		if (renderer.isSameContentForExportAndPreview() && media != null 
 				&& media.getContentType().equals(contentType) && media.getFormat().equals(fileExtension))
 			return media;
-				
+		//return null;  // Martin	
 		return renderer != null ? renderer.renderMedia(this, true) : null;
 	}
 
@@ -1974,7 +1995,8 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 		if (jasperPrintRenderer != null) {
 			return jasperPrintRenderer.getMedia(JasperPrintRenderer.getMIMEType(rendererId), JasperPrintRenderer.getFileExtension(rendererId));
 		}
-		IReportViewerRendererRGN renderer = rendererMap.get(rendererId);
+		IReportViewerRenderer renderer = rendererMap.get(rendererId);
+	//	return null;  // Martin
 		return renderer != null ? renderer.renderMedia(this, false) : null;
 	}
 	

@@ -344,7 +344,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_driver)).getNumericCellValue()).toBigInteger() ;
 					driver_IDNo =   bint.toString();
 				}
-				if (row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
+				if (columnmap.get(p_loads) != null && row.getCell(columnmap.get(p_loads)) != null && row.getCell(columnmap.get(p_loads)).getCellType().equals(CellType.NUMERIC)) {
 					no_Of_Loads =   row.getCell(columnmap.get(p_loads)).getNumericCellValue(); 
 				}
 				String driversName = null;

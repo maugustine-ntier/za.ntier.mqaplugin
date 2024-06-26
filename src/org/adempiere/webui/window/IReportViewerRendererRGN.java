@@ -21,7 +21,6 @@
  **********************************************************************/
 package org.adempiere.webui.window;
 
-import org.adempiere.webui.window.ZkReportViewer;
 import org.zkoss.util.media.AMedia;
 
 /**
