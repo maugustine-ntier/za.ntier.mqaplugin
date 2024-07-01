@@ -61,7 +61,9 @@ public class ZZ_Fix_Jasper_With_Incorrect_SubReports extends SvrProcess {
 				+ "join ad_attachment aa  on ap.ad_process_id = aa.record_id "
 				+ "where ap.jasperreport is not null "
 				+ "and aa.ad_table_id  = (select ad_table_id from ad_table t where t.tablename  = 'AD_Process') "
-				+ " and ap.created >= current_date "
+				+ "and ap.ad_process_id = 1000128 "
+				+ ""
+			//	+ " and ap.created >= current_date "
 				+ "group by aa.ad_attachment_id " ;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
