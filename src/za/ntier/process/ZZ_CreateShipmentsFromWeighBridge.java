@@ -1,36 +1,17 @@
 package za.ntier.process;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.SvrProcess;
-
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.xml.JRXmlWriter;
 
 @org.adempiere.base.annotation.Process
 public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 
-	private static final String RESOURCE_DIR_PARAM = "$P{RESOURCE_DIR}";
-	private static final String RESOURCE_DIR_PARAM_REPLACE = "\\$P\\{RESOURCE_DIR\\}";
-	private static final String SUBREPORT_DIR_PARAM = "$P{SUBREPORT_DIR}";
-	private static final String SUBREPORT_DIR_PARAM_REPLACE = "\\$P\\{SUBREPORT_DIR\\}";
-	private static final String BASE_PATH_PARAM = "$P{BASE_PATH}";
-	private static final String BASE_PATH_PARAM_REPLACE = "\\$P\\{BASE_PATH\\}";
-	String inputJasperFilePath = "/tmp/jasper";
-	String dir = "/home/martin/ACATS/AD_Process_1000128";
-	
-	int cnt = 0;
 
 	@Override
 	protected void prepare() {
@@ -40,78 +21,77 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		createDirectoryIfNotExists("/tmp/jrxml");
-		createDirectoryIfNotExists("/tmp/jasper");
+		Connection connection = null;
+		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
+		String user = "sa";
+		String pass = "LMISupport1!";
 
-		
-		Path path = Paths.get(dir);
-		List<Path> paths = listFiles(path);
-		paths.forEach(x -> {
-			try {
-				processFile(x);
-			} catch (AdempiereException | JRException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			connection = DriverManager.getConnection(dbURL, user, pass);
+
+
+
+			// Displaying the outcome
+			String selectQuery = "SELECT * FROM Transactions";
+			PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+			ResultSet resultSet = selectStatement.executeQuery();
+
+			System.out.println("Outcome:");
+			System.out.printf("%-10s %-20s %-20s %-30s %-20s%n", "Field1", "Field2", "Field3", "Field4", "Field5");
+
+			while (resultSet.next()) {
+				System.out.printf("%-10s %-20s %-20s %-30s %-20s%n",
+						resultSet.getString("Field1"),
+						resultSet.getString("Field2"),
+						resultSet.getString("Field3"),
+						resultSet.getString("Field4"),
+						resultSet.getString("Field5"));
 			}
-		});
 
-		return cnt + " files converted " + cnt;
+			selectStatement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
+		return connection.toString();
 
 
 
 	}
 
+	public static void main(String[] args) {
+		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
+		String user = "sa";
+		String pass = "LMISupport1!";
 
-	private void processFile(Path pathToFile) throws AdempiereException, JRException {
-		File file = pathToFile.toFile();
-		if (!file.getName().endsWith(".jasper")) {
-			return;
-		}
-		String outputPath = "";
-		if (file.exists()) {
-			cnt++;
-			JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(file.getAbsolutePath());
-			String entryNameWithoutExtension = file.getName().replaceFirst("[.][^.]+$", "");
-			outputPath = dir + "/" + entryNameWithoutExtension + ".jrxml";
-			JRXmlWriter.writeReport(jasperReport, outputPath, "UTF-8");
-		} else {
-			log.severe("file not found: " + file.getAbsolutePath());
-			return;
-		}
-	}
+		try {
+			Connection connection = DriverManager.getConnection(dbURL, user, pass);
 
-	// list all files from this path
-	public static List<Path> listFiles(Path path) throws IOException {
 
-		List<Path> result;
-		try (Stream<Path> walk = Files.walk(path)) {
-			result = walk.filter(Files::isRegularFile)
-					.collect(Collectors.toList());
-		}
-		return result;
 
-	}
+			// Displaying the outcome
+			String selectQuery = "SELECT * FROM Transactions";
+			PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+			ResultSet resultSet = selectStatement.executeQuery();
 
-	private static void createDirectoryIfNotExists(String directoryPath) {
-		Path path = Paths.get(directoryPath);
-		if (!Files.exists(path)) {
-			try {
-				Files.createDirectories(path);
-				System.out.println("Directory " + directoryPath + " created successfully");
-			} catch (Exception e) {
-				System.out.println("Failed to create directory " + directoryPath);
-				e.printStackTrace();
+			System.out.println("Outcome:");
+			System.out.printf("%-10s %-20s %-20s %-30s %-20s%n", "Field1", "Field2", "Field3", "Field4", "Field5");
+
+			while (resultSet.next()) {
+				System.out.printf("%-10s %-20s %-20s %-30s %-20s%n",
+						resultSet.getString("Field1"),
+						resultSet.getString("Field2"),
+						resultSet.getString("Field3"),
+						resultSet.getString("Field4"),
+						resultSet.getString("Field5"));
 			}
-		} else {
-			System.out.println("Directory " + directoryPath + " already exists");
+
+			selectStatement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
-
-
-
-
-
-
 
 }
