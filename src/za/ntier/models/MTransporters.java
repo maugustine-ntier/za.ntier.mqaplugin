@@ -1,6 +1,7 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.compiere.util.DB;
@@ -50,6 +51,18 @@ public class MTransporters extends X_ZZ_Transporters implements I_ZZ_Transporter
 			}
 		}
 		return super.beforeSave(newRecord);
+	}
+	
+	public static int get(Properties ctx,int c_BPartner_ID,int m_Product_ID,Timestamp LoadingDate,int MShipperID,String trxName) {
+		if (c_BPartner_ID > 0 && m_Product_ID > 0 && LoadingDate != null) {
+			String SQL = "Select ZZ_Transporters_ID from ZZ_Transporters tr where "
+			+ " tr.C_BPartner_ID" + " = ?" 
+			+ " and tr.M_Product_ID" + " = ?" 
+			+ " and date(tr.ZZ_Loading_Date)" + " = date(?)" 
+			+ " and tr.m_Shipper_ID = ?";
+			return DB.getSQLValueEx(trxName, SQL, c_BPartner_ID,m_Product_ID,LoadingDate,MShipperID);
+		}
+		return -1;
 	}
 
 }

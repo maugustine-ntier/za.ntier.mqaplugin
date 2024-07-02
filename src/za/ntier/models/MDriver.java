@@ -82,6 +82,18 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 		}
 		return null;
 	}
+	
+	public static MDriver getDriver(Properties ctx,Timestamp dateOfShipment,String trxName) {
+		MDriver mDriver = null;
+		if (dateOfShipment != null) {
+			String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
+			int zz_Driver_ID = DB.getSQLValue(trxName, SQL, zz_ID_Passport_No.trim());
+			if (zz_Driver_ID > 0) {
+				mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
+			}
+		}
+		return mDriver;
+	}
 
 
 }

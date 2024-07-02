@@ -5,8 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
+import org.compiere.model.MOrder;
 import org.compiere.process.SvrProcess;
+
+import za.ntier.models.MInOut_New;
+import za.ntier.models.MInvoice_New;
 
 @org.adempiere.base.annotation.Process
 public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
@@ -46,6 +51,14 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						resultSet.getString("Field3"),
 						resultSet.getString("Field4"),
 						resultSet.getString("Field5"));
+				String InvNo = resultSet.getString("Field1");
+				Timestamp movementDate = resultSet.getTimestamp("DateTimeIn");
+				if (InvNo != null) {
+					MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), InvNo, get_TrxName());
+					MOrder mOrder = new MOrder(getCtx(), mInvoice_New.getC_Order_ID(), get_TrxName());
+					MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
+					
+				}
 			}
 
 			selectStatement.close();
@@ -58,6 +71,13 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 
 
+	}
+	
+	
+	private int getDriverID(Timestamp dateOfShipment) {
+		int driverID = 0;
+		
+		return driverID;
 	}
 
 	public static void main(String[] args) {
