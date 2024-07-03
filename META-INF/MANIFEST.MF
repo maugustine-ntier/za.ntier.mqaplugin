@@ -30,6 +30,6 @@ Service-Component: OSGI-INF/za.ntier.callouts.CalloutFactory.xml,
 Automatic-Module-Name: za.ntier.rgnplugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
-Bundle-ClassPath: lib/mssql-jdbc-12.6.3.jre11.jar,
- .
+Bundle-ClassPath: .,
+ lib/mssql-jdbc-12.6.3.jre11.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-17

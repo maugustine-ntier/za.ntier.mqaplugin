@@ -39,6 +39,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		String pass = "LMISupport1!";
 
 		try {
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			connection = DriverManager.getConnection(dbURL, user, pass);
 
 
@@ -70,30 +71,33 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 				}
 				if (invNo != null) {
 					MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName());
-					MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
-					int m_Product_ID = 0;
-					if (mInvoiceLine != null && mInvoiceLine.length > 0) {
-						m_Product_ID = mInvoiceLine[0].getM_Product_ID();
+					if (mInvoice_New != null) {
+						MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
+						int m_Product_ID = 0;
+						if (mInvoiceLine != null && mInvoiceLine.length > 0) {
+							m_Product_ID = mInvoiceLine[0].getM_Product_ID();
+						}
+						MOrder mOrder = new MOrder(getCtx(), mInvoice_New.getC_Order_ID(), get_TrxName());
+						MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
+						if (mInOut_New != null) {
+							mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
+							Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
+							MDriver mDriver = (MDriver) objs[0];
+							MTransporters mTransporters = (MTransporters) objs[1];
+							mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
+							mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
+							mInOut_New.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+							mInOut_New.setShipDate(movementDate);
+							mInOut_New.setWB_TransactionID(transactionID);
+							mInOut_New.setZZ_StockPile_ID(getStockPile_ID(stockPileNo));
+							mInOut_New.saveEx();
+							MInOutLine mInOutLine = new MInOutLine(mInOut_New);
+							mInOutLine.setM_Product_ID(m_Product_ID);
+							mInOutLine.setQty(netMass);
+							mInOutLine.setC_UOM_ID(1000000);
+							mInOutLine.saveEx();
+						} 
 					}
-					MOrder mOrder = new MOrder(getCtx(), mInvoice_New.getC_Order_ID(), get_TrxName());
-					MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
-					if (mInOut_New != null) {
-						mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
-						Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
-						MDriver mDriver = (MDriver) objs[0];
-						MTransporters mTransporters = (MTransporters) objs[1];
-						mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
-						mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
-						mInOut_New.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
-						mInOut_New.setShipDate(movementDate);
-						mInOut_New.setWB_TransactionID(transactionID);
-						mInOut_New.setZZ_StockPile_ID(getStockPile_ID(stockPileNo));
-						mInOut_New.saveEx();
-						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
-						mInOutLine.setM_Product_ID(m_Product_ID);
-						mInOutLine.setQty(netMass);
-						mInOutLine.setC_UOM_ID(1000000);
-					} 
 
 				}
 			}
