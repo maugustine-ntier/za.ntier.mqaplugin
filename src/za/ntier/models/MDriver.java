@@ -83,8 +83,9 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 		return null;
 	}
 
-	public static MDriver getDriver(Properties ctx,int c_BPartner_ID,int m_Product_ID,Timestamp LoadingDate,int MShipperID,String trxName) {
+	public static Object[] getDriver(Properties ctx,int c_BPartner_ID,int m_Product_ID,Timestamp LoadingDate,String trxName) {
 		MDriver mDriver = null;		
+		Object objs [] = new Object [2];
 		if (LoadingDate != null) {
 			MTransporters mTransporters [] = MTransporters.get(ctx, c_BPartner_ID, m_Product_ID, LoadingDate, trxName);
 			for (MTransporters mTransporter : mTransporters) {
@@ -92,7 +93,8 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 				int zz_Driver_ID = DB.getSQLValue(trxName, SQL, mTransporter.getZZ_Transporters_ID());
 				if (zz_Driver_ID > 0) {
 					mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
-					return mDriver;
+					objs[0] = mDriver;
+					objs[1] = mTransporter;
 				}
 			}
 		}

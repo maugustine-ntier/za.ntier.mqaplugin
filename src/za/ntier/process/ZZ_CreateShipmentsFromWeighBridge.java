@@ -6,15 +6,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Properties;
 
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
+import org.compiere.model.X_M_InOut;
 import org.compiere.process.SvrProcess;
 
 import za.ntier.models.MDriver;
 import za.ntier.models.MInOut_New;
 import za.ntier.models.MInvoice_New;
+import za.ntier.models.MTransporters;
 
 @org.adempiere.base.annotation.Process
 public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
@@ -67,7 +69,16 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					MOrder mOrder = new MOrder(getCtx(), mInvoice_New.getC_Order_ID(), get_TrxName());
 					MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
 					if (mInOut_New != null) {
-						MDriver mDriver = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,int MShipperID,String trxName);
+						mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
+						Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,get_TrxName());
+						MDriver mDriver = (MDriver) objs[0];
+						MTransporters mTransporters = (MTransporters) objs[1];
+						mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
+						mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
+						mInOut_New.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+						mInOut_New.setShipDate(movementDate);
+						mInOut_New.saveEx();
+						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 					}
 					
 				}
