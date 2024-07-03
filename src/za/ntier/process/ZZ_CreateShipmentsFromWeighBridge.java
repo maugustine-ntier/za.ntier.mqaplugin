@@ -82,8 +82,8 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						if (mInOut_New != null) {
 							mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
 							Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
-							MDriver mDriver = (MDriver) objs[0];
-							MTransporters mTransporters = (MTransporters) objs[1];
+							MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
+							MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
 							mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 							mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
 							mInOut_New.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
