@@ -37,7 +37,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
 		String user = "sa";
 		String pass = "LMISupport1!";
-
+		PreparedStatement selectStatement = null;
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			connection = DriverManager.getConnection(dbURL, user, pass);
@@ -46,7 +46,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 			// Displaying the outcome
 			String selectQuery = "SELECT * FROM Transactions";   
-			PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+			selectStatement = connection.prepareStatement(selectQuery);
 			ResultSet resultSet = selectStatement.executeQuery();
 
 			System.out.println("Outcome:");
@@ -106,6 +106,13 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 			connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			if (selectStatement != null) {
+				selectStatement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
 		}
 
 		return connection.toString();
