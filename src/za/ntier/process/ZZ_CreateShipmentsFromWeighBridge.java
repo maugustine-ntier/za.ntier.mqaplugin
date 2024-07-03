@@ -1,5 +1,6 @@
 package za.ntier.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.X_M_InOut;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 
 import za.ntier.models.MDriver;
 import za.ntier.models.MInOut_New;
@@ -42,7 +44,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 
 			// Displaying the outcome
-			String selectQuery = "SELECT * FROM Transactions";
+			String selectQuery = "SELECT * FROM Transactions";   
 			PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
 			ResultSet resultSet = selectStatement.executeQuery();
 
@@ -55,10 +57,17 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						resultSet.getString("Field2"),
 						resultSet.getString("Field3"),
 						resultSet.getString("Field4"),
-						resultSet.getString("Field5"));
+						resultSet.getString("Field5"));				
 				String invNo = resultSet.getString("Field1");
+				String stockPileNo = resultSet.getString("Field2");
 				Timestamp movementDate = resultSet.getTimestamp("DateTimeIn");
 				String prod = resultSet.getString("Field3").substring(0,3);
+				BigDecimal netMass = resultSet.getBigDecimal("NetMass");
+				String truckRegNo = resultSet.getString("TruckRegNo");
+				int transactionID = resultSet.getInt("TransactionID");
+				if (MInOut_New.getCount(transactionID, get_TrxName()) > 0) {
+					continue;
+				}
 				if (invNo != null) {
 					MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName());
 					MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
@@ -70,17 +79,22 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
 					if (mInOut_New != null) {
 						mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
-						Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,get_TrxName());
+						Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
 						MDriver mDriver = (MDriver) objs[0];
 						MTransporters mTransporters = (MTransporters) objs[1];
 						mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 						mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
 						mInOut_New.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
 						mInOut_New.setShipDate(movementDate);
+						mInOut_New.setWB_TransactionID(transactionID);
+						mInOut_New.setZZ_StockPile_ID(getStockPile_ID(stockPileNo));
 						mInOut_New.saveEx();
 						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
-					}
-					
+						mInOutLine.setM_Product_ID(m_Product_ID);
+						mInOutLine.setQty(netMass);
+						mInOutLine.setC_UOM_ID(1000000);
+					} 
+
 				}
 			}
 
@@ -95,12 +109,15 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 
 	}
-	
-	
-	private int getDriverID(Timestamp dateOfShipment) {
-		int driverID = 0;
-		
-		return driverID;
+
+
+	private int getStockPile_ID(String stockPileNo) {
+		int zz_StockPile_ID = 0;
+		if (stockPileNo != null && !stockPileNo.trim().equals("")) {
+			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where sp.documentno = ?";
+			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo);
+		}
+		return zz_StockPile_ID;
 	}
 
 	public static void main(String[] args) {

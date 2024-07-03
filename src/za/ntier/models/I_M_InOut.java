@@ -1013,6 +1013,15 @@ public interface I_M_InOut
 	  */
 	public BigDecimal getVolume();
 
+    /** Column name WB_TransactionID */
+    public static final String COLUMNNAME_WB_TransactionID = "WB_TransactionID";
+
+	/** Set Weighbridge_Transaction	  */
+	public void setWB_TransactionID (int WB_TransactionID);
+
+	/** Get Weighbridge_Transaction	  */
+	public int getWB_TransactionID();
+
     /** Column name Weight */
     public static final String COLUMNNAME_Weight = "Weight";
 

@@ -65,17 +65,18 @@ public class MInvoice_New extends MInvoice implements I_C_Invoice  {
 	public void setZZ_Batch_No(int ZZ_Batch_No) {
 		System.out.println("In Here");
 		set_Value (COLUMNNAME_ZZ_Batch_No, Integer.valueOf(ZZ_Batch_No));
-		
+
 	}
 
 	@Override
 	public int getZZ_Batch_No() {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Batch_No);
-		if (ii == null)
-			 return 0;
+		if (ii == null) {
+			return 0;
+		}
 		return ii.intValue();
 	}
-	
+
 	public void setZZ_Batch_No() {
 		if (getZZ_Batch_No() > 0) {
 			return;
@@ -89,18 +90,21 @@ public class MInvoice_New extends MInvoice implements I_C_Invoice  {
 	@Override
 	public void setZZ_CreateLinesFromRGN(String ZZ_CreateLinesFromRGN) {
 		set_Value (COLUMNNAME_ZZ_CreateLinesFromRGN, ZZ_CreateLinesFromRGN);
-		
+
 	}
 
 	@Override
 	public String getZZ_CreateLinesFromRGN() {
 		return (String)get_Value(COLUMNNAME_ZZ_CreateLinesFromRGN);
 	}
-	
+
 	public static MInvoice_New get (Properties ctx,String invoiceDocNo,String TrxName) {
 		String SQL = "Select max(i.C_Invoice_ID) from C_Invoice i where i.DocumentNO = ? ";
 		int invoiceID = DB.getSQLValue(TrxName,SQL,invoiceDocNo);
-		return new MInvoice_New(ctx, invoiceID, TrxName);
+		if (invoiceID > 0) {
+			return new MInvoice_New(ctx, invoiceID, TrxName);
+		}
+		return null;
 	}
 
 }

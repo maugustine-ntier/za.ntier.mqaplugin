@@ -13,6 +13,7 @@ import org.compiere.model.MOrder;
 import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.process.DocAction;
+import org.compiere.util.DB;
 
 public class MInOut_New extends MInOut implements I_M_InOut{
 
@@ -260,6 +261,29 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	@Override
+	public void setWB_TransactionID(int WB_TransactionID) {
+		set_Value (COLUMNNAME_WB_TransactionID, Integer.valueOf(WB_TransactionID));
+		
+	}
+
+	@Override
+	public int getWB_TransactionID() {
+		Integer ii = (Integer)get_Value(COLUMNNAME_WB_TransactionID);
+		if (ii == null) {
+			return 0;
+		}
+		return ii.intValue();
+	}
+	
+	public static int getCount(int wb_TransactionID,String trxName) {
+		int cnt = 0;
+		String SQL = "select count(*) from M_InOut m where m.WB_TransactionID = ?";
+		cnt = DB.getSQLValue(trxName, SQL,wb_TransactionID );
+		return cnt;
+		
 	}
 
 

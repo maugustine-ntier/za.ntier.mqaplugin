@@ -83,14 +83,14 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 		return null;
 	}
 
-	public static Object[] getDriver(Properties ctx,int c_BPartner_ID,int m_Product_ID,Timestamp LoadingDate,String trxName) {
+	public static Object[] getDriver(Properties ctx,int c_BPartner_ID,int m_Product_ID,Timestamp LoadingDate,String truckRegNo,String trxName) {
 		MDriver mDriver = null;		
 		Object objs [] = new Object [2];
 		if (LoadingDate != null) {
 			MTransporters mTransporters [] = MTransporters.get(ctx, c_BPartner_ID, m_Product_ID, LoadingDate, trxName);
 			for (MTransporters mTransporter : mTransporters) {
-				String SQL = "select max(tl.ZZ_Driver_ID) from ZZ_Truck_List tl, ZZ_Truck t where tl.ZZ_Transporters_ID = ? and tl.ZZ_Horse_ID = t.ZZ_truck_ID";
-				int zz_Driver_ID = DB.getSQLValue(trxName, SQL, mTransporter.getZZ_Transporters_ID());
+				String SQL = "select max(tl.ZZ_Driver_ID) from ZZ_Truck_List tl, ZZ_Truck t where tl.ZZ_Transporters_ID = ? and tl.ZZ_Horse_ID = t.ZZ_truck_ID and t.ZZ_Registration_No = ?";
+				int zz_Driver_ID = DB.getSQLValue(trxName, SQL, mTransporter.getZZ_Transporters_ID(),truckRegNo);
 				if (zz_Driver_ID > 0) {
 					mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
 					objs[0] = mDriver;

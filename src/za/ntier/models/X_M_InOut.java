@@ -1936,6 +1936,24 @@ public class X_M_InOut extends PO implements I_M_InOut, I_Persistent
 		return bd;
 	}
 
+	/** Set Weighbridge_Transaction.
+		@param WB_TransactionID Weighbridge_Transaction
+	*/
+	public void setWB_TransactionID (int WB_TransactionID)
+	{
+		set_Value (COLUMNNAME_WB_TransactionID, Integer.valueOf(WB_TransactionID));
+	}
+
+	/** Get Weighbridge_Transaction.
+		@return Weighbridge_Transaction	  */
+	public int getWB_TransactionID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_WB_TransactionID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Weight.
 		@param Weight Weight of a product
 	*/
