@@ -95,6 +95,7 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 					mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
 					objs[0] = mDriver;
 					objs[1] = mTransporter;
+					return objs;
 				}
 			}
 		}
