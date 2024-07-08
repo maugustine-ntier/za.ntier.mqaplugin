@@ -64,7 +64,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						resultSet.getString("Field5"));				
 				String invNo = resultSet.getString("Field1");
 				String stockPileNo = resultSet.getString("Field2");
-				Timestamp movementDate = resultSet.getTimestamp("DateTimeIn");
+				Timestamp movementDate = resultSet.getTimestamp("DateTimeOut");
 				//	String prod = resultSet.getString("Field3").substring(0,3);
 				BigDecimal netMass = resultSet.getBigDecimal("NetMass");
 				String truckRegNo = resultSet.getString("TruckRegNo");
@@ -97,6 +97,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 								int stockPileID= getStockPile_ID(stockPileNo);
 								mInOut_New.setZZ_StockPile_ID(stockPileID);
 								mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
+								mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
 								mInOut_New.saveEx();								
 								MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 								mInOutLine.setM_Product_ID(m_Product_ID);
