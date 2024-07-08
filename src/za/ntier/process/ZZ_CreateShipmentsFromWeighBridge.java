@@ -86,6 +86,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 							MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
 							MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
 							if (mTransporters != null) {
+								mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
 								mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 								mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
 								mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
@@ -93,7 +94,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 								mInOut_New.setWB_TransactionID(transactionID);
 								mInOut_New.setZZ_StockPile_ID(getStockPile_ID(stockPileNo));
 								mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
-								mInOut_New.saveEx();
+								mInOut_New.saveEx();								
 								MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 								mInOutLine.setM_Product_ID(m_Product_ID);
 								mInOutLine.setQty(netMass);
