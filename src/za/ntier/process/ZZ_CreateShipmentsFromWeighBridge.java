@@ -12,6 +12,7 @@ import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MProduct;
 import org.compiere.model.X_M_InOut;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -20,6 +21,7 @@ import za.ntier.models.MDriver;
 import za.ntier.models.MInOut_New;
 import za.ntier.models.MInvoice_New;
 import za.ntier.models.MTransporters;
+import za.ntier.models.X_ZZ_StockPile;
 
 @org.adempiere.base.annotation.Process
 public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
@@ -92,7 +94,8 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 								mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
 								mInOut_New.setShipDate(movementDate);
 								mInOut_New.setWB_TransactionID(transactionID);
-								mInOut_New.setZZ_StockPile_ID(getStockPile_ID(stockPileNo));
+								int stockPileID= getStockPile_ID(stockPileNo);
+								mInOut_New.setZZ_StockPile_ID(stockPileID);
 								mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 								mInOut_New.saveEx();								
 								MInOutLine mInOutLine = new MInOutLine(mInOut_New);
@@ -102,6 +105,16 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 								MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
 								if (ols != null && ols.length > 0) {
 									mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
+								}
+								X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(),stockPileID,get_TrxName());
+								MProduct mProduct = new MProduct(getCtx(), m_Product_ID, null);
+								String zz_Block = x_ZZ_StockPile.getZZ_Block();
+								if (zz_Block.length() == 1) {
+									zz_Block = "0" + zz_Block;
+								}	
+								int m_Locator_ID = getmLocatorID(mTransporters.getM_Warehouse_ID(),mProduct.getValue(),x_ZZ_StockPile.getZZ_Side(),zz_Block);
+								if (m_Locator_ID > 0) {
+									mInOutLine.setM_Locator_ID(m_Locator_ID);
 								}
 								mInOutLine.saveEx();
 							}
@@ -130,7 +143,10 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	}
 
-
+	private int getmLocatorID (int wareHouseID,String prodValue, String side,String block) {
+		String SQL = "select max(M_Locator_ID) from M_Locator l where l.M_Warehouse_ID = ? and l.X = ? and l.Y = ? and l.Z = ?";
+		return DB.getSQLValue(get_TrxName(), SQL, wareHouseID,prodValue,side,block);
+	}
 
 
 	private int getStockPile_ID(String stockPileNo) {
