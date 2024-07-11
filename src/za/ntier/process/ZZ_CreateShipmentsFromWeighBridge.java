@@ -33,6 +33,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		// TODO Auto-generated method stub
 
 	}
+	int cnt = 0;
 
 	@Override
 	protected String doIt() throws Exception {
@@ -98,7 +99,8 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 								mInOut_New.setZZ_StockPile_ID(stockPileID);
 								mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 								mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
-								mInOut_New.saveEx();								
+								mInOut_New.saveEx();
+								cnt++;
 								MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 								mInOutLine.setM_Product_ID(m_Product_ID);
 								mInOutLine.setQty(netMass);
@@ -138,13 +140,25 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 			}
 		}
 
-		return connection.toString();
+		return "Number of Shipments Created : " + cnt;
 
 
 
 	}
 
 	private int getmLocatorID (int wareHouseID,String prodValue, String side,String block) {
+		if (side.equals("W")) {
+			side = "WEST";
+		}
+		if (side.equals("E")) {
+			side = "EAST";
+		}
+		if (side.equals("N")) {
+			side = "NORTH";
+		}
+		if (side.equals("S")) {
+			side = "SOUTH";
+		}
 		String SQL = "select max(M_Locator_ID) from M_Locator l where l.M_Warehouse_ID = ? and l.X = ? and l.Y = ? and l.Z = ?";
 		return DB.getSQLValue(get_TrxName(), SQL, wareHouseID,prodValue,side,block);
 	}

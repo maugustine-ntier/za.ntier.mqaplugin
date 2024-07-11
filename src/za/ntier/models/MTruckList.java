@@ -86,5 +86,15 @@ public class MTruckList extends X_ZZ_Truck_List implements I_ZZ_Truck_List {
 		}
 		return null;
 	}
+	
+	public static MTruckList getTruckList(Properties ctx,String ZZ_Registration_No, String trxName) {
+		MTruck mTruck = null;
+		String SQL = "select tl.ZZ_Truck_List_ID from ZZ_Truck_List tl where tl.ZZ_Horse_ID = ?";
+		int zz_Truck_ID = DB.getSQLValue(trxName, SQL, ZZ_Registration_No.trim());
+		if (zz_Truck_ID > 0) {
+			mTruck = new MTruck(ctx, zz_Truck_ID, trxName);
+		}
+		return mTruck;
+	}
 
 }

@@ -33,7 +33,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbookFactory;
 import org.compiere.model.MImportTemplate;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.util.AdempiereUserError;
 import org.compiere.util.DB;
 
 import za.ntier.models.MDriver;
@@ -70,12 +69,13 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		for (int i = 0; i < para.length; i++)
 		{
 			String name = para[i].getParameterName();
-			if (para[i].getParameter() == null)
+			if (para[i].getParameter() == null) {
 				;
-			else if (name.equals("FileName"))
+			} else if (name.equals("FileName")) {
 				p_FileName = para[i].getParameterAsString();
-			else
+			} else {
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
+			}
 		} 
 	}
 
@@ -113,18 +113,20 @@ public class ImportTruckListViaExcel extends SvrProcess {
 			msg = loadTruckList(workbook, zz_Transporters_ID);
 
 			if (noOfErrorLines > 0) {  // dont display if we just have headers
-				String fileName = writeOutErrorLogFile(errorSheet);
-				msg = "There are errors on the file.  Please check the error Log file : " + fileName;
+				//String fileName = writeOutErrorLogFile(errorSheet);
+				//msg = "There are errors on the file.  Please check the error Log file : " + fileName;
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
 		finally {
-			if (inp != null)
+			if (inp != null) {
 				inp.close();
-			if (workbook != null)
+			}
+			if (workbook != null) {
 				workbook.close();
+			}
 		}
 
 		return msg;
@@ -357,8 +359,12 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				String name = null;
 				String surname = null;
 				if (driversName != null) {
-					surname = driversName.substring(driversName.lastIndexOf(' ') + 1);
-					name = driversName.substring(0,driversName.lastIndexOf(' '));
+					if (driversName.trim().contains(" ")) {
+					surname = driversName.trim().substring(driversName.lastIndexOf(' ') + 1);
+					name = driversName.trim().substring(0,driversName.lastIndexOf(' '));
+					} else {
+						surname = driversName.trim();
+					}
 				}
 
 				if ((horse == null || horse.trim().equals(""))
@@ -374,7 +380,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_fleet)).getNumericCellValue()).toBigInteger() ;
 					fleetNO =   bint.toString();
 				}
-				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
+				
 				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
 				if (mTruck_horse == null) {
 					mTruck_horse = MTruck.createTruck(getCtx(), horse, "H",get_TrxName());
@@ -383,6 +389,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					mTruck_horse.setZZ_Fleet_No(fleetNO);
 					mTruck_horse.saveEx();
 				}
+				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
 				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
 				if (mTruck_trailer1 == null) {
 					mTruck_trailer1 = MTruck.createTruck(getCtx(), trailer_1, "T",get_TrxName());
@@ -396,14 +403,18 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					mDriver = MDriver.createDriver(getCtx(), driver_IDNo, name, surname, null, get_TrxName());
 				} 
 				mTruckList.setZZ_Transporters_ID(zz_Transporters_ID);
-				if (mTruck_horse != null)
+				if (mTruck_horse != null) {
 					mTruckList.setZZ_Horse_ID(mTruck_horse.getZZ_Truck_ID());
-				if (mTruck_trailer1 != null)
+				}
+				if (mTruck_trailer1 != null) {
 					mTruckList.setZZ_Trailer1_ID(mTruck_trailer1.getZZ_Truck_ID());
-				if (mTruck_trailer2 != null)
+				}
+				if (mTruck_trailer2 != null) {
 					mTruckList.setZZ_Trailer2_ID(mTruck_trailer2.getZZ_Truck_ID());
-				if (mDriver != null)
+				}
+				if (mDriver != null) {
 					mTruckList.setZZ_Driver_ID(mDriver.getZZ_Driver_ID());
+				}
 				if (fleetNO != null) {
 					mTruckList.setZZ_Fleet_No(fleetNO);
 				}
@@ -566,8 +577,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		return logFileName;
 	}
 
-
-
+	
+	public static void main(String[] args) {
+		String driversName = "Test ";
+		String surname = driversName.substring(driversName.lastIndexOf(' ') + 1);
+		String name = driversName.substring(0,driversName.lastIndexOf(' '));
+		System.out.println(surname);
+		System.out.println(name);
+	}
 
 
 }
