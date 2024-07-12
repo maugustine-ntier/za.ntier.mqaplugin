@@ -389,7 +389,14 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					mTruck_horse.setZZ_Fleet_No(fleetNO);
 					mTruck_horse.saveEx();
 				}
-				MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
+				
+				MTruckList mTruckList = null;
+				if (mTruck_horse != null && mTruck_horse.getZZ_Registration_No() != null) {
+					mTruckList = MTruckList.getTruckList(getCtx(), mTruck_horse.getZZ_Registration_No(), get_TrxName());
+				}
+				if (mTruckList == null) {
+					mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
+				}
 				MTruck mTruck_trailer1 = MTruck.getTruck(getCtx(), trailer_1,get_TrxName());
 				if (mTruck_trailer1 == null) {
 					mTruck_trailer1 = MTruck.createTruck(getCtx(), trailer_1, "T",get_TrxName());
@@ -557,7 +564,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 	
 
 
-
+    // Was removed because the report was confusing the user.   Can be used later.   It brings the excel sheet in another tab.
 	private String writeOutErrorLogFile(Sheet sheet) {
 		for (int i = 0; i <= maxCols; i++) {
 			sheet.autoSizeColumn(i); 
