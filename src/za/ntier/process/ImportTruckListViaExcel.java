@@ -391,8 +391,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				}
 				
 				MTruckList mTruckList = null;
-				if (mTruck_horse != null && mTruck_horse.getZZ_Registration_No() != null) {
-					mTruckList = MTruckList.getTruckList(getCtx(), mTruck_horse.getZZ_Registration_No(), get_TrxName());
+				if (mTruck_horse != null && mTruck_horse.getZZ_Truck_ID() > 0) {
+					mTruckList = MTruckList.getTruckList(getCtx(), zz_Transporters_ID,mTruck_horse.getZZ_Truck_ID(), get_TrxName());
 				}
 				if (mTruckList == null) {
 					mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
