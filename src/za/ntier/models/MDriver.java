@@ -72,8 +72,12 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 	public static MDriver createDriver(Properties ctx,String zz_ID_Passport_No,String name, String surname, Timestamp expiryDt, String trxName) {
 		MDriver mDriver = new MDriver(ctx, 0, trxName);
 		mDriver.setZZ_ID_Passport_No(zz_ID_Passport_No);
-		mDriver.setName(name);
-		mDriver.setZZ_Surname(surname);
+		if (name != null) {
+			mDriver.setName(name);
+		}
+		if (surname != null) {
+			mDriver.setZZ_Surname(surname);
+		}
 		if (expiryDt == null) {
 			mDriver.setZZ_License_Expiry_Date(DB.getSQLValueTS(trxName,"select to_Date('01011960','ddmmyyyy')"));
 		}
