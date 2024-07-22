@@ -272,8 +272,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						rowNoToWrite++;
 					} else {
 						if (!mDriver.isZZ_Is_Valid()) {
-						//	writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database",row);
-						//	rowNoToWrite++;
+							//	writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Driver is marked as Invalid on the database",row);
+							//	rowNoToWrite++;
 						}
 						if (mDriver.getZZ_License_Expiry_Date() == null || (DB.TO_DATE(mDriver.getZZ_License_Expiry_Date()).compareTo(DB.TO_DATE(new Timestamp(System.currentTimeMillis()))) < 0)) {
 							String stringDt = "";
@@ -360,8 +360,8 @@ public class ImportTruckListViaExcel extends SvrProcess {
 				String surname = null;
 				if (driversName != null) {
 					if (driversName.trim().contains(" ")) {
-					surname = driversName.trim().substring(driversName.lastIndexOf(' ') + 1);
-					name = driversName.trim().substring(0,driversName.lastIndexOf(' '));
+						surname = driversName.trim().substring(driversName.trim().lastIndexOf(' ') + 1);
+						name = driversName.trim().substring(0,driversName.trim().lastIndexOf(' '));
 					} else {
 						surname = driversName.trim();
 					}
@@ -380,7 +380,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					BigInteger bint = BigDecimal.valueOf(row.getCell(columnmap.get(p_fleet)).getNumericCellValue()).toBigInteger() ;
 					fleetNO =   bint.toString();
 				}
-				
+
 				MTruck mTruck_horse = MTruck.getTruck(getCtx(), horse,get_TrxName());
 				if (mTruck_horse == null) {
 					mTruck_horse = MTruck.createTruck(getCtx(), horse, "H",get_TrxName());
@@ -389,7 +389,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 					mTruck_horse.setZZ_Fleet_No(fleetNO);
 					mTruck_horse.saveEx();
 				}
-				
+
 				MTruckList mTruckList = null;
 				if (mTruck_horse != null && mTruck_horse.getZZ_Truck_ID() > 0) {
 					mTruckList = MTruckList.getTruckList(getCtx(), zz_Transporters_ID,mTruck_horse.getZZ_Truck_ID(), get_TrxName());
@@ -560,11 +560,11 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		}
 
 	}
-	
-	
 
 
-    // Was removed because the report was confusing the user.   Can be used later.   It brings the excel sheet in another tab.
+
+
+	// Was removed because the report was confusing the user.   Can be used later.   It brings the excel sheet in another tab.
 	private String writeOutErrorLogFile(Sheet sheet) {
 		for (int i = 0; i <= maxCols; i++) {
 			sheet.autoSizeColumn(i); 
@@ -584,7 +584,7 @@ public class ImportTruckListViaExcel extends SvrProcess {
 		return logFileName;
 	}
 
-	
+
 	public static void main(String[] args) {
 		String driversName = "Test ";
 		String surname = driversName.substring(driversName.lastIndexOf(' ') + 1);

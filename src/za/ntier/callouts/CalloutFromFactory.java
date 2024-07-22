@@ -48,11 +48,15 @@ public class CalloutFromFactory implements IColumnCallout {
 			if (mField.getValue() != null) {
 				MBPartner cust = MBPartner.get(ctx, (Integer)mField.getValue(), null);
 				MBPartnerLocation[] locs = cust.getLocations(false);
+				mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
 				if (locs != null && locs.length > 0) {
-					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, locs[0].getC_BPartner_Location_ID());
-				} else {
-					mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
-				}
+					for (MBPartnerLocation loc : locs) {
+						if (loc.isShipTo()) {
+							mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, loc.getC_BPartner_Location_ID());
+							break;
+						}
+					}
+				} 
 			} else {
 				mTab.setValue(X_ZZ_Transporters.COLUMNNAME_C_BPartner_Location_ID, null);
 			}
