@@ -107,6 +107,33 @@ public interface I_ZZ_WB_Transaction
 	/** Get Field2	  */
 	public String getField2();
 
+    /** Column name Field3 */
+    public static final String COLUMNNAME_Field3 = "Field3";
+
+	/** Set Field3	  */
+	public void setField3 (String Field3);
+
+	/** Get Field3	  */
+	public String getField3();
+
+    /** Column name Field4 */
+    public static final String COLUMNNAME_Field4 = "Field4";
+
+	/** Set Field4	  */
+	public void setField4 (String Field4);
+
+	/** Get Field4	  */
+	public String getField4();
+
+    /** Column name Field5 */
+    public static final String COLUMNNAME_Field5 = "Field5";
+
+	/** Set Field5	  */
+	public void setField5 (String Field5);
+
+	/** Get Field5	  */
+	public String getField5();
+
     /** Column name Help */
     public static final String COLUMNNAME_Help = "Help";
 

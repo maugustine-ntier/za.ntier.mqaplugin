@@ -34,7 +34,7 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240722L;
+	private static final long serialVersionUID = 20240723L;
 
     /** Standard Constructor */
     public X_ZZ_WB_Transaction (Properties ctx, int ZZ_WB_Transaction_ID, String trxName)
@@ -147,6 +147,51 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
 	public String getField2()
 	{
 		return (String)get_Value(COLUMNNAME_Field2);
+	}
+
+	/** Set Field3.
+		@param Field3 Field3
+	*/
+	public void setField3 (String Field3)
+	{
+		set_Value (COLUMNNAME_Field3, Field3);
+	}
+
+	/** Get Field3.
+		@return Field3	  */
+	public String getField3()
+	{
+		return (String)get_Value(COLUMNNAME_Field3);
+	}
+
+	/** Set Field4.
+		@param Field4 Field4
+	*/
+	public void setField4 (String Field4)
+	{
+		set_Value (COLUMNNAME_Field4, Field4);
+	}
+
+	/** Get Field4.
+		@return Field4	  */
+	public String getField4()
+	{
+		return (String)get_Value(COLUMNNAME_Field4);
+	}
+
+	/** Set Field5.
+		@param Field5 Field5
+	*/
+	public void setField5 (String Field5)
+	{
+		set_Value (COLUMNNAME_Field5, Field5);
+	}
+
+	/** Get Field5.
+		@return Field5	  */
+	public String getField5()
+	{
+		return (String)get_Value(COLUMNNAME_Field5);
 	}
 
 	/** Set Comment/Help.

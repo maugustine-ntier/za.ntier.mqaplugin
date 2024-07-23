@@ -66,6 +66,9 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				mZZWBTransaction.setWB_TransactionID(transactionID);
 				mZZWBTransaction.setField1(invNo);
 				mZZWBTransaction.setField2(stockPileNo);
+				mZZWBTransaction.setField3(resultSet.getString("Field3"));
+				mZZWBTransaction.setField4(resultSet.getString("Field4"));
+				mZZWBTransaction.setField5(resultSet.getString("Field5"));
 				mZZWBTransaction.setDateTimeOut(movementDate);
 				mZZWBTransaction.setNetMass(netMass);
 				mZZWBTransaction.setTruckRegNo(truckRegNo);
