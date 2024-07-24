@@ -73,6 +73,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				mZZWBTransaction.setNetMass(netMass);
 				mZZWBTransaction.setTruckRegNo(truckRegNo);
 				mZZWBTransaction.saveEx();
+				cnt++;
 			}
 
 			selectStatement.close();

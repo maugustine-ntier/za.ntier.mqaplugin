@@ -89,6 +89,15 @@ public interface I_ZZ_WB_Transaction
 	/** Get DateTimeOut	  */
 	public Timestamp getDateTimeOut();
 
+    /** Column name ErrorMsg */
+    public static final String COLUMNNAME_ErrorMsg = "ErrorMsg";
+
+	/** Set Error Msg	  */
+	public void setErrorMsg (String ErrorMsg);
+
+	/** Get Error Msg	  */
+	public String getErrorMsg();
+
     /** Column name Field1 */
     public static final String COLUMNNAME_Field1 = "Field1";
 

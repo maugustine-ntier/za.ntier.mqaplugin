@@ -34,7 +34,7 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240723L;
+	private static final long serialVersionUID = 20240724L;
 
     /** Standard Constructor */
     public X_ZZ_WB_Transaction (Properties ctx, int ZZ_WB_Transaction_ID, String trxName)
@@ -117,6 +117,21 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
 	public Timestamp getDateTimeOut()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_DateTimeOut);
+	}
+
+	/** Set Error Msg.
+		@param ErrorMsg Error Msg
+	*/
+	public void setErrorMsg (String ErrorMsg)
+	{
+		set_Value (COLUMNNAME_ErrorMsg, ErrorMsg);
+	}
+
+	/** Get Error Msg.
+		@return Error Msg	  */
+	public String getErrorMsg()
+	{
+		return (String)get_Value(COLUMNNAME_ErrorMsg);
 	}
 
 	/** Set Field1.

@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.logging.Level;
 
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoiceLine;
@@ -22,11 +21,10 @@ import za.ntier.models.MDriver;
 import za.ntier.models.MInOut_New;
 import za.ntier.models.MInvoice_New;
 import za.ntier.models.MTransporters;
-import za.ntier.models.MZZWBTransaction;
 import za.ntier.models.X_ZZ_StockPile;
 
 @org.adempiere.base.annotation.Process
-public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
+public class ZZ_CreateShipmentsFromWeighBridge_OLD extends SvrProcess {
 
 
 
@@ -39,22 +37,39 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where M_InOut_ID is null";
+		Connection connection = null;
+		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
+		String user = "sa";
+		String pass = "LMISupport1!";
+		PreparedStatement selectStatement = null;
 		try {
-			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
-			rs = pstmt.executeQuery();
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			connection = DriverManager.getConnection(dbURL, user, pass);
 
-			while (rs.next()) {
-				MZZWBTransaction mZZWBTransaction = new MZZWBTransaction(getCtx(),rs.getInt(1),get_TrxName());							
-				String invNo = mZZWBTransaction.getField1(); 
-				String stockPileNo = mZZWBTransaction.getField2(); 
-				Timestamp movementDate = mZZWBTransaction.getDateTimeOut();
+
+
+			// Displaying the outcome
+			String selectQuery = "SELECT * FROM Transactions";   
+			selectStatement = connection.prepareStatement(selectQuery);
+			ResultSet resultSet = selectStatement.executeQuery();
+
+			System.out.println("Outcome:");
+			System.out.printf("%-10s %-20s %-20s %-30s %-20s%n", "Field1", "Field2", "Field3", "Field4", "Field5");
+
+			while (resultSet.next()) {
+				System.out.printf("%-10s %-20s %-20s %-30s %-20s%n",
+						resultSet.getString("Field1"),
+						resultSet.getString("Field2"),
+						resultSet.getString("Field3"),
+						resultSet.getString("Field4"),
+						resultSet.getString("Field5"));				
+				String invNo = resultSet.getString("Field1");
+				String stockPileNo = resultSet.getString("Field2");
+				Timestamp movementDate = resultSet.getTimestamp("DateTimeOut");
 				//	String prod = resultSet.getString("Field3").substring(0,3);
-				BigDecimal netMass = mZZWBTransaction.getNetMass();
-				String truckRegNo = mZZWBTransaction.getTruckRegNo();
-				int transactionID = mZZWBTransaction.getWB_TransactionID();
+				BigDecimal netMass = resultSet.getBigDecimal("NetMass");
+				String truckRegNo = resultSet.getString("TruckRegNo");
+				int transactionID = resultSet.getInt("TransactionID");
 				if (MInOut_New.getCount(transactionID, get_TrxName()) > 0) {
 					continue;
 				}
@@ -105,34 +120,25 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 									mInOutLine.setM_Locator_ID(m_Locator_ID);
 								}
 								mInOutLine.saveEx();
-								mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
-								mZZWBTransaction.saveEx();
 							}
 						} 
-					} else {
-						mZZWBTransaction.setErrorMsg("Invoice No : " + invNo + " does not exist");
-						mZZWBTransaction.saveEx();
 					}
 
-				} else {
-					mZZWBTransaction.setErrorMsg("Invoice Number is Blank. Cannot create shipment");
-					mZZWBTransaction.saveEx();
 				}
-			
+			}
+
+			selectStatement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (selectStatement != null) {
+				selectStatement.close();
+			}
+			if (connection != null) {
+				connection.close();
 			}
 		}
-
-		catch (Exception ex)	{
-			log.log(Level.SEVERE, selectQuery, ex);
-		}
-		finally
-		{
-			DB.close(rs,pstmt);
-			rs = null;pstmt = null;
-		}
-
-
-
 
 		return "Number of Shipments Created : " + cnt;
 
