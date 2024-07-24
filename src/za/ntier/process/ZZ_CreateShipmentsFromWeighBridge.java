@@ -105,6 +105,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 									mInOutLine.setM_Locator_ID(m_Locator_ID);
 								}
 								mInOutLine.saveEx();
+								mZZWBTransaction.setErrorMsg(null);
 								mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
 								mZZWBTransaction.saveEx();
 							}
