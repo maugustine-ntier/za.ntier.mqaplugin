@@ -38,7 +38,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 
 
 			// Displaying the outcome
-			String selectQuery = "SELECT * FROM Transactions";   
+			String selectQuery = "SELECT * FROM Transactions where DateTimeOut is not null";   
 			selectStatement = connection.prepareStatement(selectQuery);
 			ResultSet resultSet = selectStatement.executeQuery();
 
