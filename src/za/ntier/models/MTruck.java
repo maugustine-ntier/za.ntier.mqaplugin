@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 public class MTruck extends X_ZZ_Truck {
 
@@ -34,7 +35,7 @@ public class MTruck extends X_ZZ_Truck {
 
 	public static MTruck getTruck(Properties ctx,String ZZ_Registration_No, String trxName) {
 		MTruck mTruck = null;
-		String SQL = "select t.ZZ_Truck_ID from ZZ_Truck t where t.ZZ_Registration_No = ?";
+		String SQL = "select t.ZZ_Truck_ID from ZZ_Truck t where t.ZZ_Registration_No = ? " + " and t.AD_Client_ID = " + Env.getAD_Client_ID(ctx);
 		int zz_Truck_ID = DB.getSQLValue(trxName, SQL, ZZ_Registration_No.trim());
 		if (zz_Truck_ID > 0) {
 			mTruck = new MTruck(ctx, zz_Truck_ID, trxName);
@@ -45,13 +46,21 @@ public class MTruck extends X_ZZ_Truck {
 	public static MTruck createTruck(Properties ctx,String zz_Registration_No, String zz_Truck_Type, String trxName) {
 		MTruck mTruck = new MTruck(ctx, 0, trxName);
 		mTruck.setZZ_Truck_Type(zz_Truck_Type);
-		mTruck.setZZ_Registration_No(zz_Registration_No);
+		mTruck.setZZ_Registration_No(zz_Registration_No.trim().replaceAll("\\s+","") );
 		if (mTruck.save()) {
 			return mTruck;
 		} else {
 			return null;
 		}
 
+	}
+
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		if (getZZ_Registration_No() != null) {
+			setZZ_Registration_No(getZZ_Registration_No().trim().replaceAll("\\s+","") );
+		}
+		return true;
 	}
 
 

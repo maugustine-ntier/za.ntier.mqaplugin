@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 
@@ -60,7 +61,7 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 	public static MDriver getDriver(Properties ctx,String zz_ID_Passport_No,String trxName) {
 		MDriver mDriver = null;
 		if (zz_ID_Passport_No != null) {
-			String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?";
+			String SQL = "select d.ZZ_Driver_ID from ZZ_Driver d where d.ZZ_ID_Passport_No = ?" + " and d.AD_Client_ID = " + Env.getAD_Client_ID(ctx);;
 			int zz_Driver_ID = DB.getSQLValue(trxName, SQL, zz_ID_Passport_No.trim());
 			if (zz_Driver_ID > 0) {
 				mDriver = new MDriver(ctx, zz_Driver_ID, trxName);
@@ -93,7 +94,8 @@ public class MDriver extends X_ZZ_Driver implements I_ZZ_Driver {
 		if (LoadingDate != null) {
 			MTransporters mTransporters [] = MTransporters.get(ctx, c_BPartner_ID, m_Product_ID, LoadingDate, trxName);
 			for (MTransporters mTransporter : mTransporters) {
-				String SQL = "select max(tl.ZZ_Driver_ID) from ZZ_Truck_List tl, ZZ_Truck t where tl.ZZ_Transporters_ID = ? and tl.ZZ_Horse_ID = t.ZZ_truck_ID and t.ZZ_Registration_No = ?";
+				String SQL = "select max(tl.ZZ_Driver_ID) from ZZ_Truck_List tl, ZZ_Truck t where tl.ZZ_Transporters_ID = ? and tl.ZZ_Horse_ID = t.ZZ_truck_ID and t.ZZ_Registration_No = ?"
+						+ " and tl.AD_Client_ID = " + Env.getAD_Client_ID(ctx);
 				int zz_Driver_ID = DB.getSQLValue(trxName, SQL, mTransporter.getZZ_Transporters_ID(),truckRegNo);
 				if (zz_Driver_ID > 0) {
 					mDriver = new MDriver(ctx, zz_Driver_ID, trxName);

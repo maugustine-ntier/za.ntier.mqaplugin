@@ -4,6 +4,7 @@ import org.compiere.model.MClient;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
+import org.compiere.model.X_R_Request;
 import org.compiere.util.CLogger;
 
 import za.ntier.models.X_M_InOut;
@@ -18,10 +19,13 @@ public class NtierModelValidator implements ModelValidator{
 
 	@Override
 	public void initialize(ModelValidationEngine engine, MClient client) {
-		if (client != null ) m_AD_Client_ID = client.getAD_Client_ID();
+		if (client != null ) {
+			m_AD_Client_ID = client.getAD_Client_ID();
+		}
 		engine.addModelChange(X_ZZ_StockPile.Table_Name, this);
 		engine.addModelChange(X_M_InOut.Table_Name, this);
 		engine.addDocValidate(X_M_InOut.Table_Name, this);
+		engine.addModelChange(X_R_Request.Table_Name, this);
 		
 	}
 

@@ -189,6 +189,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						&& (driver_IDNo == null|| driver_IDNo.trim().equals(""))) {
 					continue;
 				}
+				horse = (horse == null) ? horse : horse.trim().replaceAll("\\s+","");
+				trailer_1 = (trailer_1 == null) ? trailer_1 : trailer_1.trim().replaceAll("\\s+","");
+				trailer_2 = (trailer_2 == null) ? trailer_2 : trailer_2.trim().replaceAll("\\s+","");
 				//	MTruckList mTruckList = new MTruckList(getCtx(), 0, get_TrxName());
 				if (horse == null || horse.trim().equals("")) {
 					writeErrorToXLS(errorSheet,rowNoToWrite,row.getRowNum(), "Horse Missing",row);
@@ -373,6 +376,9 @@ public class ImportTruckListViaExcel extends SvrProcess {
 						&& (driver_IDNo == null|| driver_IDNo.trim().equals(""))) {
 					continue;
 				}
+				horse = (horse == null) ? horse : horse.trim().replaceAll("\\s+","");
+				trailer_1 = (trailer_1 == null) ? trailer_1 : trailer_1.trim().replaceAll("\\s+","");
+				trailer_2 = (trailer_2 == null) ? trailer_2 : trailer_2.trim().replaceAll("\\s+","");
 				String fleetNO = null;
 				if (row.getCell(columnmap.get(p_fleet)).getCellType().equals(CellType.STRING)) {
 					fleetNO =   row.getCell(columnmap.get(p_fleet)).getStringCellValue(); 
