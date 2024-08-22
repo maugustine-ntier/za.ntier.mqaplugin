@@ -28,6 +28,9 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		MClient mClient = MClient.get(getAD_Client_ID());
+		if (mClient == null) {
+			return "No Client";
+		}
 		Connection connection = null;
 		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
 		String user = "sa";
@@ -55,7 +58,9 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 						resultSet.getString("Field4"),
 						resultSet.getString("Field5"));		
 				String client = resultSet.getString("Field7");
-				if (!(mClient.getName().equals(client))) {
+				client = client.replaceAll("[^a-zA-Z]", "").trim();
+				String clientName = mClient.getName().replaceAll("[^a-zA-Z]", "").trim();
+				if (!(clientName.equals(client))) {
 					continue;
 				}
 				String invNo = resultSet.getString("Field1");
