@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import org.compiere.model.MClient;
 import org.compiere.process.SvrProcess;
 
 import za.ntier.models.MZZWBTransaction;
@@ -26,6 +27,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
+		MClient mClient = MClient.get(getAD_Client_ID());
 		Connection connection = null;
 		String dbURL = "jdbc:sqlserver://41.76.221.102:5533;encrypt=true;trustServerCertificate=true;databaseName=WeighBridgeMng";
 		String user = "sa";
@@ -51,7 +53,11 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 						resultSet.getString("Field2"),
 						resultSet.getString("Field3"),
 						resultSet.getString("Field4"),
-						resultSet.getString("Field5"));				
+						resultSet.getString("Field5"));		
+				String client = resultSet.getString("Field7");
+				if (!(mClient.getName().equals(client))) {
+					continue;
+				}
 				String invNo = resultSet.getString("Field1");
 				String stockPileNo = resultSet.getString("Field2");
 				Timestamp movementDate = resultSet.getTimestamp("DateTimeOut");
@@ -62,6 +68,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				if (MZZWBTransaction.getCount(transactionID, get_TrxName()) > 0) {
 					continue;
 				}
+				
 				MZZWBTransaction  mZZWBTransaction = new MZZWBTransaction(getCtx(),0,get_TrxName());
 				mZZWBTransaction.setWB_TransactionID(transactionID);
 				mZZWBTransaction.setField1(invNo);

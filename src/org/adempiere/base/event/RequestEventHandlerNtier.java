@@ -60,7 +60,7 @@ public class RequestEventHandlerNtier extends AbstractEventHandler implements Ma
 		String topic = event.getTopic();
 		if (topic.equals(IEventTopics.REQUEST_SEND_EMAIL)) 
 		{
-			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
+			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManagerNtier.EVENT_DATA);
 			if (!eventData.getClient().sendEMail(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachment()))
 			{
 				int AD_Message_ID = MESSAGE_REQUESTUPDATE;
@@ -413,8 +413,8 @@ public class RequestEventHandlerNtier extends AbstractEventHandler implements Ma
 					|| X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(NotificationType))
 				{
 					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
-					Event event = EventManager.newEvent(IEventTopics.REQUEST_SEND_EMAIL, eventData, true);
-					EventManager.getInstance().postEvent(event);
+					Event event = EventManagerNtier.newEvent(IEventTopics.REQUEST_SEND_EMAIL, eventData, true);
+					EventManagerNtier.getInstance().postEvent(event);
 				}
 				//	Send Note
 				if (X_AD_User.NOTIFICATIONTYPE_Notice.equals(NotificationType)
