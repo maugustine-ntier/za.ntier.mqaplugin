@@ -35,7 +35,7 @@ public class X_R_RequestUpdate extends PO implements I_R_RequestUpdate, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240821L;
+	private static final long serialVersionUID = 20240823L;
 
     /** Standard Constructor */
     public X_R_RequestUpdate (Properties ctx, int R_RequestUpdate_ID, String trxName)
@@ -317,6 +317,34 @@ public class X_R_RequestUpdate extends PO implements I_R_RequestUpdate, I_Persis
 	public String getResult()
 	{
 		return (String)get_Value(COLUMNNAME_Result);
+	}
+
+	public org.compiere.model.I_AD_User getSalesRep() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getSalesRep_ID(), get_TrxName());
+	}
+
+	/** Set Sales Representative.
+		@param SalesRep_ID Sales Representative or Company Agent
+	*/
+	public void setSalesRep_ID (int SalesRep_ID)
+	{
+		if (SalesRep_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_SalesRep_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_SalesRep_ID, Integer.valueOf(SalesRep_ID));
+	}
+
+	/** Get Sales Representative.
+		@return Sales Representative or Company Agent
+	  */
+	public int getSalesRep_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_SalesRep_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Start Time.
