@@ -49,7 +49,7 @@ public class ZZ_SendRequestMessages extends SvrProcess {
 				if (x_R_RequestUpdate.getSalesRep_ID() > 0) {
 					String mess = x_R_RequestUpdate.getResult();
 					MUser mUser = MUser.get(x_R_RequestUpdate.getSalesRep_ID());
-					String To_Number = "0844627361";
+					String To_Number = "+27844627361";
 					String retMess = SendMessage.send(getCtx(), getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,mess); 
 					if (retMess.equals("Message Sent")) {
 						x_R_RequestUpdate.setZZ_Whatsapp_Sent(true);
@@ -74,7 +74,7 @@ public class ZZ_SendRequestMessages extends SvrProcess {
 	private void requestSend() {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT R_RequestUpdate_ID FROM R_Request Where ZZ_Whatsapp_Sent = 'N' and AD_Client_ID = ?";
+		String selectQuery = "SELECT R_Request_ID FROM R_Request Where ZZ_Whatsapp_Sent = 'N' and AD_Client_ID = ?";
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setInt(1, getAD_Client_ID());
@@ -83,9 +83,9 @@ public class ZZ_SendRequestMessages extends SvrProcess {
 			while (rs.next()) {
 				X_R_Request x_R_Request = new X_R_Request(getCtx(),rs.getInt(1),get_TrxName());
 				if (x_R_Request.getSalesRep_ID() > 0) {
-					String mess = x_R_Request.getResult();
+					String mess = x_R_Request.getSummary();
 					MUser mUser = MUser.get(x_R_Request.getSalesRep_ID());
-					String To_Number = "0844627361";
+					String To_Number = "+27844627361";
 					String retMess = SendMessage.send(getCtx(), getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,mess); 
 					if (retMess.equals("Message Sent")) {
 						x_R_Request.setZZ_Whatsapp_Sent(true);
