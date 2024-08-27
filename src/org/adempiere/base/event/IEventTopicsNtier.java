@@ -20,6 +20,6 @@ package org.adempiere.base.event;
 public interface IEventTopicsNtier {
 
 
-	public static final String REQUEST_SEND_WHATSAPP = "idempiere/requestSendEMail";
+	public static final String REQUEST_SEND_WHATSAPP = "idempiere/requestSendWhatsapp";
 
 }

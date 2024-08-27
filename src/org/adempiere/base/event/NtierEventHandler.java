@@ -11,9 +11,11 @@ import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
 import org.compiere.model.MClient;
+import org.compiere.model.MColumn;
 import org.compiere.model.MRequest;
 import org.compiere.model.MRequestType;
 import org.compiere.model.MRequestUpdate;
+import org.compiere.model.MTable;
 import org.compiere.model.MUser;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
@@ -77,7 +79,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				if (ignoreRequestTypes.contains(rt.getName())) {
 					return;
 				}				
-				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
+				afterSaveRequest(ru,r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
 			if (po.get_TableName().equals(I_R_Request.Table_Name))
 			{
@@ -89,11 +91,14 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				}
 				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
-		} else if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {
+		} else if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {  // Save old salesRep
 			PO po = getPO(event);
-			X_R_Request r = (X_R_Request) po;
-			r.setSalesRep_OLD_ID(r.get_ValueOldAsInt(I_R_Request.COLUMNNAME_SalesRep_ID));
-			r.saveEx();
+			if (po instanceof MRequest) {
+				MRequest r = (MRequest) po;
+				String sql = "Update R_Request set SalesRep_OLD_ID = ? where R_Request_ID = ?";
+				Integer [] arr = new Integer[] {r.get_ValueOldAsInt(I_R_Request.COLUMNNAME_SalesRep_ID),r.getR_Request_ID()};
+				DB.executeUpdate(sql, arr, false,po.get_TrxName());
+			}
 			
 		}
 	}
@@ -204,14 +209,34 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	public boolean checkChange (MRequest r, MRequestUpdate ru, String columnName)
 	{
 		String oldValue = r.get_ValueAsString(columnName);
-		String newValue = ru.get_ValueAsString(columnName);
+		String newValue = null;
+		
+		
+		boolean found = false;
+		for (final MColumn col : MTable.get(Env.getCtx(), I_R_RequestUpdate.Table_ID).getColumns(false))
+		{
+			if (col.isStandardColumn() || col.isKey() || col.isParent() || col.isUUIDColumn() || col.isVirtualColumn()) {
+				continue;
+			}
+			final String theColumnName = col.getColumnName();
+			final int i = r.get_ColumnIndex(theColumnName);
+			if (i >= 0 && theColumnName.equals(columnName))
+			{
+				newValue = r.get_ValueAsString(i);
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			return false;
+		}
 		if (oldValue == null && newValue == null) {
 			return false;
 		}
 		if ((oldValue == null && newValue != null) || (newValue == null && oldValue != null)) {
 			return true;
 		}
-		if (oldValue.equals(newValue)) {
+		if (!oldValue.equals(newValue)) {
 			return true;
 		}
 		return false;
