@@ -1,7 +1,5 @@
 package org.adempiere.base.event;
 
-import static org.compiere.model.SystemIDs.MESSAGE_REQUESTUPDATE;
-
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,16 +10,12 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
-import org.compiere.model.I_R_Request;
 import org.compiere.model.MClient;
-import org.compiere.model.MNote;
 import org.compiere.model.MRequest;
-import org.compiere.model.MRequestAction;
 import org.compiere.model.MRequestType;
 import org.compiere.model.MRequestUpdate;
 import org.compiere.model.MUser;
 import org.compiere.model.PO;
-import org.compiere.model.X_R_Request;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -37,6 +31,8 @@ import org.osgi.service.event.Event;
 
 import za.co.ntier.twilio.models.X_TW_Message;
 import za.co.ntier.utils.SendMessage;
+import za.ntier.models.I_R_Request;
+import za.ntier.models.I_R_RequestUpdate;
 import za.ntier.models.X_AD_User;
 
 @Component(
@@ -57,19 +53,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	@Override
 	protected void doHandleEvent(Event event) {
 		String topic = event.getTopic();
-
-		if (topic.equals(IEventTopics.REQUEST_SEND_EMAIL)) 
-		{
-			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
-			if (!eventData.getClient().sendEMail(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachment()))
-			{
-				int AD_Message_ID = MESSAGE_REQUESTUPDATE;
-				MNote note = new MNote(Env.getCtx(), AD_Message_ID, eventData.getTo().getAD_User_ID(),
-						X_R_Request.Table_ID, eventData.getRequestID(), 
-						eventData.getSubject(), eventData.getMessage(), null);
-				note.saveEx();
-			}
-		} else if (topic.equals(IEventTopicsNtier.REQUEST_SEND_WHATSAPP)) {
+		if (topic.equals(IEventTopicsNtier.REQUEST_SEND_WHATSAPP)) {
 			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
 			// String To_Number = "+27844627361";
 			String To_Number = eventData.getTo().getPhone();
@@ -80,24 +64,30 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				e.printStackTrace();
 			} 			
 		}
-		else if (topic.equals(IEventTopics.PO_BEFORE_NEW) || topic.equals(IEventTopics.PO_BEFORE_CHANGE)
-				|| topic.equals(IEventTopics.PO_AFTER_NEW) || topic.equals(IEventTopics.PO_AFTER_CHANGE)) 
+		else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
 		{
 			PO po = getPO(event);
+			if (po.get_TableName().equals(I_R_RequestUpdate.Table_Name))
+			{
+				MRequestUpdate ru = (MRequestUpdate) po;
+				MRequest r = new MRequest(Env.getCtx(),ru.getR_Request_ID(),ru.get_TrxName());
+				
+				MRequestType rt = r.getRequestType();
+				if (ignoreRequestTypes.contains(rt.getName())) {
+					return;
+				}				
+				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
+			}
 			if (po.get_TableName().equals(I_R_Request.Table_Name))
 			{
-				MRequest r = (MRequest) po;
+				MRequestUpdate ru = (MRequestUpdate) po;
+				MRequest r = new MRequest(Env.getCtx(),ru.getR_Request_ID(),ru.get_TrxName());
 				
 				MRequestType rt = r.getRequestType();
 				if (ignoreRequestTypes.contains(rt.getName())) {
 					return;
 				}
-				
-				if (topic.equals(IEventTopics.PO_BEFORE_NEW) || topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {
-					beforeSaveRequest(r, topic.equals(IEventTopics.PO_BEFORE_NEW));
-				} else if (topic.equals(IEventTopics.PO_AFTER_NEW) || topic.equals(IEventTopics.PO_AFTER_CHANGE)) {
-					afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
-				}
+				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
 		}
 	}
@@ -105,11 +95,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	@Override
 	protected void initialize() {
 		registerEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP);
-		registerTableEvent(IEventTopics.PO_BEFORE_NEW, I_R_Request.Table_Name);
-		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_R_Request.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_Request.Table_Name);
-		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_R_Request.Table_Name);
-		
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);		
 	}
 	
 	/**
@@ -118,48 +105,41 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	 * @param newRecord
 	 * @return error message or null
 	 */
-	private String beforeSaveRequest(MRequest r, boolean newRecord)
+	private String afterSaveRequest(MRequestUpdate ru,MRequest r, boolean newRecord)
 	{
 		//	New
-		if (newRecord) {
-			return null;
-		}
+	//	if (newRecord) {
+	//		return null;
+	//	}
 		
 		//	Change Log
 		r.setIsChanged(false);
 		ArrayList<String> sendInfo = new ArrayList<String>();
-		MRequestAction ra = new MRequestAction(r, false);
 		//
-		if (checkChange(r, ra, "R_RequestType_ID")) {
+		if (checkChange(r, ru, "R_RequestType_ID")) {
 			sendInfo.add("R_RequestType_ID");
 		}
-		if (checkChange(r, ra, "R_Group_ID")) {
+		if (checkChange(r, ru, "R_Group_ID")) {
 			sendInfo.add("R_Group_ID");
 		}
-		if (checkChange(r, ra, "R_Category_ID")) {
+		if (checkChange(r, ru, "R_Category_ID")) {
 			sendInfo.add("R_Category_ID");
 		}
-		if (checkChange(r, ra, "R_Status_ID")) {
+		if (checkChange(r, ru, "R_Status_ID")) {
 			sendInfo.add("R_Status_ID");
 		}
-		if (checkChange(r, ra, "R_Resolution_ID")) {
+		if (checkChange(r, ru, "R_Resolution_ID")) {
 			sendInfo.add("R_Resolution_ID");
 		}
 		//
-		if (checkChange(r, ra, "SalesRep_ID"))
+		if (checkChange(r, ru, "SalesRep_ID"))
 		{
 			//	Sender
 			int AD_User_ID = Env.getContextAsInt(r.getCtx(), Env.AD_USER_ID);
 			if (AD_User_ID == 0) {
 				AD_User_ID = r.getUpdatedBy();
 			}
-			//	Old
-			Object oo = r.get_ValueOld("SalesRep_ID");
-			int oldSalesRep_ID = 0;
-			if (oo instanceof Integer) {
-				oldSalesRep_ID = ((Integer)oo).intValue();
-			}
-			if (oldSalesRep_ID != 0)
+			if (checkChange(r, ru, "SalesRep_ID"))
 			{
 				//  RequestActionTransfer - Request {0} was transferred by {1} from {2} to {3}
 				Object[] args = new Object[] {r.getDocumentNo(), 
@@ -172,54 +152,16 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				sendInfo.add("SalesRep_ID");
 			}
 		}
-		checkChange(r, ra, "AD_Role_ID");
+		checkChange(r, ru, "AD_Role_ID");
 		//
-		checkChange(r, ra, "Priority");
-		if (checkChange(r, ra, "PriorityUser")) {
+		checkChange(r, ru, "Priority");
+		if (checkChange(r, ru, "PriorityUser")) {
 			sendInfo.add("PriorityUser");
 		}
-		if (checkChange(r, ra, "IsEscalated")) {
+		if (checkChange(r, ru, "IsEscalated")) {
 			sendInfo.add("IsEscalated");
 		}
-		//
-		checkChange(r, ra, "ConfidentialType");
-		checkChange(r, ra, "Summary");
-		checkChange(r, ra, "IsSelfService");
-		checkChange(r, ra, "C_BPartner_ID");
-		checkChange(r, ra, "AD_User_ID");
-		checkChange(r, ra, "C_Project_ID");
-		checkChange(r, ra, "A_Asset_ID");
-		checkChange(r, ra, "C_Order_ID");
-		checkChange(r, ra, "C_Invoice_ID");
-		checkChange(r, ra, "M_Product_ID");
-		checkChange(r, ra, "C_Payment_ID");
-		checkChange(r, ra, "M_InOut_ID");
-		checkChange(r, ra, "M_RMA_ID");
-		checkChange(r, ra, "IsInvoiced");
-		checkChange(r, ra, "C_Activity_ID");
-		checkChange(r, ra, "DateNextAction");
-		checkChange(r, ra, "M_ProductSpent_ID");
-		checkChange(r, ra, "QtySpent");
-		checkChange(r, ra, "QtyInvoiced");
-		checkChange(r, ra, "StartDate");
-		checkChange(r, ra, "CloseDate");
-		checkChange(r, ra, "TaskStatus");
-		checkChange(r, ra, "DateStartPlan");
-		checkChange(r, ra, "DateCompletePlan");
-		//
-		if (r.is_Changed()) {
-			ra.saveEx();
-		}
-		
-		//	Current Info
-		MRequestUpdate update = new MRequestUpdate(r);
-		if (update.isNewInfo()) {
-			update.saveEx();
-		} else {
-			update = null;
-		}
-		//
-		if (update != null || sendInfo.size() > 0)
+		if (ru.isNewInfo() || sendInfo.size() > 0)
 		{
 			// Note that calling the notifications from beforeSave is causing the
 			// new interested are not notified if the RV_RequestUpdates view changes
@@ -250,10 +192,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	 */
 	private String afterSaveRequest(MRequest r, boolean newRecord)
 	{
-		//	Initial Mail
-		if (newRecord) {
+		
 			sendNotices(r, new ArrayList<String>());
-		}
 		
 		return null;
 	}
@@ -264,23 +204,17 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	 *	@param columnName column
 	 *	@return true if columnName has changes
 	 */
-	public boolean checkChange (MRequest r, MRequestAction ra, String columnName)
+	public boolean checkChange (MRequest r, MRequestUpdate ru, String columnName)
 	{
-		if (r.is_ValueChanged(columnName))
-		{
-			Object value = r.get_ValueOld(columnName);
-			if (value == null) {
-				ra.addNullColumn(columnName);
-			} else {
-				if (value instanceof Boolean
-					&& (   MRequestAction.COLUMNNAME_IsEscalated.equals(columnName)
-					    || MRequestAction.COLUMNNAME_IsSelfService.equals(columnName))) {
-					ra.set_ValueNoCheck(columnName, ((Boolean)value).booleanValue() ? "Y" : "N");
-				} else {
-					ra.set_ValueNoCheck(columnName, value);
-				}
-			}
-			r.setIsChanged(true);
+		String oldValue = r.get_ValueAsString(columnName);
+		String newValue = ru.get_ValueAsString(columnName);
+		if (oldValue == null && newValue == null) {
+			return false;
+		}
+		if ((oldValue == null && newValue != null) || (newValue == null && oldValue != null)) {
+			return true;
+		}
+		if (oldValue.equals(newValue)) {
 			return true;
 		}
 		return false;
@@ -290,7 +224,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	 * 	Send Update EMail/Notices
 	 * 	@param list list of changes
 	 */
-	private void sendNotices(MRequest r, ArrayList<String> list)
+	private void sendNotices(MRequest r,MRequestUpdate ru, ArrayList<String> list)
 	{
 		//	Subject
 		String subject = Msg.translate(r.getCtx(), "R_Request_ID") 
@@ -344,7 +278,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		}
 		//
 		ArrayList<Integer> userList = new ArrayList<Integer>();
-		final String sql = "SELECT u.AD_User_ID, u.NotificationType, u.EMail, u.Name, MAX(r.AD_Role_ID) "
+		final String sql = "SELECT u.AD_User_ID, u.NotificationType, u.EMail, u.Name, MAX(r.AD_Role_ID),u.phone "
 			+ "FROM RV_RequestUpdates_Only ru"
 			+ " INNER JOIN AD_User u ON (ru.AD_User_ID=u.AD_User_ID OR u.AD_User_ID=?)"
 			+ " LEFT OUTER JOIN AD_User_Roles r ON (u.AD_User_ID=r.AD_User_ID) "
@@ -367,6 +301,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				}
 				String email = rs.getString(3);
 				String Name = rs.getString(4);
+				String phone = rs.getString(5);
 				//	Role
 				int AD_Role_ID = rs.getInt(5);
 				if (rs.wasNull()) {
@@ -387,16 +322,21 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 					}
 					continue;
 				}
-				if ((X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType)
-					|| X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType))
-					&& (email == null || email.length() == 0))
+				boolean notice = false;
+				if (X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType) && (phone == null || phone.length() == 0)) {
+					notice = true;
+				}
+				if (X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) && ((email == null || email.length() == 0) && (phone == null || phone.length() == 0))) {
+					notice = true;
+				}
+				if (notice)
 				{
 					if (AD_Role_ID >= 0) {
 						NotificationType = X_AD_User.NOTIFICATIONTYPE_Notice;
 					} else
 					{
 						if (s_log.isLoggable(Level.CONFIG)) {
-							s_log.config("No EMail: " + Name);
+							s_log.config("No EMail and phone: " + Name);
 						}
 						continue;
 					}
