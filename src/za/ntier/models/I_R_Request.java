@@ -854,6 +854,21 @@ public interface I_R_Request
 
 	public org.compiere.model.I_AD_User getSalesRep() throws RuntimeException;
 
+    /** Column name SalesRep_OLD_ID */
+    public static final String COLUMNNAME_SalesRep_OLD_ID = "SalesRep_OLD_ID";
+
+	/** Set Sales Representative OLD.
+	  * Sales Representative or Company Agent
+	  */
+	public void setSalesRep_OLD_ID (int SalesRep_OLD_ID);
+
+	/** Get Sales Representative OLD.
+	  * Sales Representative or Company Agent
+	  */
+	public int getSalesRep_OLD_ID();
+
+	public org.compiere.model.I_AD_User getSalesRep_OLD() throws RuntimeException;
+
     /** Column name StartDate */
     public static final String COLUMNNAME_StartDate = "StartDate";
 

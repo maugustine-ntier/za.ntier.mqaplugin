@@ -35,7 +35,7 @@ public class X_R_Request extends PO implements I_R_Request, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240823L;
+	private static final long serialVersionUID = 20240827L;
 
     /** Standard Constructor */
     public X_R_Request (Properties ctx, int R_Request_ID, String trxName)
@@ -1502,6 +1502,34 @@ public class X_R_Request extends PO implements I_R_Request, I_Persistent
 	public int getSalesRep_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_SalesRep_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_User getSalesRep_OLD() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getSalesRep_OLD_ID(), get_TrxName());
+	}
+
+	/** Set Sales Representative OLD.
+		@param SalesRep_OLD_ID Sales Representative or Company Agent
+	*/
+	public void setSalesRep_OLD_ID (int SalesRep_OLD_ID)
+	{
+		if (SalesRep_OLD_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_SalesRep_OLD_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_SalesRep_OLD_ID, Integer.valueOf(SalesRep_OLD_ID));
+	}
+
+	/** Get Sales Representative OLD.
+		@return Sales Representative or Company Agent
+	  */
+	public int getSalesRep_OLD_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_SalesRep_OLD_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

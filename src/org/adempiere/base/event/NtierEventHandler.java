@@ -34,6 +34,7 @@ import za.co.ntier.utils.SendMessage;
 import za.ntier.models.I_R_Request;
 import za.ntier.models.I_R_RequestUpdate;
 import za.ntier.models.X_AD_User;
+import za.ntier.models.X_R_Request;
 
 @Component(
 
@@ -80,8 +81,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			}
 			if (po.get_TableName().equals(I_R_Request.Table_Name))
 			{
-				MRequestUpdate ru = (MRequestUpdate) po;
-				MRequest r = new MRequest(Env.getCtx(),ru.getR_Request_ID(),ru.get_TrxName());
+				MRequest r = (MRequest) po;
 				
 				MRequestType rt = r.getRequestType();
 				if (ignoreRequestTypes.contains(rt.getName())) {
@@ -89,6 +89,12 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				}
 				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
+		} else if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {
+			PO po = getPO(event);
+			X_R_Request r = (X_R_Request) po;
+			r.setSalesRep_OLD_ID(r.get_ValueOldAsInt(I_R_Request.COLUMNNAME_SalesRep_ID));
+			r.saveEx();
+			
 		}
 	}
 
@@ -96,7 +102,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	protected void initialize() {
 		registerEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_Request.Table_Name);
-		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);		
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_R_Request.Table_Name);
 	}
 	
 	/**
@@ -139,12 +146,13 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			if (AD_User_ID == 0) {
 				AD_User_ID = r.getUpdatedBy();
 			}
-			if (checkChange(r, ru, "SalesRep_ID"))
+			int oldSalesRepID = new X_R_Request(r.getCtx(), r.getR_Request_ID(), r.get_TrxName()).getSalesRep_OLD_ID();
+			if (r.getSalesRep_ID() != oldSalesRepID)
 			{
 				//  RequestActionTransfer - Request {0} was transferred by {1} from {2} to {3}
 				Object[] args = new Object[] {r.getDocumentNo(), 
 					MUser.getNameOfUser(AD_User_ID), 
-					MUser.getNameOfUser(oldSalesRep_ID),
+					MUser.getNameOfUser(oldSalesRepID),
 					MUser.getNameOfUser(r.getSalesRep_ID())
 					};
 				String msg = Msg.getMsg(r.getCtx(), "RequestActionTransfer", args);
@@ -167,18 +175,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			// new interested are not notified if the RV_RequestUpdates view changes
 			// this is, when changed the sales rep (solved in sendNotices)
 			// or when changed the request category or group or contact (unsolved - the old ones are notified)
-			sendNotices(r, sendInfo);
-			
-			//	Update
-			r.setDateLastAction(r.getUpdated());
-			r.setLastResult(r.getResult());
-			//	Reset
-			r.setConfidentialTypeEntry (r.getConfidentialType());
-
-			r.setEndTime(null);
-			r.setR_StandardResponse_ID(0);
-			r.setR_MailText_ID(0);
-			r.setResult(null);
+			sendNotices(r,ru, sendInfo);
 		}
 		
 		return null;
@@ -193,7 +190,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	private String afterSaveRequest(MRequest r, boolean newRecord)
 	{
 		
-			sendNotices(r, new ArrayList<String>());
+			sendNotices(r,null, new ArrayList<String>());
 		
 		return null;
 	}
