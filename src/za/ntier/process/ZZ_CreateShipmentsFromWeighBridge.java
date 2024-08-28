@@ -77,7 +77,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					}
 				} else {
 					if (ordNo != null) {
-						createShipmentUsingInvoice(mZZWBTransaction, invNo, stockPileNo, movementDate, netMass, truckRegNo,transactionID);
+						createShipmentUsingOrder(mZZWBTransaction, invNo, stockPileNo, movementDate, netMass, truckRegNo,transactionID);
 
 					} else {
 						mZZWBTransaction.setErrorMsg("Sales Order Number is Blank. Cannot create shipment");
@@ -164,7 +164,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 			mZZWBTransaction.saveEx();
 		}
 	}
-	
+
 	private void createShipmentUsingOrder(MZZWBTransaction mZZWBTransaction, String ordNo, String stockPileNo,
 			Timestamp movementDate, BigDecimal netMass, String truckRegNo, int transactionID) {
 		MOrder mOrder =  null;
@@ -174,60 +174,60 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 			mOrder =  new MOrder(getCtx(), orderID, get_TrxName());
 		}
 		if (mOrder != null) {
-			MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
+			MOrderLine mOrderLine[] = mOrder.getLines();
 			int m_Product_ID = 0;
-			if (mInvoiceLine != null && mInvoiceLine.length > 0) {
-				m_Product_ID = mInvoiceLine[0].getM_Product_ID();
+			if (mOrderLine != null && mOrderLine.length > 0) {
+				m_Product_ID = mOrderLine[0].getM_Product_ID();
+				MInOut_New mInOut_New = new MInOut_New (mOrder, 0, movementDate);
+				if (mInOut_New != null && mOrder != null) {
+					mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
+					Object objs [] = MDriver.getDriver(getCtx(),mOrder.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
+					MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
+					MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
+					if (mTransporters != null) {
+						//mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
+						mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
+						mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
+						mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
+						mInOut_New.setShipDate(movementDate);
+						mInOut_New.setWB_TransactionID(transactionID);
+						int stockPileID= getStockPile_ID(stockPileNo);
+						mInOut_New.setZZ_StockPile_ID(stockPileID);
+						mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
+						mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
+						mInOut_New.saveEx();
+						cnt++;
+						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
+						mInOutLine.setM_Product_ID(m_Product_ID);
+						mInOutLine.setQty(netMass);
+						mInOutLine.setC_UOM_ID(1000000);
+						MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
+						if (ols != null && ols.length > 0) {
+							mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
+						}
+						X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(),stockPileID,get_TrxName());
+						MProduct mProduct = new MProduct(getCtx(), m_Product_ID, null);
+						String zz_Block = x_ZZ_StockPile.getZZ_Block();
+						if (zz_Block.length() == 1) {
+							zz_Block = "0" + zz_Block;
+						}	
+						int m_Locator_ID = getmLocatorID(mTransporters.getM_Warehouse_ID(),mProduct.getValue(),x_ZZ_StockPile.getZZ_Side(),zz_Block);
+						if (m_Locator_ID > 0) {
+							mInOutLine.setM_Locator_ID(m_Locator_ID);
+						}
+						mInOutLine.saveEx();
+						mZZWBTransaction.setErrorMsg(null);
+						mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
+						mZZWBTransaction.saveEx();
+					}
+				} 
+			} else {
+				mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " does not exist");
+				mZZWBTransaction.saveEx();
 			}
-			MOrder mOrder = new MOrder(getCtx(), mInvoice_New.getC_Order_ID(), get_TrxName());
-			MInOut_New mInOut_New = new MInOut_New (mInvoice_New, 0, movementDate, mOrder.getM_Warehouse_ID());
-			if (mInOut_New != null && mOrder != null) {
-				mInOut_New.setDeliveryViaRule(X_M_InOut.DELIVERYVIARULE_Shipper);
-				Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
-				MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
-				MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
-				if (mTransporters != null) {
-					mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
-					mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
-					mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
-					mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
-					mInOut_New.setShipDate(movementDate);
-					mInOut_New.setWB_TransactionID(transactionID);
-					int stockPileID= getStockPile_ID(stockPileNo);
-					mInOut_New.setZZ_StockPile_ID(stockPileID);
-					mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
-					mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
-					mInOut_New.saveEx();
-					cnt++;
-					MInOutLine mInOutLine = new MInOutLine(mInOut_New);
-					mInOutLine.setM_Product_ID(m_Product_ID);
-					mInOutLine.setQty(netMass);
-					mInOutLine.setC_UOM_ID(1000000);
-					MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
-					if (ols != null && ols.length > 0) {
-						mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
-					}
-					X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(),stockPileID,get_TrxName());
-					MProduct mProduct = new MProduct(getCtx(), m_Product_ID, null);
-					String zz_Block = x_ZZ_StockPile.getZZ_Block();
-					if (zz_Block.length() == 1) {
-						zz_Block = "0" + zz_Block;
-					}	
-					int m_Locator_ID = getmLocatorID(mTransporters.getM_Warehouse_ID(),mProduct.getValue(),x_ZZ_StockPile.getZZ_Side(),zz_Block);
-					if (m_Locator_ID > 0) {
-						mInOutLine.setM_Locator_ID(m_Locator_ID);
-					}
-					mInOutLine.saveEx();
-					mZZWBTransaction.setErrorMsg(null);
-					mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
-					mZZWBTransaction.saveEx();
-				}
-			} 
-		} else {
-			mZZWBTransaction.setErrorMsg("Invoice No : " + invNo + " does not exist");
-			mZZWBTransaction.saveEx();
 		}
 	}
+
 
 	private int getmLocatorID (int wareHouseID,String prodValue, String side,String block) {
 		if (side.equals("W")) {
