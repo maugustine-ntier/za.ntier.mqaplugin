@@ -282,7 +282,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				.append(": ").append(r.getDateNextAction());
 		}
 		message.append(MRequest.SEPARATOR)
-			.append(r.getSummary());
+			.append((ru == null) ? r.getSummary() : ru.getResult());
 		if (r.getResult() != null) {
 			message.append("\n----------\n").append(r.getResult());
 		}

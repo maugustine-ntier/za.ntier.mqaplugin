@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
-import org.compiere.model.I_C_InvoiceLine;
-import org.compiere.model.MInvoiceLine;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Msg;
@@ -48,8 +46,9 @@ public class MTransporters extends X_ZZ_Transporters implements I_ZZ_Transporter
 					+ " and tr.M_Product_ID" + " = ?" 
 					+ " and date(tr.ZZ_Loading_Date)" + " = date(?)" 
 					+ " and (" + getZZ_Transporters_ID() + " <= 0 or tr.ZZ_Transporters_ID <> " + getZZ_Transporters_ID() + ")"
-					+ " and tr.m_Shipper_ID = ?";
-			if (DB.getSQLValueEx(get_TrxName(), SQL, getC_BPartner_ID(),getM_Product_ID(),getZZ_Loading_Date(),getM_Shipper_ID()) > 0) {
+					+ " and tr.m_Shipper_ID = ?"
+					+ " and tr.C_BPartner_Location_ID = ?";
+			if (DB.getSQLValueEx(get_TrxName(), SQL, getC_BPartner_ID(),getM_Product_ID(),getZZ_Loading_Date(),getM_Shipper_ID(),getC_BPartner_Location_ID()) > 0) {
 				log.saveError("Error", Msg.getMsg(getCtx(), "TransportListAlreadyExistsForThatDate")); 
 				return false;
 			}
@@ -73,8 +72,9 @@ public class MTransporters extends X_ZZ_Transporters implements I_ZZ_Transporter
 
 	public static MTruckList[] getLines (Properties ctx,String whereClause,int zz_Transporters_ID,String trxName){
 		String whereClauseFinal = "ZZ_Transporters_ID=? ";
-		if (whereClause != null)
+		if (whereClause != null) {
 			whereClauseFinal += whereClause;
+		}
 		List<MTruckList> list = new Query(ctx, I_ZZ_Truck_List.Table_Name, whereClauseFinal, trxName)
 				.setParameters(zz_Transporters_ID)
 				.setOrderBy("ZZ_Truck_List_ID")
