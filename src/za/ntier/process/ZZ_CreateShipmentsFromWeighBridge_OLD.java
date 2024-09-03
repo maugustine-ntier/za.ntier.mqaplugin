@@ -70,11 +70,11 @@ public class ZZ_CreateShipmentsFromWeighBridge_OLD extends SvrProcess {
 				BigDecimal netMass = resultSet.getBigDecimal("NetMass");
 				String truckRegNo = resultSet.getString("TruckRegNo");
 				int transactionID = resultSet.getInt("TransactionID");
-				if (MInOut_New.getCount(transactionID, get_TrxName()) > 0) {
+				if (MInOut_New.getCount(transactionID, 0, get_TrxName()) > 0) {
 					continue;
 				}
 				if (invNo != null) {
-					MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName());
+					MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName(), null);
 					if (mInvoice_New != null) {
 						MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
 						int m_Product_ID = 0;

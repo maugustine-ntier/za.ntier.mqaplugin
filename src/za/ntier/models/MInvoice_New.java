@@ -98,11 +98,12 @@ public class MInvoice_New extends MInvoice implements I_C_Invoice  {
 		return (String)get_Value(COLUMNNAME_ZZ_CreateLinesFromRGN);
 	}
 
-	public static MInvoice_New get (Properties ctx,String invoiceDocNo,String TrxName) {
-		String SQL = "Select max(i.C_Invoice_ID) from C_Invoice i where i.DocumentNO = ? ";
-		int invoiceID = DB.getSQLValue(TrxName,SQL,invoiceDocNo);
+	public static MInvoice_New get (Properties ctx,String invoiceDocNo,String trxName, int ad_Client_ID) {
+		String SQL = "Select max(i.C_Invoice_ID) from C_Invoice i where i.DocumentNO = ? and i.AD_Client_ID = ? ";
+		Object arr [] = new Object[] {invoiceDocNo,ad_Client_ID};
+		int invoiceID = DB.getSQLValue(trxName,SQL,arr);
 		if (invoiceID > 0) {
-			return new MInvoice_New(ctx, invoiceID, TrxName);
+			return new MInvoice_New(ctx, invoiceID, trxName);
 		}
 		return null;
 	}

@@ -60,7 +60,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				String client = resultSet.getString("Field7");
 				client = client.replaceAll("[^a-zA-Z]", "").trim();
 				String clientName = mClient.getName().replaceAll("[^a-zA-Z]", "").trim();
-				if (!(clientName.equals(client))) {
+				if (client != null && client.length() > 2 && clientName != null && !(clientName.contains(client))) {
 					continue;
 				}
 				String invNo = resultSet.getString("Field1");
@@ -81,6 +81,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				mZZWBTransaction.setField3(resultSet.getString("Field3"));
 				mZZWBTransaction.setField4(resultSet.getString("Field4"));
 				mZZWBTransaction.setField5(resultSet.getString("Field5"));
+				mZZWBTransaction.setField7(resultSet.getString("Field7"));
 				mZZWBTransaction.setDateTimeOut(movementDate);
 				mZZWBTransaction.setNetMass(netMass);
 				mZZWBTransaction.setTruckRegNo(truckRegNo);

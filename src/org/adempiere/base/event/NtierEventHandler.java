@@ -61,7 +61,12 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			// String To_Number = "+27844627361";
 			String To_Number = eventData.getTo().getPhone();
 			try {
-				String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,eventData.getMessage());
+				MRequest request = new MRequest(Env.getCtx(),eventData.getRequestID(),null);
+				String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,request.getDocumentNo(),
+						eventData.getTo().getName(),
+						eventData.getFrom().getName(),
+						request.getSummary(),
+						eventData.getMessage());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -298,6 +303,13 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		if (from.getEMailUser() == null || from.getEMailUserPW() == null) {
 			from = null;
 		}
+		StringBuilder message2 = new StringBuilder();
+		if (ru != null) {
+			message2.append(ru.getResult());
+		} else {
+			MRequestUpdate[] updates = r.getUpdates(null);
+			message2.append(updates != null ? updates[0] : "");
+		}
 		//
 		ArrayList<Integer> userList = new ArrayList<Integer>();
 		final String sql = "SELECT u.AD_User_ID, u.NotificationType, u.EMail, u.Name, MAX(r.AD_Role_ID),u.phone "
@@ -323,7 +335,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				}
 				String email = rs.getString(3);
 				String Name = rs.getString(4);
-				String phone = rs.getString(5);
+				String phone = rs.getString(6);
 				//	Role
 				int AD_Role_ID = rs.getInt(5);
 				if (rs.wasNull()) {
@@ -382,7 +394,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				MUser to = MUser.get (r.getCtx(), AD_User_ID);
 				if (X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType))
 				{
-					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
+					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message2.toString(), pdf, r.getR_Request_ID());
 					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP, eventData, true);
 					EventManager.getInstance().postEvent(event);
 				}

@@ -143,6 +143,15 @@ public interface I_ZZ_WB_Transaction
 	/** Get Field5	  */
 	public String getField5();
 
+    /** Column name Field7 */
+    public static final String COLUMNNAME_Field7 = "Field7";
+
+	/** Set Field7	  */
+	public void setField7 (String Field7);
+
+	/** Get Field7	  */
+	public String getField7();
+
     /** Column name Help */
     public static final String COLUMNNAME_Help = "Help";
 

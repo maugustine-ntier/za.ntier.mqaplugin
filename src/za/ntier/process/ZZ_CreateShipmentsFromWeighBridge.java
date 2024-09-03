@@ -40,12 +40,13 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		boolean useInvoice = ("Y".equals(MSysConfig.getValue(ZZ_WB_USE_INVOICE)));
+		boolean useInvoice = ("Y".equals(MSysConfig.getValue(ZZ_WB_USE_INVOICE,getAD_Client_ID())));
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where M_InOut_ID is null";
+		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where M_InOut_ID is null and AD_Client_ID = ?";
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
+			pstmt.setInt(1, getAD_Client_ID());
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
@@ -63,7 +64,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 				BigDecimal netMass = mZZWBTransaction.getNetMass();
 				String truckRegNo = mZZWBTransaction.getTruckRegNo();
 				int transactionID = mZZWBTransaction.getWB_TransactionID();
-				if (MInOut_New.getCount(transactionID, get_TrxName()) > 0) {
+				if (MInOut_New.getCount(transactionID, getAD_Client_ID(), get_TrxName()) > 0) {
 					continue;
 				}
 				if (useInvoice) {
@@ -77,7 +78,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					}
 				} else {
 					if (ordNo != null) {
-						createShipmentUsingOrder(mZZWBTransaction, invNo, stockPileNo, movementDate, netMass, truckRegNo,transactionID);
+						createShipmentUsingOrder(mZZWBTransaction, ordNo, stockPileNo, movementDate, netMass, truckRegNo,transactionID);
 
 					} else {
 						mZZWBTransaction.setErrorMsg("Sales Order Number is Blank. Cannot create shipment");
@@ -90,6 +91,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 		catch (Exception ex)	{
 			log.log(Level.SEVERE, selectQuery, ex);
+			return ex.getMessage();
 		}
 		finally
 		{
@@ -108,7 +110,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	private void createShipmentUsingInvoice(MZZWBTransaction mZZWBTransaction, String invNo, String stockPileNo,
 			Timestamp movementDate, BigDecimal netMass, String truckRegNo, int transactionID) {
-		MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName());
+		MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), invNo, get_TrxName(), getAD_Client_ID());
 		if (mInvoice_New != null) {
 			MInvoiceLine mInvoiceLine[] = mInvoice_New.getLines();
 			int m_Product_ID = 0;
@@ -122,14 +124,14 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 				Object objs [] = MDriver.getDriver(getCtx(),mInvoice_New.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
 				MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
 				MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
-				if (mTransporters != null) {
+				int stockPileID= getStockPile_ID(stockPileNo);
+				if (mTransporters != null && stockPileID > 0) {
 					mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
 					mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 					mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
 					mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
 					mInOut_New.setShipDate(movementDate);
 					mInOut_New.setWB_TransactionID(transactionID);
-					int stockPileID= getStockPile_ID(stockPileNo);
 					mInOut_New.setZZ_StockPile_ID(stockPileID);
 					mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 					mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
@@ -157,6 +159,14 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					mZZWBTransaction.setErrorMsg(null);
 					mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
 					mZZWBTransaction.saveEx();
+				} else { 
+					if (mTransporters == null) {
+						mZZWBTransaction.setErrorMsg("Invoice No : " + invNo + " No Transporters list found");
+					}
+					if (stockPileID <= 0) {
+						mZZWBTransaction.setErrorMsg("Invoice No : " + invNo + " No StockPile found");
+					}
+					mZZWBTransaction.saveEx();
 				}
 			} 
 		} else {
@@ -168,8 +178,9 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 	private void createShipmentUsingOrder(MZZWBTransaction mZZWBTransaction, String ordNo, String stockPileNo,
 			Timestamp movementDate, BigDecimal netMass, String truckRegNo, int transactionID) {
 		MOrder mOrder =  null;
-		String SQL = "Select max(o.C_Order_ID) from C_Order o where o.DocumentNO = ? ";
-		int orderID = DB.getSQLValue(get_TrxName(),SQL,ordNo);
+		String SQL = "Select max(o.C_Order_ID) from C_Order o where o.DocumentNO = ? and o.AD_Client_ID = ? ";
+		Object arr [] = new Object[] {ordNo,getAD_Client_ID()};
+		int orderID = DB.getSQLValue(get_TrxName(),SQL,arr);
 		if (orderID > 0) {
 			mOrder =  new MOrder(getCtx(), orderID, get_TrxName());
 		}
@@ -184,14 +195,14 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					Object objs [] = MDriver.getDriver(getCtx(),mOrder.getC_BPartner_ID(),m_Product_ID,movementDate,truckRegNo,get_TrxName());
 					MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
 					MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
-					if (mTransporters != null) {
+					int stockPileID= getStockPile_ID(stockPileNo);
+					if (mTransporters != null && stockPileID > 0) {
 						//mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
 						mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 						mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
 						mInOut_New.setZZ_Driver_ID((mDriver !=null) ? mDriver.getZZ_Driver_ID() : null);
 						mInOut_New.setShipDate(movementDate);
 						mInOut_New.setWB_TransactionID(transactionID);
-						int stockPileID= getStockPile_ID(stockPileNo);
 						mInOut_New.setZZ_StockPile_ID(stockPileID);
 						mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 						mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
@@ -219,12 +230,23 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						mZZWBTransaction.setErrorMsg(null);
 						mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
 						mZZWBTransaction.saveEx();
+					} else { 
+						if (mTransporters == null) {
+							mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " No Transporters list found");
+						}
+						if (stockPileID <= 0) {
+							mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " No StockPile found");
+						}
+						mZZWBTransaction.saveEx();
 					}
 				} 
 			} else {
-				mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " does not exist");
+				mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " No Order Lines");
 				mZZWBTransaction.saveEx();
 			}
+		} else {
+			mZZWBTransaction.setErrorMsg("Order No : " + ordNo + " does not exist");
+			mZZWBTransaction.saveEx();
 		}
 	}
 
@@ -242,16 +264,16 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		if (side.equals("S")) {
 			side = "SOUTH";
 		}
-		String SQL = "select max(M_Locator_ID) from M_Locator l where l.M_Warehouse_ID = ? and l.X = ? and l.Y = ? and l.Z = ?";
-		return DB.getSQLValue(get_TrxName(), SQL, wareHouseID,prodValue,side,block);
+		String SQL = "select max(M_Locator_ID) from M_Locator l where l.M_Warehouse_ID = ? and l.X = ? and l.Y = ? and l.Z = ? and l.AD_Client_ID = ?";
+		return DB.getSQLValue(get_TrxName(), SQL, wareHouseID,prodValue,side,block,getAD_Client_ID());
 	}
 
 
 	private int getStockPile_ID(String stockPileNo) {
 		int zz_StockPile_ID = 0;
 		if (stockPileNo != null && !stockPileNo.trim().equals("")) {
-			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where sp.documentno = ?";
-			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo);
+			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where sp.documentno = ? and sp.AD_Client_ID = ?";
+			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo,getAD_Client_ID());
 		}
 		return zz_StockPile_ID;
 	}

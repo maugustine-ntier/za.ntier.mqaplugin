@@ -278,10 +278,10 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 		return ii.intValue();
 	}
 	
-	public static int getCount(int wb_TransactionID,String trxName) {
+	public static int getCount(int wb_TransactionID,int ad_Client_ID, String trxName) {
 		int cnt = 0;
-		String SQL = "select count(*) from M_InOut m where m.WB_TransactionID = ?";
-		cnt = DB.getSQLValue(trxName, SQL,wb_TransactionID );
+		String SQL = "select count(*) from M_InOut m where m.WB_TransactionID = ? and m.AD_Client_ID = ?";
+		cnt = DB.getSQLValue(trxName, SQL,wb_TransactionID,ad_Client_ID );
 		return cnt;
 		
 	}
