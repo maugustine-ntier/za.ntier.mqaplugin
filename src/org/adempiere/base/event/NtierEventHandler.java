@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.DBException;
 import org.compiere.model.MClient;
 import org.compiere.model.MColumn;
+import org.compiere.model.MRefList;
 import org.compiere.model.MRequest;
 import org.compiere.model.MRequestType;
 import org.compiere.model.MRequestUpdate;
@@ -57,16 +58,15 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	protected void doHandleEvent(Event event) {
 		String topic = event.getTopic();
 		if (topic.equals(IEventTopicsNtier.REQUEST_SEND_WHATSAPP)) {
-			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
+			RequestSendEMailEventDataNtier eventData = (RequestSendEMailEventDataNtier) event.getProperty(EventManager.EVENT_DATA);
 			// String To_Number = "+27844627361";
 			String To_Number = eventData.getTo().getPhone();
 			try {
-				MRequest request = new MRequest(Env.getCtx(),eventData.getRequestID(),null);
-				String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,request.getDocumentNo(),
-						eventData.getTo().getName(),
-						eventData.getFrom().getName(),
-						request.getSummary(),
-						eventData.getMessage());
+				String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,eventData.getDocumentNo(),
+						eventData.getTo().getName(),eventData.getPriority(),eventData.getFrom().getName(),
+						((eventData.getDateLastAction() == null) ? (eventData.getUpdated() + "") : (eventData.getDateLastAction() + "")) ,
+						eventData.getSummary(),
+						eventData.getMessage()); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -74,6 +74,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		}
 		else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
 		{
+			
 			PO po = getPO(event);
 			if (po.get_TableName().equals(I_R_RequestUpdate.Table_Name))
 			{
@@ -97,6 +98,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
 		} else if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {  // Save old salesRep
+			
 			PO po = getPO(event);
 			if (po instanceof MRequest) {
 				MRequest r = (MRequest) po;
@@ -287,9 +289,9 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				.append(": ").append(r.getDateNextAction());
 		}
 		message.append(MRequest.SEPARATOR)
-			.append((ru == null) ? r.getSummary() : ru.getResult());
-		if (r.getResult() != null) {
-			message.append("\n----------\n").append(r.getResult());
+			.append(r.getSummary() );
+		if (ru != null && ru.getResult() != null) {
+			message.append("\n----------\n").append(ru.getResult());
 		}
 		message.append(getMailTrailer(r, null));
 		File pdf = r.createPDF();
@@ -308,7 +310,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			message2.append(ru.getResult());
 		} else {
 			MRequestUpdate[] updates = r.getUpdates(null);
-			message2.append(updates != null ? updates[0] : "");
+			message2.append(updates != null && updates.length > 0 ? updates[0] : "None");
 		}
 		//
 		ArrayList<Integer> userList = new ArrayList<Integer>();
@@ -394,7 +396,12 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				MUser to = MUser.get (r.getCtx(), AD_User_ID);
 				if (X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType))
 				{
-					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message2.toString(), pdf, r.getR_Request_ID());
+					String priorityValue = "";
+					if (r.getPriority() != null) {						
+						priorityValue = MRefList.getListName(r.getCtx(), X_R_Request.PRIORITY_AD_Reference_ID, r.getPriority());						
+					}
+					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), pdf, r.getR_Request_ID(),r.get_TrxName(),
+							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo());
 					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP, eventData, true);
 					EventManager.getInstance().postEvent(event);
 				}
