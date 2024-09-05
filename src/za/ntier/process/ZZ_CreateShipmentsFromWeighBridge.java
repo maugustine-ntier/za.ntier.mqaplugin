@@ -14,7 +14,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
-import org.compiere.model.MSysConfig;
+import org.compiere.model.MUOM;
 import org.compiere.model.X_M_InOut;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -40,7 +40,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		boolean useInvoice = ("Y".equals(MSysConfig.getValue(ZZ_WB_USE_INVOICE,getAD_Client_ID())));
+		boolean useInvoice = false;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where M_InOut_ID is null and AD_Client_ID = ?";
@@ -50,13 +50,31 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				MZZWBTransaction mZZWBTransaction = new MZZWBTransaction(getCtx(),rs.getInt(1),get_TrxName());							
+				MZZWBTransaction mZZWBTransaction = new MZZWBTransaction(getCtx(),rs.getInt(1),get_TrxName());	
+				if (mZZWBTransaction.getField1() == null) {
+					mZZWBTransaction.setErrorMsg("No Order Number or Invoice Number in Field 1");
+					mZZWBTransaction.saveEx();
+					continue;
+				}
 				String invNo = null;
 				String ordNo = null;
-				if (useInvoice) {
+				MInvoice_New  mInvoice_New = MInvoice_New.get(getCtx(), mZZWBTransaction.getField1().trim() , get_TrxName(), getAD_Client_ID());
+				if (mInvoice_New != null) {
 					invNo = mZZWBTransaction.getField1(); 
+					useInvoice = true;
 				} else {
-					ordNo = mZZWBTransaction.getField1(); 
+					String SQL = "Select max(o.C_Order_ID) from C_Order o where o.DocumentNO = ? and o.AD_Client_ID = ? ";
+					Object arr [] = new Object[] {mZZWBTransaction.getField1().trim(),getAD_Client_ID()};
+					int orderID = DB.getSQLValue(get_TrxName(),SQL,arr);
+					if (orderID > 0) {
+						ordNo = mZZWBTransaction.getField1();
+						useInvoice = false;
+					}
+				}
+				if (invNo == null && ordNo == null) {
+					mZZWBTransaction.setErrorMsg("No Order or Invoice found for Number : " + mZZWBTransaction.getField1());
+					mZZWBTransaction.saveEx();
+					continue;
 				}
 				String stockPileNo = mZZWBTransaction.getField2(); 
 				Timestamp movementDate = mZZWBTransaction.getDateTimeOut();
@@ -125,7 +143,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 				MDriver mDriver = (objs != null && objs.length > 0 && objs[0] instanceof MDriver) ? (MDriver) objs[0] : null;
 				MTransporters mTransporters = (objs != null && objs.length > 1 && objs[1] instanceof MTransporters) ? (MTransporters) objs[1] : null;
 				int stockPileID= getStockPile_ID(stockPileNo);
-				if (mTransporters != null && stockPileID > 0) {
+				if (mTransporters != null && stockPileID > 0) { 
 					mInOut_New.setC_Invoice_ID(mInvoice_New.getC_Invoice_ID());							
 					mInOut_New.setM_Warehouse_ID(mTransporters.getM_Warehouse_ID());
 					mInOut_New.setM_Shipper_ID(mTransporters.getM_Shipper_ID());
@@ -184,6 +202,11 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		if (orderID > 0) {
 			mOrder =  new MOrder(getCtx(), orderID, get_TrxName());
 		}
+		if (!(mOrder.getDocStatus().equals(MOrder.DOCSTATUS_Completed)) && !(mOrder.getDocStatus().equals(MOrder.DOCSTATUS_Closed))) {
+			mZZWBTransaction.setErrorMsg("Sales Order Number " + ordNo + " Has not been completed,Cannot create shipment ");
+			mZZWBTransaction.saveEx();
+			return;
+		}
 		if (mOrder != null) {
 			MOrderLine mOrderLine[] = mOrder.getLines();
 			int m_Product_ID = 0;
@@ -211,7 +234,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 						mInOutLine.setM_Product_ID(m_Product_ID);
 						mInOutLine.setQty(netMass);
-						mInOutLine.setC_UOM_ID(1000000);
+						mInOutLine.setC_UOM_ID(MUOM.getDefault_UOM_ID(getCtx()));
 						MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
 						if (ols != null && ols.length > 0) {
 							mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
