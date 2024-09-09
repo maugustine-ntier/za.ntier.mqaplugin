@@ -16,6 +16,7 @@ import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.MUOM;
 import org.compiere.model.X_M_InOut;
+import org.compiere.process.DocAction;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
@@ -43,7 +44,8 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		boolean useInvoice = false;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where M_InOut_ID is null and AD_Client_ID = ?";
+		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where IsActive = 'Y' and M_InOut_ID is null and AD_Client_ID = ? "
+				+ " and DateTimeOut >= to_date('20082024','ddmmyyyy')";
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setInt(1, getAD_Client_ID());
@@ -109,7 +111,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 		catch (Exception ex)	{
 			log.log(Level.SEVERE, selectQuery, ex);
-			return ex.getMessage();
+			throw ex;
 		}
 		finally
 		{
@@ -153,16 +155,24 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 					mInOut_New.setZZ_StockPile_ID(stockPileID);
 					mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 					mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
+					int c_OrderLine_ID = 0;
+					MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
+					if (ols != null && ols.length > 0) {
+						c_OrderLine_ID = ols[0].getC_OrderLine_ID();
+					}
+					if (c_OrderLine_ID <= 0) {
+						mZZWBTransaction.setErrorMsg("Invoice not linked to a Sales Order");
+						mZZWBTransaction.saveEx();
+						return;
+					}
 					mInOut_New.saveEx();
 					cnt++;
 					MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 					mInOutLine.setM_Product_ID(m_Product_ID);
 					mInOutLine.setQty(netMass);
-					mInOutLine.setC_UOM_ID(1000000);
-					MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
-					if (ols != null && ols.length > 0) {
-						mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
-					}
+					mInOutLine.setC_UOM_ID(MUOM.getDefault_UOM_ID(getCtx()));
+					mInOutLine.setC_OrderLine_ID(c_OrderLine_ID);
+					
 					X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(),stockPileID,get_TrxName());
 					MProduct mProduct = new MProduct(getCtx(), m_Product_ID, null);
 					String zz_Block = x_ZZ_StockPile.getZZ_Block();
@@ -174,6 +184,10 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						mInOutLine.setM_Locator_ID(m_Locator_ID);
 					}
 					mInOutLine.saveEx();
+					String docAction = DocAction.ACTION_Complete;
+					mInOut_New.setDocAction( docAction );
+					mInOut_New.processIt( docAction );
+					mInOut_New.saveEx();
 					mZZWBTransaction.setErrorMsg(null);
 					mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
 					mZZWBTransaction.saveEx();
@@ -229,16 +243,23 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 						mInOut_New.setZZ_StockPile_ID(stockPileID);
 						mInOut_New.setZZ_Vehicle_Reg_No(truckRegNo);
 						mInOut_New.setZZ_Mine_Ticket(String.valueOf(transactionID));
+						int c_OrderLine_ID = 0;
+						MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
+						if (ols != null && ols.length > 0) {
+							c_OrderLine_ID = ols[0].getC_OrderLine_ID();
+						}
+						if (c_OrderLine_ID <= 0) {
+							mZZWBTransaction.setErrorMsg("Sales Order does not have a line with the product");
+							mZZWBTransaction.saveEx();
+							return;
+						}
 						mInOut_New.saveEx();
 						cnt++;
 						MInOutLine mInOutLine = new MInOutLine(mInOut_New);
 						mInOutLine.setM_Product_ID(m_Product_ID);
 						mInOutLine.setQty(netMass);
 						mInOutLine.setC_UOM_ID(MUOM.getDefault_UOM_ID(getCtx()));
-						MOrderLine[] ols = mOrder.getLines("And M_Product_ID = " + m_Product_ID, null);
-						if (ols != null && ols.length > 0) {
-							mInOutLine.setC_OrderLine_ID(ols[0].getC_OrderLine_ID());
-						}
+						mInOutLine.setC_OrderLine_ID(c_OrderLine_ID);
 						X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(),stockPileID,get_TrxName());
 						MProduct mProduct = new MProduct(getCtx(), m_Product_ID, null);
 						String zz_Block = x_ZZ_StockPile.getZZ_Block();
@@ -250,6 +271,10 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 							mInOutLine.setM_Locator_ID(m_Locator_ID);
 						}
 						mInOutLine.saveEx();
+						String docAction = DocAction.ACTION_Complete;
+						mInOut_New.setDocAction( docAction );
+						mInOut_New.processIt( docAction );
+						mInOut_New.saveEx();
 						mZZWBTransaction.setErrorMsg(null);
 						mZZWBTransaction.setM_InOut_ID(mInOut_New.getM_InOut_ID());
 						mZZWBTransaction.saveEx();
@@ -295,8 +320,8 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 	private int getStockPile_ID(String stockPileNo) {
 		int zz_StockPile_ID = 0;
 		if (stockPileNo != null && !stockPileNo.trim().equals("")) {
-			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where sp.documentno = ? and sp.AD_Client_ID = ?";
-			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo,getAD_Client_ID());
+			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where ? is not null and length(?) > 2 and (sp.documentno like '?%') and sp.AD_Client_ID = ?";
+			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo,stockPileNo,stockPileNo,getAD_Client_ID());
 		}
 		return zz_StockPile_ID;
 	}
