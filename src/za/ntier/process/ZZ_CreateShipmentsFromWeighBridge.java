@@ -319,9 +319,10 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 
 	private int getStockPile_ID(String stockPileNo) {
 		int zz_StockPile_ID = 0;
-		if (stockPileNo != null && !stockPileNo.trim().equals("")) {
-			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where ? is not null and length(?) > 2 and (sp.documentno like '?%') and sp.AD_Client_ID = ?";
-			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, stockPileNo,stockPileNo,stockPileNo,getAD_Client_ID());
+		if (stockPileNo != null && !stockPileNo.trim().equals("") && stockPileNo.length() > 2) {
+			String SQL = "select ZZ_StockPile_ID from ZZ_StockPile sp where (sp.documentno like '" + stockPileNo 
+					+ "%')  and sp.AD_Client_ID = ?";
+			zz_StockPile_ID = DB.getSQLValue(get_TrxName(), SQL, getAD_Client_ID());
 		}
 		return zz_StockPile_ID;
 	}
