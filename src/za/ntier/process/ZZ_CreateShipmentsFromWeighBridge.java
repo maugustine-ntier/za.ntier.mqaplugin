@@ -1,6 +1,7 @@
 package za.ntier.process;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -82,6 +83,9 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 				Timestamp movementDate = mZZWBTransaction.getDateTimeOut();
 				//	String prod = resultSet.getString("Field3").substring(0,3);
 				BigDecimal netMass = mZZWBTransaction.getNetMass();
+				if (netMass != null) {
+					netMass = netMass.divide(new BigDecimal("1000").setScale(2, RoundingMode.HALF_UP));
+				}
 				String truckRegNo = mZZWBTransaction.getTruckRegNo();
 				int transactionID = mZZWBTransaction.getWB_TransactionID();
 				if (MInOut_New.getCount(transactionID, getAD_Client_ID(), get_TrxName()) > 0) {
