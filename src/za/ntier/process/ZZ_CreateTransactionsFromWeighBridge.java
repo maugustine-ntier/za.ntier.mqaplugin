@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 
 import org.compiere.model.MClient;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 
 import za.ntier.models.MZZWBTransaction;
 
@@ -83,6 +84,7 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 				mZZWBTransaction.setField5(resultSet.getString("Field5"));
 				mZZWBTransaction.setField7(resultSet.getString("Field7"));
 				mZZWBTransaction.setDateTimeOut(movementDate);
+				mZZWBTransaction.setDateOut(DB.getSQLValueTS(null, "select to_date(to_char(?::timestamp,'dd/mm/yyyy'::text)::text,'dd/mm/yyyy'::text)",movementDate));
 				mZZWBTransaction.setNetMass(netMass);
 				mZZWBTransaction.setTruckRegNo(truckRegNo);
 				mZZWBTransaction.saveEx();

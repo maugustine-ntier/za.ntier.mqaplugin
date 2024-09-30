@@ -32,7 +32,7 @@ public interface I_ZZ_WB_Transaction
     /** TableName=ZZ_WB_Transaction */
     public static final String Table_Name = "ZZ_WB_Transaction";
 
-    /** AD_Table_ID=1000018 */
+    /** AD_Table_ID=1000027 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -79,6 +79,15 @@ public interface I_ZZ_WB_Transaction
 	  * User who created this records
 	  */
 	public int getCreatedBy();
+
+    /** Column name DateOut */
+    public static final String COLUMNNAME_DateOut = "DateOut";
+
+	/** Set DateOut	  */
+	public void setDateOut (Timestamp DateOut);
+
+	/** Get DateOut	  */
+	public Timestamp getDateOut();
 
     /** Column name DateTimeOut */
     public static final String COLUMNNAME_DateTimeOut = "DateTimeOut";

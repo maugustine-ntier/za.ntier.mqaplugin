@@ -34,7 +34,7 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240830L;
+	private static final long serialVersionUID = 20240919L;
 
     /** Standard Constructor */
     public X_ZZ_WB_Transaction (Properties ctx, int ZZ_WB_Transaction_ID, String trxName)
@@ -103,6 +103,21 @@ public class X_ZZ_WB_Transaction extends PO implements I_ZZ_WB_Transaction, I_Pe
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	/** Set DateOut.
+		@param DateOut DateOut
+	*/
+	public void setDateOut (Timestamp DateOut)
+	{
+		set_Value (COLUMNNAME_DateOut, DateOut);
+	}
+
+	/** Get DateOut.
+		@return DateOut	  */
+	public Timestamp getDateOut()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_DateOut);
+	}
 
 	/** Set DateTimeOut.
 		@param DateTimeOut DateTimeOut

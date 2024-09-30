@@ -2,7 +2,6 @@ package za.ntier.process;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.logging.Level;
 
 import org.compiere.model.MUser;
 import org.compiere.process.SvrProcess;
@@ -10,8 +9,6 @@ import org.compiere.util.DB;
 
 import za.co.ntier.twilio.models.X_TW_Message;
 import za.co.ntier.utils.SendMessage;
-import za.ntier.models.X_R_Request;
-import za.ntier.models.X_R_RequestUpdate;
 
 @org.adempiere.base.annotation.Process
 public class ZZ_SendRequestMessages extends SvrProcess {
@@ -33,7 +30,7 @@ public class ZZ_SendRequestMessages extends SvrProcess {
 
 
 
-	}
+	} 
 
 	private void requestUpdateSend() {
 		PreparedStatement pstmt = null;

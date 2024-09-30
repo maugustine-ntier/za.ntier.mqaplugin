@@ -65,7 +65,7 @@ public class MInOut_New extends MInOut implements I_M_InOut{
 	@Override
 	public String completeIt() {
 		String msg = super.completeIt();
-		if (msg.equals(DocAction.STATUS_Completed))	{
+		if (msg.equals(DocAction.STATUS_Completed) && getMovementType().equals(MOVEMENTTYPE_CustomerShipment))	{
 			X_ZZ_StockPile x_ZZ_StockPile = new X_ZZ_StockPile(getCtx(), getZZ_StockPile_ID(), get_TrxName());
 			BigDecimal deliveredQty = BigDecimal.ZERO;
 			MInOutLine[] m_InOutLines_curr = this.getLines();
