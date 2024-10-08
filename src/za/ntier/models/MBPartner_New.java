@@ -1,5 +1,6 @@
 package za.ntier.models;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,18 +8,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_BPartner;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MColumn;
+import org.compiere.model.MPInstance;
+import org.compiere.model.MProcess;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.model.X_AD_Package_UUID_Map;
+import org.compiere.model.X_A_Asset_Addition;
+import org.compiere.model.X_A_Asset_Disposed;
+import org.compiere.model.X_A_Asset_Reval;
+import org.compiere.model.X_A_Asset_Transfer;
+import org.compiere.model.X_A_Depreciation_Entry;
+import org.compiere.model.X_A_Depreciation_Exp;
+import org.compiere.model.X_C_AllocationHdr;
+import org.compiere.model.X_C_AllocationLine;
+import org.compiere.model.X_C_BankStatement;
+import org.compiere.model.X_C_BankStatementLine;
+import org.compiere.model.X_C_Cash;
+import org.compiere.model.X_C_CashLine;
+import org.compiere.model.X_C_Invoice;
+import org.compiere.model.X_C_InvoiceLine;
+import org.compiere.model.X_C_Order;
+import org.compiere.model.X_C_OrderLine;
+import org.compiere.model.X_C_Payment;
+import org.compiere.model.X_C_ProjectIssue;
+import org.compiere.model.X_GL_Journal;
+import org.compiere.model.X_GL_JournalLine;
 import org.compiere.model.X_I_BPartner;
+import org.compiere.model.X_M_InOut;
+import org.compiere.model.X_M_InOutLine;
+import org.compiere.model.X_M_Inventory;
+import org.compiere.model.X_M_InventoryLine;
+import org.compiere.model.X_M_MatchInv;
+import org.compiere.model.X_M_MatchPO;
+import org.compiere.model.X_M_Movement;
+import org.compiere.model.X_M_MovementLine;
+import org.compiere.model.X_M_Production;
+import org.compiere.model.X_M_ProductionLine;
+import org.compiere.model.X_M_Requisition;
+import org.compiere.model.X_M_RequisitionLine;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
@@ -28,6 +62,29 @@ import org.compiere.util.Util;
 public class MBPartner_New extends MBPartner {
 
 	private static final long serialVersionUID = 4154740391812230437L;
+	
+	final private static String insertConversionId = "INSERT INTO T_MoveClient (AD_PInstance_ID, TableName, Source_Key, Target_Key) VALUES (?, ?, ?, ?)";
+	final private static String queryT_MoveClient = "SELECT Target_Key FROM T_MoveClient WHERE AD_PInstance_ID=? AND TableName=? AND Source_Key=?";
+
+	private Connection externalConn;
+	private StringBuffer p_excludeTablesWhere = new StringBuffer();
+	private StringBuffer p_whereClient = new StringBuffer();
+	private List<String> p_errorList = new ArrayList<String>();
+	private List<String> p_tablesVerifiedList = new ArrayList<String>();
+	private List<String> p_tablesToPreserveIDsList = new ArrayList<String>();
+	private List<String> p_tablesToExcludeList = new ArrayList<String>();
+	private List<String> p_columnsVerifiedList = new ArrayList<String>();
+	private List<String> p_idSystemConversionList = new ArrayList<String>(); // can consume lot of memory but it helps for performance
+	private boolean p_isPreserveAll = false;
+	private MPInstance mPInstance = null;
+	private String p_ClientsToInclude = null;
+	private boolean p_IsCopyClient = true;
+	/** New client name when copying from template */
+	private String p_ClientName;
+	/** New client value when copying from template */
+	private String p_ClientValue;
+	
+
 
 	public MBPartner_New(Properties ctx) {
 		super(ctx);
@@ -96,13 +153,17 @@ public class MBPartner_New extends MBPartner {
 		if (getAD_Client_ID() != 1000018) {
 			return true;
 		}
+		MProcess mProcess = MProcess.get(200110);
 		MClient[] mclients = MClient.getAll(getCtx());
+		mPInstance = new MPInstance(mProcess, getC_BPartner_ID());
 		PO.setCrossTenantSafe();
 		for (MClient mClient:mclients) {
-			if (mClient.getAD_Client_ID() == 0 || ) {
+			if (mClient.getAD_Client_ID() == 0 || mClient.getAD_Client_ID() == 1000018 ) {
 				continue;
 			}
-			//MBPartner mBPartner 
+			p_ClientsToInclude = mClient.getAD_Client_ID() + "";
+			validate();
+			moveClient();
 		}
 		PO.clearCrossTenantSafe();
 		return true;
@@ -138,11 +199,11 @@ public class MBPartner_New extends MBPartner {
 			DB.close(rsRT, stmtRT);
 		}
 
-		if (! p_IsSkipSomeValidations) {
+		//if (! p_IsSkipSomeValidations) {
 			for (String tableName : p_tablesVerifiedList) {
 				validateOrphan(tableName);
 			}
-		}
+		//}
 
 	}
 
@@ -151,49 +212,17 @@ public class MBPartner_New extends MBPartner {
 	 * @param tableName
 	 */
 	private void validateExternalTable(String tableName) {
-		statusUpdate("Validating table " + tableName);
+	//	statusUpdate("Validating table " + tableName);
 
 		// if table is not present in target
 		// inform blocking as it has client data
 		MTable localTable = MTable.get(getCtx(), tableName);
 		if (localTable == null || localTable.getAD_Table_ID() <= 0) {
-			p_errorList.add("Table " + tableName + " doesn't exist");
+			//p_errorList.add("Table " + tableName + " doesn't exist");
 			return;
 		}
 
-		// if table doesn't have client data (taking into account include/exclude) in the source DB
-		// add to the list of tables to ignore
-		// ignore and continue with next table
-		if (! "AD_Client".equalsIgnoreCase(tableName)) {
-			StringBuilder sqlCountData = new StringBuilder()
-					.append("SELECT COUNT(*) FROM ").append(tableName);
-			if ("AD_Attribute_Value".equalsIgnoreCase(tableName)) {
-				sqlCountData.append(" JOIN AD_Attribute ON (AD_Attribute_Value.AD_Attribute_ID=AD_Attribute.AD_Attribute_ID)");
-				sqlCountData.append(" JOIN AD_Client ON (AD_Attribute.AD_Client_ID=AD_Client.AD_Client_ID)");
-			} else if ("AD_PInstance_Log".equalsIgnoreCase(tableName)) {
-				sqlCountData.append(" JOIN AD_PInstance ON (AD_PInstance_Log.AD_PInstance_ID=AD_PInstance.AD_PInstance_ID)");
-				sqlCountData.append(" JOIN AD_Client ON (AD_PInstance.AD_Client_ID=AD_Client.AD_Client_ID)");
-			} else {
-				if (MColumn.get(getCtx(), tableName, "AD_Client_ID") == null) {
-					if (log.isLoggable(Level.WARNING)) {
-						log.warning("Ignoring " + tableName + ", doesn't have column AD_Client_ID");
-					}
-					return;
-				}
-				sqlCountData.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
-			}
-			sqlCountData.append(" WHERE ").append(p_whereClient);
-			int cntCD = countInExternal(sqlCountData.toString());
-			if (cntCD == 0) {
-				if (log.isLoggable(Level.INFO)) {
-					log.info("Ignoring " + tableName + ", doesn't have tenant data");
-				}
-				return;
-			}
-			if (cntCD > 0 && "AD_Attribute_Value".equalsIgnoreCase(tableName)) {
-				throw new AdempiereUserError("Table " + tableName + " has data, migration not supported");
-			}
-		}
+
 
 		// for each source column
 		final String sqlRemoteColumnsST = ""
@@ -239,7 +268,7 @@ public class MBPartner_New extends MBPartner {
 		// statusUpdate("Validating column " + tableName + "." + columnName);
 		MColumn localColumn = MColumn.get(getCtx(), tableName, columnName);
 		if (localColumn == null || localColumn.getAD_Column_ID() <= 0) {
-			p_errorList.add("Column " + tableName + "." + columnName +  " doesn't exist");
+		//	p_errorList.add("Column " + tableName + "." + columnName +  " doesn't exist");
 			return;
 		}
 
@@ -260,7 +289,7 @@ public class MBPartner_New extends MBPartner {
 				.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)")
 				.append(" WHERE ").append(tableName).append(".").append(columnName).append(" IS NOT NULL")
 				.append(" AND ").append(p_whereClient);
-		if (!p_IsSkipSomeValidations && refID > MTable.MAX_OFFICIAL_ID) {
+		if ( refID > MTable.MAX_OFFICIAL_ID) {
 			int cntET = countInExternal(sqlDataNotNullInColumn.toString());
 			if (cntET > 0) {
 				// TODO: Implement support for non-official data types (must implement how to obtain the foreign table with MColumn.getReferenceTableName)
@@ -403,7 +432,7 @@ public class MBPartner_New extends MBPartner {
 						.append("       AND ( c.FKConstraintType IS NULL OR c.FKConstraintType=").append(DB.TO_STRING(MColumn.FKCONSTRAINTTYPE_DoNotCreate_Ignore)).append(")");
 				int cntFk = countInExternal(sqlVerifFKSB.toString());
 				if (cntFk > 0) {
-					statusUpdate("Validating orphans for " + table.getTableName() + "." + columnName);
+				//	statusUpdate("Validating orphans for " + table.getTableName() + "." + columnName);
 					// target database has not defined a foreign key, validate orphans
 					MTable foreignTable = MTable.get(getCtx(), foreignTableName);
 					StringBuilder sqlExternalOrgOrphanSB = new StringBuilder("SELECT COUNT(*) FROM ").append(tableName);
@@ -485,7 +514,7 @@ public class MBPartner_New extends MBPartner {
 				continue;
 			}
 			
-			statusUpdate("Converting IDs for table " + tableName);
+		//	statusUpdate("Converting IDs for table " + tableName);
 			StringBuilder selectVerifyIdSB = new StringBuilder()
 					.append("SELECT ").append(keyCol).append(" FROM ").append(tableName)
 					.append(" WHERE ").append(keyCol).append("=?");
@@ -519,12 +548,12 @@ public class MBPartner_New extends MBPartner {
 					} else {
 						if ("AD_ChangeLog".equalsIgnoreCase(tableName)) {
 							// AD_ChangeLog_ID is not really a unique key - validate if it was already converted before
-							int clId = DB.getSQLValueEx(get_TrxName(),
-									queryT_MoveClient,
-									getAD_PInstance_ID(), "AD_CHANGELOG", String.valueOf(source_Key));
-							if (clId == -1) {
-								target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());
-							}
+							//int clId = DB.getSQLValueEx(get_TrxName(),
+							//		queryT_MoveClient,
+							//		getAD_PInstance_ID(), "AD_CHANGELOG", String.valueOf(source_Key));
+							//if (clId == -1) {
+							//	target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());
+							//}
 						} else {
 							if (table.isUUIDKeyTable()) {
 								target_Key = UUID.randomUUID().toString();
@@ -535,7 +564,7 @@ public class MBPartner_New extends MBPartner {
 					}
 					if (target_Key != null || (target_Key instanceof Number && ((Number)target_Key).intValue() >= 0)) {
 						DB.executeUpdateEx(insertConversionId,
-								new Object[] {getAD_PInstance_ID(), tableName.toUpperCase(), source_Key, target_Key},
+								new Object[] {getC_BPartner_ID(), tableName.toUpperCase(), source_Key, target_Key},
 								get_TrxName());
 					}
 				}
@@ -546,16 +575,16 @@ public class MBPartner_New extends MBPartner {
 			}
 
 		}
-
+		/*
 		try {
 			commitEx(); // commit the T_MoveClient table to analyze potential problems
 		} catch (SQLException e1) {
 			throw new AdempiereException(e1);
-		} 
+		} */
 
 		int newADClientID = -1;
 		String oldClientValue = null;
-		if (p_IsCopyClient) {
+		//if (p_IsCopyClient) {
 			int clientInt;
 			try {
 				clientInt = Integer.parseInt(p_ClientsToInclude);
@@ -564,10 +593,10 @@ public class MBPartner_New extends MBPartner {
 			}
 			newADClientID = DB.getSQLValueEx(get_TrxName(),
 					queryT_MoveClient,
-					getAD_PInstance_ID(), "AD_CLIENT", String.valueOf(clientInt));
+					mPInstance.getAD_PInstance_ID(), "AD_CLIENT", String.valueOf(clientInt));
 			oldClientValue = DB.getSQLValueStringEx(get_TrxName(),
 					"SELECT Value FROM AD_Client WHERE AD_Client_ID=?", clientInt);
-		}
+		//}
 
 		// get the source data and insert into target converting the IDs
 		for (MTable table : tables) {
@@ -575,7 +604,7 @@ public class MBPartner_New extends MBPartner {
 			if (! p_tablesVerifiedList.contains(tableName.toUpperCase())) {
 				continue;
 			}
-			statusUpdate("Inserting data for table " + tableName);
+			//statusUpdate("Inserting data for table " + tableName);
 			StringBuilder valuesSB = new StringBuilder();
 			StringBuilder columnsSB = new StringBuilder();
 			StringBuilder qColumnsSB = new StringBuilder();
@@ -725,7 +754,7 @@ public class MBPartner_New extends MBPartner {
 								parameters[i] = null;
 							} else {
 								if (   ! (key instanceof Number && ((Number)key).intValue() == 0 && ("Parent_ID".equalsIgnoreCase(columnName) || "Node_ID".equalsIgnoreCase(columnName)))  // Parent_ID/Node_ID=0 is valid
-									&& (key instanceof String || (key instanceof Number && ((Number)key).intValue() >= MTable.MAX_OFFICIAL_ID) || p_IsCopyClient)) {
+									&& (key instanceof String || (key instanceof Number && ((Number)key).intValue() >= MTable.MAX_OFFICIAL_ID))) {
 									Object convertedId = null;
 
 									if (DisplayType.isMultiID(column.getAD_Reference_ID())) {
@@ -788,7 +817,7 @@ public class MBPartner_New extends MBPartner {
 								if (columnName.equals(uuidCol)) {
 									String oldUUID = (String) parameters[i];
 									// it is possible that the UUID has been resolved before because of a foreign key Record_UU, so search in T_MoveClient first
-									String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, getAD_PInstance_ID(), tableName.toUpperCase(), oldUUID);
+									String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), oldUUID);
 									if (newUUID == null) {
 										newUUID = UUID.randomUUID().toString();
 									}
@@ -856,13 +885,268 @@ public class MBPartner_New extends MBPartner {
 		}
 
 		// commit - here it can throw errors because of foreign keys, verify and inform
-		statusUpdate("Committing.  Validating foreign keys");
-		try {
-			commitEx();
-		} catch (SQLException e) {
-			throw new AdempiereException("Could not commit,\nCause: " + e.getLocalizedMessage());
-		}
+		//statusUpdate("Committing.  Validating foreign keys");
+	//	try {
+		//	commitEx();
+		//} catch (SQLException e) {
+	//		throw new AdempiereException("Could not commit,\nCause: " + e.getLocalizedMessage());
+	//	}
 	}
 	
+	/**
+	 * Get the local ID or UUID based on a UUID
+	 * @param foreignTableName
+	 * @param uuidCol
+	 * @param tableName
+	 * @param columnName
+	 * @param foreignUU
+	 * @param foreign_Key
+	 * @return
+	 */
+	private Object getFromUUID(String foreignTableName, String uuidCol, String tableName, String columnName, String foreignUU, Object foreign_Key) {
+		Object local_Key = null;
+		MTable foreignTable = MTable.get(getCtx(), foreignTableName);
+		StringBuilder sqlCheckLocalUU = new StringBuilder("SELECT ");
+		if (foreignTable.isUUIDKeyTable()) {
+			sqlCheckLocalUU.append(PO.getUUIDColumnName(foreignTableName));
+		} else {
+			sqlCheckLocalUU.append(foreignTableName).append("_ID");
+		}
+		sqlCheckLocalUU.append(" FROM ").append(foreignTableName).append(" WHERE ").append(uuidCol).append("=?");
+		List<Object> list = DB.getSQLValueObjectsEx(get_TrxName(), sqlCheckLocalUU.toString(), foreignUU);
+		if (list != null && list.size() == 1) {
+			local_Key = list.get(0);
+		}
+		if (local_Key == null || (local_Key instanceof Number && ((Number)local_Key).intValue() < 0)) {
+			p_errorList.add("Column " + tableName + "." + columnName +  " has system reference not convertible, "
+					+ foreignTableName + "." + uuidCol + "=" + foreignUU);
+			return -1;
+		}
+		DB.executeUpdateEx(insertConversionId,
+				new Object[] {mPInstance.getAD_PInstance_ID(), foreignTableName.toUpperCase(), foreign_Key, local_Key},
+				get_TrxName());
+		p_idSystemConversionList.add(foreignTableName.toUpperCase() + "." + foreign_Key);
+		return local_Key;
+	}
+	
+	
+	private String getExternalTableName(int tableId) {
+		String tableName = null;
+		String sql = DB.getDatabase().convertStatement("SELECT TableName FROM AD_Table WHERE AD_Table_ID=?");
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = externalConn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmt.setInt(1, tableId);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				tableName = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			throw new AdempiereException("Could not execute external query: " + sql + "\nCause = " + e.getLocalizedMessage());
+		} finally {
+			DB.close(rs, stmt);
+		}
+		return tableName;
+	}
+
+	/**
+	 * Get the Accounting Detail table based on the document table
+	 * @param tableId
+	 * @return
+	 */
+	private String getAcctDetailTableName(int tableId) {
+		String detailTableName = "";
+		switch (tableId) {
+		case X_A_Depreciation_Entry.Table_ID : detailTableName = X_A_Depreciation_Exp.Table_Name  ; break;
+		case X_C_AllocationHdr.Table_ID      : detailTableName = X_C_AllocationLine.Table_Name    ; break;
+		case X_C_BankStatement.Table_ID      : detailTableName = X_C_BankStatementLine.Table_Name ; break;
+		case X_C_Cash.Table_ID               : detailTableName = X_C_CashLine.Table_Name          ; break;
+		case X_C_Invoice.Table_ID            : detailTableName = X_C_InvoiceLine.Table_Name       ; break;
+		case X_C_Order.Table_ID              : detailTableName = X_C_OrderLine.Table_Name         ; break;
+		case X_C_ProjectIssue.Table_ID       : detailTableName = X_C_ProjectIssue.Table_Name      ; break;
+		case X_GL_Journal.Table_ID           : detailTableName = X_GL_JournalLine.Table_Name      ; break;
+		case X_M_InOut.Table_ID              : detailTableName = X_M_InOutLine.Table_Name         ; break;
+		case X_M_Inventory.Table_ID          : detailTableName = X_M_InventoryLine.Table_Name     ; break;
+		case X_M_Movement.Table_ID           : detailTableName = X_M_MovementLine.Table_Name      ; break;
+		case X_M_Production.Table_ID         : detailTableName = X_M_ProductionLine.Table_Name    ; break;
+		case X_M_Requisition.Table_ID        : detailTableName = X_M_RequisitionLine.Table_Name   ; break;
+		case X_A_Asset_Addition.Table_ID     : break;
+		case X_A_Asset_Disposed.Table_ID     : break;
+		case X_A_Asset_Reval.Table_ID        : break;
+		case X_A_Asset_Transfer.Table_ID     : break;
+		case X_M_MatchInv.Table_ID           : break;
+		case X_M_MatchPO.Table_ID            : break;
+		case X_C_Payment.Table_ID            : break;
+		default: log.warning("Fact_Acct.Line_ID detail table not identified for table ID = " + tableId);
+		}
+		return detailTableName;
+	}
+	
+	
+	/**
+	 * Return the table name of the table driving a tree 
+	 * @param treeId
+	 * @return
+	 */
+	private String getExternalTableFromTree(int treeId) {
+		String tableName = null;
+		final String sqlTableTree = ""
+				+ "SELECT CASE "
+				+ "         WHEN TreeType = 'AY' THEN 'C_Activity' "
+				+ "         WHEN TreeType = 'BB' THEN 'M_BOM' "
+				+ "         WHEN TreeType = 'BP' THEN 'C_BPartner' "
+				+ "         WHEN TreeType = 'CC' THEN 'CM_Container' "
+				+ "         WHEN TreeType = 'CM' THEN 'CM_Media' "
+				+ "         WHEN TreeType = 'CS' THEN 'CM_CStage' "
+				+ "         WHEN TreeType = 'CT' THEN 'CM_Template' "
+				+ "         WHEN TreeType = 'EV' THEN 'C_ElementValue' "
+				+ "         WHEN TreeType = 'MC' THEN 'C_Campaign' "
+				+ "         WHEN TreeType = 'MM' THEN 'AD_Menu' "
+				+ "         WHEN TreeType = 'OO' THEN 'AD_Org' "
+				+ "         WHEN TreeType = 'PC' THEN 'M_Product_Category' "
+				+ "         WHEN TreeType = 'PJ' THEN 'C_Project' "
+				+ "         WHEN TreeType = 'PR' THEN 'M_Product' "
+				+ "         WHEN TreeType = 'SR' THEN 'C_SalesRegion' "
+				+ "         WHEN TreeType = 'U1' THEN 'C_ElementValue' "
+				+ "         WHEN TreeType = 'U2' THEN 'C_ElementValue' "
+				+ "         WHEN TreeType = 'U3' THEN 'C_ElementValue' "
+				+ "         WHEN TreeType = 'U4' THEN 'C_ElementValue' "
+				+ "         WHEN TreeType = 'TL' THEN AD_Table.TableName "
+				+ "         ELSE NULL "
+				+ "       END "
+				+ "FROM   AD_Tree "
+				+ "       LEFT JOIN AD_Table ON ( AD_Table.AD_Table_ID = AD_Tree.AD_Table_ID ) "
+				+ "WHERE  AD_Tree_ID = ?";
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = externalConn.prepareStatement(sqlTableTree, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmt.setInt(1, treeId);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				tableName = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			throw new AdempiereException("Could not execute external query: " + sqlTableTree + "\nCause = " + e.getLocalizedMessage());
+		} finally {
+			DB.close(rs, stmt);
+		}
+		return tableName;
+	}
+	
+
+	/**
+	 * Return a converted ID
+	 * @param convertTable
+	 * @param key
+	 * @param tableName
+	 * @param columnName 
+	 * @return
+	 */
+	private Object getConvertedId(String convertTable, Object key, String tableName, String columnName) {
+		Object convertedId = null;
+		try {
+			List<Object> list = DB.getSQLValueObjectsEx(get_TrxName(), queryT_MoveClient,
+					mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), String.valueOf(key));
+			if (list != null && list.size() == 1) {
+				convertedId = list.get(0);
+			}
+		} catch (Exception e) {
+			throw new AdempiereException("Could not execute query: " + queryT_MoveClient + "\nCause = " + e.getLocalizedMessage());
+		}
+		if (convertedId == null || (convertedId instanceof Number && ((Number)convertedId).intValue() < 0)) {
+			// when obtaining a UUID for a non-UUID table means to generate and insert the conversion
+			// for example AD_Attachment.Record_UU requires the UUID of a still not inserted record in another table
+			MTable cTable = MTable.get(getCtx(), convertTable);
+			if (key instanceof String && ! cTable.isUUIDKeyTable() && columnName.equals("Record_UU")) {
+				convertedId = UUID.randomUUID().toString();
+				DB.executeUpdateEx(insertConversionId,
+						new Object[] {mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), key, convertedId},
+						get_TrxName());
+			} else {
+				// not found in the T_MoveClient table - try to get it again - could be missed in first pass
+				convertedId = getLocalKeyFor(convertTable, key, tableName);
+			}
+		}
+		return convertedId;
+	}
+	
+	/**
+	 * Define if is acceptable to ignore a non existing converted ID
+	 * @return
+	 */
+	private boolean canIgnoreNullConvertedId(MTable table, String tableName, String columnName, String convertTable) {
+		if (   (("Record_ID".equalsIgnoreCase(columnName) || "Record_UU".equalsIgnoreCase(columnName)) && table.columnExistsInDB("AD_Table_ID"))
+			|| ("Line_ID".equalsIgnoreCase(columnName) && "Fact_Acct".equalsIgnoreCase(tableName))
+				|| (("Node_ID".equalsIgnoreCase(columnName) || "Parent_ID".equalsIgnoreCase(columnName))
+						&& (   "AD_TreeNode".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeMM".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeBP".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeCMC".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeCMM".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeCMS".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeCMT".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodePR".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeU1".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeU2".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeU3".equalsIgnoreCase(tableName)
+								|| "AD_TreeNodeU4".equalsIgnoreCase(tableName)
+								|| "AD_Tree_Favorite_Node".equalsIgnoreCase(tableName)
+								|| "AD_TreeBar".equalsIgnoreCase(tableName)))) {
+			if (p_tablesToExcludeList.contains(convertTable.toUpperCase())) {
+				// record is pointing to a table that is not included, ignore it
+				return true;
+			}
+		}
+		if (   "AD_ChangeLog".equalsIgnoreCase(tableName)
+			|| "AD_PInstance".equalsIgnoreCase(tableName)
+			|| "AD_PInstance_Log".equalsIgnoreCase(tableName)) {
+			// skip orphan records in AD_ChangeLog, AD_PInstance and AD_PInstance_Log, can be log of deleted records, skip
+			return true;
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Get the local converted ID or UUID for a record
+	 * @param tableName
+	 * @param foreign_Key
+	 * @param tableNameSource
+	 * @return
+	 */
+	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource) {
+		String uuidCol = PO.getUUIDColumnName(tableName);
+		MTable table = MTable.get(getCtx(), tableName);
+		String remoteUUID = null;
+		if (! table.isIDKeyTable()) {
+			remoteUUID = foreign_Key.toString();
+		} else {
+			StringBuilder sqlRemoteUUSB = new StringBuilder()
+					.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
+					.append(" WHERE ").append(tableName).append("_ID=?");
+			String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
+			PreparedStatement stmtUU = null;
+			ResultSet rs = null;
+			try {
+				stmtUU = externalConn.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtUU.setObject(1, foreign_Key);
+				rs = stmtUU.executeQuery();
+				if (rs.next()) {
+					remoteUUID = rs.getString(1);
+				}
+			} catch (SQLException e) {
+				throw new AdempiereException("Could not execute external query for table " + tableNameSource + ": " + sqlRemoteUU + "\nCause = " + e.getLocalizedMessage());
+			} finally {
+				DB.close(rs, stmtUU);
+			}
+		}
+		Object local_Key = null;
+		if (remoteUUID != null) {
+			local_Key = getFromUUID(tableName, uuidCol, null, null, remoteUUID, foreign_Key);
+		}
+		return local_Key;
+	}
 
 }
