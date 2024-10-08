@@ -15,6 +15,7 @@
 package org.adempiere.base.event;
 
 import java.io.File;
+import java.util.List;
 
 import org.compiere.model.MClient;
 import org.compiere.model.MUser;
@@ -30,7 +31,7 @@ public class RequestSendEMailEventDataNtier
 	private MUser to;
 	private String subject;
 	private String message;
-	private File attachment;
+	private List<File> attachments;
 	private int requestID;
 	private boolean isHtml;
 	private String trxName;
@@ -50,9 +51,8 @@ public class RequestSendEMailEventDataNtier
 	 * @param attachment
 	 * @param requestID
 	 */
-	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, File attachment, int requestID,String trxName,
-			String priority, String updated, String dateLastAction,String summary,String documentNo)  {
-		this(client, from, to, subject, message, attachment, requestID, false,trxName,priority, updated,dateLastAction,   summary,documentNo);
+	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, List<File> attachments, int requestID) {
+		this(client, from, to, subject, message, attachments, requestID, false);
 	}
 	
 	/**
@@ -65,14 +65,48 @@ public class RequestSendEMailEventDataNtier
 	 * @param requestID
 	 * @param isHtml
 	 */
-	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, File attachment, int requestID, boolean isHtml,String trxName,
+	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, List<File> attachments, int requestID, boolean isHtml) {
+		setClient(client);
+		setFrom(from);
+		setTo(to);
+		setSubject(subject);
+		setMessage(message);
+		setAttachments(attachments);
+		setRequestID(requestID);
+		setHtml(isHtml);
+	}
+	/**
+	 * @param client
+	 * @param from
+	 * @param to
+	 * @param subject
+	 * @param message
+	 * @param attachment
+	 * @param requestID
+	 */
+	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, List<File> attachments, int requestID,String trxName,
+			String priority, String updated, String dateLastAction,String summary,String documentNo)  {
+		this(client, from, to, subject, message, attachments, requestID, false,trxName,priority, updated,dateLastAction,   summary,documentNo);
+	}
+	
+	/**
+	 * @param client
+	 * @param from
+	 * @param to
+	 * @param subject
+	 * @param message
+	 * @param attachment
+	 * @param requestID
+	 * @param isHtml
+	 */
+	public RequestSendEMailEventDataNtier(MClient client, MUser from, MUser to, String subject, String message, List<File> attachments, int requestID, boolean isHtml,String trxName,
 			String priority, String updated, String dateLastAction,String summary,String documentNo) {
 		setClient(client);
 		setFrom(from);
 		setTo(to);
 		setSubject(subject);
 		setMessage(message);
-		setAttachment(attachment);
+		setAttachments(attachments);
 		setRequestID(requestID);
 		setHtml(isHtml);
 		setTrxName(trxName);
@@ -156,15 +190,15 @@ public class RequestSendEMailEventDataNtier
 	/**
 	 * @return attachment file
 	 */
-	public File getAttachment() {
-		return attachment;
+	public List<File> getAttachments() {
+		return attachments;
 	}
 
 	/**
 	 * @param attachment
 	 */
-	public void setAttachment(File attachment) {
-		this.attachment = attachment;
+	public void setAttachments(List<File> attachments) {
+		this.attachments = attachments;
 	}
 
 	/**

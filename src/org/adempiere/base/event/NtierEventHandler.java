@@ -1,17 +1,23 @@
 package org.adempiere.base.event;
 
+import static org.compiere.model.SystemIDs.MESSAGE_REQUESTUPDATE;
+
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
+import org.compiere.model.MAttachment;
+import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MClient;
 import org.compiere.model.MColumn;
+import org.compiere.model.MNote;
 import org.compiere.model.MRefList;
 import org.compiere.model.MRequest;
 import org.compiere.model.MRequestType;
@@ -36,6 +42,7 @@ import za.co.ntier.twilio.models.X_TW_Message;
 import za.co.ntier.utils.SendMessage;
 import za.ntier.models.I_R_Request;
 import za.ntier.models.I_R_RequestUpdate;
+import za.ntier.models.MUser_New;
 import za.ntier.models.X_AD_User;
 import za.ntier.models.X_R_Request;
 
@@ -71,6 +78,17 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 			
+		} else 	if (topic.equals(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL)) 
+		{
+			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
+			if (!eventData.getClient().sendEMail(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachment()))
+			{
+				int AD_Message_ID = MESSAGE_REQUESTUPDATE;
+				MNote note = new MNote(Env.getCtx(), AD_Message_ID, eventData.getTo().getAD_User_ID(),
+						X_R_Request.Table_ID, eventData.getRequestID(), 
+						eventData.getSubject(), eventData.getMessage(), null);
+				note.saveEx();
+			}
 		}
 		else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
 		{
@@ -113,6 +131,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	@Override
 	protected void initialize() {
 		registerEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP);
+		registerEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_Request.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_R_Request.Table_Name);
@@ -294,7 +313,14 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			message.append("\n----------\n").append(ru.getResult());
 		}
 		message.append(getMailTrailer(r, null));
+		MAttachment mAttachment = r.getAttachment();
 		File pdf = r.createPDF();
+		//MAttachment mAttachment = r.getAttachment();
+		List<File> attachments = new ArrayList<>();
+		MAttachmentEntry[] entries = mAttachment.getEntries();
+		for (int i = 0; i < entries.length; i++) {			
+			attachments.add(entries[i].getFile());
+		}
 		if (s_log.isLoggable(Level.FINER)) {
 			s_log.finer(message.toString());
 		}
@@ -393,14 +419,15 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				}
 				userList.add(ii);
 				//
-				MUser to = MUser.get (r.getCtx(), AD_User_ID);
-				if (X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType))
+				MUser_New to = MUser_New.get (r.getCtx(), AD_User_ID);
+				if ((X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType)) && 
+				   (to.getOpt_In_Date() != null && (to.getOpt_Out_Date() == null || (to.getOpt_In_Date().compareTo(to.getOpt_Out_Date())) > 0 )))
 				{
 					String priorityValue = "";
 					if (r.getPriority() != null) {						
 						priorityValue = MRefList.getListName(r.getCtx(), X_R_Request.PRIORITY_AD_Reference_ID, r.getPriority());						
 					}
-					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), pdf, r.getR_Request_ID(),r.get_TrxName(),
+					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), attachments, r.getR_Request_ID(),r.get_TrxName(),
 							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo());
 					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP, eventData, true);
 					EventManager.getInstance().postEvent(event);
@@ -411,6 +438,9 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
 					Event event = EventManager.newEvent(IEventTopics.REQUEST_SEND_EMAIL, eventData, true);
 					EventManager.getInstance().postEvent(event);
+				//	RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message.toString(), attachments, r.getR_Request_ID());
+				//	Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
+				//	EventManager.getInstance().postEvent(event);
 				}
 				//	Send Note
 				/*

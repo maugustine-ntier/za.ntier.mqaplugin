@@ -705,6 +705,24 @@ public interface I_AD_User
 	  */
 	public String getNotificationType();
 
+    /** Column name Opt_In_Date */
+    public static final String COLUMNNAME_Opt_In_Date = "Opt_In_Date";
+
+	/** Set Whatsapp Opt In	  */
+	public void setOpt_In_Date (Timestamp Opt_In_Date);
+
+	/** Get Whatsapp Opt In	  */
+	public Timestamp getOpt_In_Date();
+
+    /** Column name Opt_Out_Date */
+    public static final String COLUMNNAME_Opt_Out_Date = "Opt_Out_Date";
+
+	/** Set Whatsapp Opt Out	  */
+	public void setOpt_Out_Date (Timestamp Opt_Out_Date);
+
+	/** Get Whatsapp Opt Out	  */
+	public Timestamp getOpt_Out_Date();
+
     /** Column name Password */
     public static final String COLUMNNAME_Password = "Password";
 

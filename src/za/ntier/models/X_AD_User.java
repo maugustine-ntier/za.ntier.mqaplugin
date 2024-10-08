@@ -33,7 +33,7 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20240826L;
+	private static final long serialVersionUID = 20241004L;
 
     /** Standard Constructor */
     public X_AD_User (Properties ctx, int AD_User_ID, String trxName)
@@ -1266,6 +1266,36 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 	public String getNotificationType()
 	{
 		return (String)get_Value(COLUMNNAME_NotificationType);
+	}
+
+	/** Set Whatsapp Opt In.
+		@param Opt_In_Date Whatsapp Opt In
+	*/
+	public void setOpt_In_Date (Timestamp Opt_In_Date)
+	{
+		set_Value (COLUMNNAME_Opt_In_Date, Opt_In_Date);
+	}
+
+	/** Get Whatsapp Opt In.
+		@return Whatsapp Opt In	  */
+	public Timestamp getOpt_In_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_Opt_In_Date);
+	}
+
+	/** Set Whatsapp Opt Out.
+		@param Opt_Out_Date Whatsapp Opt Out
+	*/
+	public void setOpt_Out_Date (Timestamp Opt_Out_Date)
+	{
+		set_Value (COLUMNNAME_Opt_Out_Date, Opt_Out_Date);
+	}
+
+	/** Get Whatsapp Opt Out.
+		@return Whatsapp Opt Out	  */
+	public Timestamp getOpt_Out_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_Opt_Out_Date);
 	}
 
 	/** Set Password.

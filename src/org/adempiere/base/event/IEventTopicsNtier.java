@@ -21,5 +21,6 @@ public interface IEventTopicsNtier {
 
 
 	public static final String REQUEST_SEND_WHATSAPP = "idempiere/requestSendWhatsapp";
+	public static final String REQUEST_SEND_ATTACHMENTS_EMAIL = "idempiere/requestSendAttachmentsEMail";
 
 }
