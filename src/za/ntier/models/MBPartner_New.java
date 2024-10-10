@@ -1,6 +1,5 @@
 package za.ntier.models;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,7 +65,7 @@ public class MBPartner_New extends MBPartner {
 	final private static String insertConversionId = "INSERT INTO T_MoveClient (AD_PInstance_ID, TableName, Source_Key, Target_Key) VALUES (?, ?, ?, ?)";
 	final private static String queryT_MoveClient = "SELECT Target_Key FROM T_MoveClient WHERE AD_PInstance_ID=? AND TableName=? AND Source_Key=?";
 
-	private Connection externalConn;
+	//private Connection externalConn;
 	private StringBuffer p_excludeTablesWhere = new StringBuffer();
 	private StringBuffer p_whereClient = new StringBuffer();
 	private List<String> p_errorList = new ArrayList<String>();
@@ -78,7 +77,7 @@ public class MBPartner_New extends MBPartner {
 	private boolean p_isPreserveAll = false;
 	private MPInstance mPInstance = null;
 	private String p_ClientsToInclude = null;
-	private boolean p_IsCopyClient = true;
+	private boolean p_IsCopyClient = false;
 	/** New client name when copying from template */
 	private String p_ClientName;
 	/** New client value when copying from template */
@@ -153,12 +152,13 @@ public class MBPartner_New extends MBPartner {
 		if (getAD_Client_ID() != 1000018) {
 			return true;
 		}
-		MProcess mProcess = MProcess.get(200110);
+		p_whereClient.append("AD_Client.AD_Client_ID NOT IN (0)"); // by default exclude System
+		MProcess mProcess = MProcess.get(1000045);
 		MClient[] mclients = MClient.getAll(getCtx());
 		mPInstance = new MPInstance(mProcess, getC_BPartner_ID());
 		PO.setCrossTenantSafe();
 		for (MClient mClient:mclients) {
-			if (mClient.getAD_Client_ID() == 0 || mClient.getAD_Client_ID() == 1000018 ) {
+			if (mClient.getAD_Client_ID() == 1000018 || mClient.getAD_Client_ID() < 1000000) {
 				continue;
 			}
 			p_ClientsToInclude = mClient.getAD_Client_ID() + "";
@@ -235,7 +235,7 @@ public class MBPartner_New extends MBPartner {
 		PreparedStatement stmtRC = null;
 		ResultSet rsRC = null;
 		try {
-			stmtRC = externalConn.prepareStatement(sqlRemoteColumns, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmtRC = DB.prepareStatement(sqlRemoteColumns, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			stmtRC.setString(1, tableName.toUpperCase());
 			rsRC = stmtRC.executeQuery();
 			while (rsRC.next()) {
@@ -372,7 +372,7 @@ public class MBPartner_New extends MBPartner {
 			PreparedStatement stmtFC = null;
 			ResultSet rsFC = null;
 			try {
-				stmtFC = externalConn.prepareStatement(sqlForeignClient, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtFC = DB	.prepareStatement(sqlForeignClient, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				rsFC = stmtFC.executeQuery();
 				while (rsFC.next()) {
 					int clientID = rsFC.getInt(1);
@@ -472,7 +472,7 @@ public class MBPartner_New extends MBPartner {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			stmt = externalConn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmt = DB	.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
 				cnt = rs.getInt(1);
@@ -523,13 +523,14 @@ public class MBPartner_New extends MBPartner {
 			if (! "AD_Client".equalsIgnoreCase(tableName)) {
 				selectGetIdsSB.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
 			}
-			selectGetIdsSB.append(" WHERE ").append(p_whereClient)
+			selectGetIdsSB.append(" WHERE ").append(p_whereClient).append(" and ").append(keyCol).append(" = ?") 
 			.append(" ORDER BY ").append(keyCol);
 			String selectGetIds = DB.getDatabase().convertStatement(selectGetIdsSB.toString());
 			PreparedStatement stmtGI = null;
 			ResultSet rsGI = null;
 			try {
-				stmtGI = externalConn.prepareStatement(selectGetIds, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtGI = DB.prepareStatement(selectGetIds, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtGI.setInt(1, getC_BPartner_ID());
 				rsGI = stmtGI.executeQuery();
 				while (rsGI.next()) {
 					Object source_Key = rsGI.getObject(1);
@@ -564,7 +565,7 @@ public class MBPartner_New extends MBPartner {
 					}
 					if (target_Key != null || (target_Key instanceof Number && ((Number)target_Key).intValue() >= 0)) {
 						DB.executeUpdateEx(insertConversionId,
-								new Object[] {getC_BPartner_ID(), tableName.toUpperCase(), source_Key, target_Key},
+								new Object[] {mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), source_Key, target_Key},
 								get_TrxName());
 					}
 				}
@@ -584,7 +585,7 @@ public class MBPartner_New extends MBPartner {
 
 		int newADClientID = -1;
 		String oldClientValue = null;
-		//if (p_IsCopyClient) {
+		if (p_IsCopyClient) {
 			int clientInt;
 			try {
 				clientInt = Integer.parseInt(p_ClientsToInclude);
@@ -596,7 +597,7 @@ public class MBPartner_New extends MBPartner {
 					mPInstance.getAD_PInstance_ID(), "AD_CLIENT", String.valueOf(clientInt));
 			oldClientValue = DB.getSQLValueStringEx(get_TrxName(),
 					"SELECT Value FROM AD_Client WHERE AD_Client_ID=?", clientInt);
-		//}
+		}
 
 		// get the source data and insert into target converting the IDs
 		for (MTable table : tables) {
@@ -641,20 +642,21 @@ public class MBPartner_New extends MBPartner {
 			} else if (! "AD_Client".equalsIgnoreCase(tableName)) {
 				selectGetDataSB.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
 			}
-			selectGetDataSB.append(" WHERE ").append(p_whereClient);
+			selectGetDataSB.append(" WHERE ").append(p_whereClient).append(" and ").append("C_BPartner_ID").append(" = ?") ;
 			String selectGetData = DB.getDatabase().convertStatement(selectGetDataSB.toString());
 			PreparedStatement stmtGD = null;
 			ResultSet rsGD = null;
 			Object[] parameters = new Object[ncols];
 			try {
-				stmtGD = externalConn.prepareStatement(selectGetData, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtGD = DB.prepareStatement(selectGetData, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtGD.setInt(1, getC_BPartner_ID());
 				rsGD = stmtGD.executeQuery();
 				while (rsGD.next()) {
 					boolean insertRecord = true;
 					for (int i = 0; i < ncols; i++) {
 						MColumn column = columns.get(i);
 						String columnName = column.getColumnName();
-
+                       // Martin added
 						// Obtain which is the table to convert the ID (the foreign table)
 						String convertTable = column.getReferenceTableName();
 						if ((tableName + "_ID").equalsIgnoreCase(columnName)) {
@@ -808,9 +810,18 @@ public class MBPartner_New extends MBPartner {
 								}
 							}
 						} else {
+							int clientIntNew = Integer.parseInt(p_ClientsToInclude);
 							parameters[i] = rsGD.getObject(i + 1);
-							if (rsGD.wasNull()) {
-								parameters[i] = null;
+							String uuidCol2 = PO.getUUIDColumnName(tableName);
+							if (columnName.equalsIgnoreCase(uuidCol2)) {
+								parameters[i] = UUID.randomUUID().toString();
+							} else if (columnName.equalsIgnoreCase("ad_client_id")) {
+								parameters[i] = clientIntNew;
+							}  
+							else {
+								if (rsGD.wasNull()) {
+									parameters[i] = null;
+								}
 							}
 							if (p_IsCopyClient) {
 								String uuidCol = PO.getUUIDColumnName(tableName);
@@ -936,7 +947,7 @@ public class MBPartner_New extends MBPartner {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			stmt = externalConn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			stmt.setInt(1, tableId);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -1021,7 +1032,7 @@ public class MBPartner_New extends MBPartner {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			stmt = externalConn.prepareStatement(sqlTableTree, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmt = DB.prepareStatement(sqlTableTree, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			stmt.setInt(1, treeId);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -1130,7 +1141,7 @@ public class MBPartner_New extends MBPartner {
 			PreparedStatement stmtUU = null;
 			ResultSet rs = null;
 			try {
-				stmtUU = externalConn.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				stmtUU.setObject(1, foreign_Key);
 				rs = stmtUU.executeQuery();
 				if (rs.next()) {
