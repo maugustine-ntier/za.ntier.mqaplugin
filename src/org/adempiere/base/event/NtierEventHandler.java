@@ -48,13 +48,13 @@ import za.ntier.models.X_R_Request;
 
 @Component(
 
-		   reference = @Reference( 
-		                 name = "IEventManager", bind = "bindEventManager", unbind="unbindEventManager", 
-		                 policy = ReferencePolicy.STATIC, cardinality =ReferenceCardinality.MANDATORY, service = IEventManager.class)
-		   )
+		reference = @Reference( 
+				name = "IEventManager", bind = "bindEventManager", unbind="unbindEventManager", 
+				policy = ReferencePolicy.STATIC, cardinality =ReferenceCardinality.MANDATORY, service = IEventManager.class)
+		)
 
 public class NtierEventHandler extends AbstractEventHandler implements ManagedService {
-	
+
 	private static final CLogger s_log = CLogger.getCLogger (RequestEventHandler.class);
 
 	public NtierEventHandler() {
@@ -92,13 +92,13 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		}
 		else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
 		{
-			
+
 			PO po = getPO(event);
 			if (po.get_TableName().equals(I_R_RequestUpdate.Table_Name))
 			{
 				MRequestUpdate ru = (MRequestUpdate) po;
 				MRequest r = new MRequest(Env.getCtx(),ru.getR_Request_ID(),ru.get_TrxName());
-				
+
 				MRequestType rt = r.getRequestType();
 				if (ignoreRequestTypes.contains(rt.getName())) {
 					return;
@@ -108,7 +108,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			if (po.get_TableName().equals(I_R_Request.Table_Name))
 			{
 				MRequest r = (MRequest) po;
-				
+
 				MRequestType rt = r.getRequestType();
 				if (ignoreRequestTypes.contains(rt.getName())) {
 					return;
@@ -116,7 +116,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
 			}
 		} else if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {  // Save old salesRep
-			
+
 			PO po = getPO(event);
 			if (po instanceof MRequest) {
 				MRequest r = (MRequest) po;
@@ -124,7 +124,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				Integer [] arr = new Integer[] {r.get_ValueOldAsInt(I_R_Request.COLUMNNAME_SalesRep_ID),r.getR_Request_ID()};
 				DB.executeUpdate(sql, arr, false,po.get_TrxName());
 			}
-			
+
 		}
 	}
 
@@ -136,7 +136,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_R_Request.Table_Name);
 	}
-	
+
 	/**
 	 * Handle before update of R_Request record
 	 * @param r
@@ -146,10 +146,10 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	private String afterSaveRequest(MRequestUpdate ru,MRequest r, boolean newRecord)
 	{
 		//	New
-	//	if (newRecord) {
-	//		return null;
-	//	}
-		
+		//	if (newRecord) {
+		//		return null;
+		//	}
+
 		//	Change Log
 		r.setIsChanged(false);
 		ArrayList<String> sendInfo = new ArrayList<String>();
@@ -182,10 +182,10 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			{
 				//  RequestActionTransfer - Request {0} was transferred by {1} from {2} to {3}
 				Object[] args = new Object[] {r.getDocumentNo(), 
-					MUser.getNameOfUser(AD_User_ID), 
-					MUser.getNameOfUser(oldSalesRepID),
-					MUser.getNameOfUser(r.getSalesRep_ID())
-					};
+						MUser.getNameOfUser(AD_User_ID), 
+						MUser.getNameOfUser(oldSalesRepID),
+						MUser.getNameOfUser(r.getSalesRep_ID())
+				};
 				String msg = Msg.getMsg(r.getCtx(), "RequestActionTransfer", args);
 				r.addToResult(msg);
 				sendInfo.add("SalesRep_ID");
@@ -208,10 +208,10 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			// or when changed the request category or group or contact (unsolved - the old ones are notified)
 			sendNotices(r,ru, sendInfo);
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Handle after save of R_Request record
 	 * @param r
@@ -220,12 +220,12 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	 */
 	private String afterSaveRequest(MRequest r, boolean newRecord)
 	{
-		
-			sendNotices(r,null, new ArrayList<String>());
-		
+
+		sendNotices(r,null, new ArrayList<String>());
+
 		return null;
 	}
-	
+
 	/**
 	 * 	Process changes
 	 *	@param ra request action
@@ -236,8 +236,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	{
 		String oldValue = r.get_ValueAsString(columnName);
 		String newValue = null;
-		
-		
+
+
 		boolean found = false;
 		for (final MColumn col : MTable.get(Env.getCtx(), I_R_RequestUpdate.Table_ID).getColumns(false))
 		{
@@ -267,7 +267,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		}
 		return false;
 	}	//	checkChange
-	
+
 	/**
 	 * 	Send Update EMail/Notices
 	 * 	@param list list of changes
@@ -276,7 +276,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	{
 		//	Subject
 		String subject = Msg.translate(r.getCtx(), "R_Request_ID") 
-			+ " " + Msg.getMsg(r.getCtx(), "Updated") + ": " + r.getDocumentNo();
+				+ " " + Msg.getMsg(r.getCtx(), "Updated") + ": " + r.getDocumentNo();
 		//	Message
 		StringBuilder message = new StringBuilder();
 		//		UpdatedBy: Joe
@@ -284,31 +284,31 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		MUser from = MUser.get(r.getCtx(), UpdatedBy);
 		if (from != null) {
 			message.append(Msg.translate(r.getCtx(), "UpdatedBy")).append(": ")
-				.append(from.getName());
+			.append(from.getName());
 		}
 		//		LastAction/Created: ...	
 		if (r.getDateLastAction() != null) {
 			message.append("\n").append(Msg.translate(r.getCtx(), "DateLastAction"))
-				.append(": ").append(r.getDateLastAction());
+			.append(": ").append(r.getDateLastAction());
 		} else {
 			message.append("\n").append(Msg.translate(r.getCtx(), "Created"))
-				.append(": ").append(r.getCreated());
+			.append(": ").append(r.getCreated());
 		}
 		//	Changes
 		for (int i = 0; i < list.size(); i++)
 		{
 			String columnName = list.get(i);
 			message.append("\n").append(Msg.getElement(r.getCtx(), columnName))
-				.append(": ").append(r.get_DisplayValue(columnName, false))
-				.append(" -> ").append(r.get_DisplayValue(columnName, true));
+			.append(": ").append(r.get_DisplayValue(columnName, false))
+			.append(" -> ").append(r.get_DisplayValue(columnName, true));
 		}
 		//	NextAction
 		if (r.getDateNextAction() != null) {
 			message.append("\n").append(Msg.translate(r.getCtx(), "DateNextAction"))
-				.append(": ").append(r.getDateNextAction());
+			.append(": ").append(r.getDateNextAction());
 		}
 		message.append(MRequest.SEPARATOR)
-			.append(r.getSummary() );
+		.append(r.getSummary() );
 		if (ru != null && ru.getResult() != null) {
 			message.append("\n----------\n").append(ru.getResult());
 		}
@@ -317,14 +317,17 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		File pdf = r.createPDF();
 		//MAttachment mAttachment = r.getAttachment();
 		List<File> attachments = new ArrayList<>();
-		MAttachmentEntry[] entries = mAttachment.getEntries();
-		for (int i = 0; i < entries.length; i++) {			
-			attachments.add(entries[i].getFile());
+		MAttachmentEntry[] entries = null;
+		if (mAttachment != null) {
+			entries = mAttachment.getEntries();
+			for (int i = 0; i < entries.length; i++) {			
+				attachments.add(entries[i].getFile());
+			}
 		}
 		if (s_log.isLoggable(Level.FINER)) {
 			s_log.finer(message.toString());
 		}
-		
+
 		//	Prepare sending Notice/Mail
 		MClient client = MClient.get(r.getCtx());
 		//	Reset from if external
@@ -341,11 +344,11 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		//
 		ArrayList<Integer> userList = new ArrayList<Integer>();
 		final String sql = "SELECT u.AD_User_ID, u.NotificationType, u.EMail, u.Name, MAX(r.AD_Role_ID),u.phone "
-			+ "FROM RV_RequestUpdates_Only ru"
-			+ " INNER JOIN AD_User u ON (ru.AD_User_ID=u.AD_User_ID OR u.AD_User_ID=?)"
-			+ " LEFT OUTER JOIN AD_User_Roles r ON (u.AD_User_ID=r.AD_User_ID) "
-			+ "WHERE ru.R_Request_ID=? "
-			+ "GROUP BY u.AD_User_ID, u.NotificationType, u.EMail, u.Name";
+				+ "FROM RV_RequestUpdates_Only ru"
+				+ " INNER JOIN AD_User u ON (ru.AD_User_ID=u.AD_User_ID OR u.AD_User_ID=?)"
+				+ " LEFT OUTER JOIN AD_User_Roles r ON (u.AD_User_ID=r.AD_User_ID) "
+				+ "WHERE ru.R_Request_ID=? "
+				+ "GROUP BY u.AD_User_ID, u.NotificationType, u.EMail, u.Name";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
@@ -369,14 +372,14 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				if (rs.wasNull()) {
 					AD_Role_ID = -1;
 				}
-				
+
 				//	No confidential to externals
 				if (AD_Role_ID == -1 
-					&& (r.getConfidentialTypeEntry().equals(MRequest.CONFIDENTIALTYPE_Internal)
-						|| r.getConfidentialTypeEntry().equals(MRequest.CONFIDENTIALTYPE_PrivateInformation))) {
+						&& (r.getConfidentialTypeEntry().equals(MRequest.CONFIDENTIALTYPE_Internal)
+								|| r.getConfidentialTypeEntry().equals(MRequest.CONFIDENTIALTYPE_PrivateInformation))) {
 					continue;
 				}
-				
+
 				if (X_AD_User.NOTIFICATIONTYPE_None.equals(NotificationType))
 				{
 					if (s_log.isLoggable(Level.CONFIG)) {
@@ -404,7 +407,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 					}
 				}
 				if (X_AD_User.NOTIFICATIONTYPE_Notice.equals(NotificationType)
-					&& AD_Role_ID < 0)
+						&& AD_Role_ID < 0)
 				{
 					if (s_log.isLoggable(Level.CONFIG)) {
 						s_log.config("No internal User: " + Name);
@@ -421,7 +424,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				//
 				MUser_New to = MUser_New.get (r.getCtx(), AD_User_ID);
 				if ((X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType)) && 
-				   (to.getOpt_In_Date() != null && (to.getOpt_Out_Date() == null || (to.getOpt_In_Date().compareTo(to.getOpt_Out_Date())) > 0 )))
+						(to.getOpt_In_Date() != null && (to.getOpt_Out_Date() == null || (to.getOpt_In_Date().compareTo(to.getOpt_Out_Date())) > 0 )))
 				{
 					String priorityValue = "";
 					if (r.getPriority() != null) {						
@@ -438,9 +441,9 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
 					Event event = EventManager.newEvent(IEventTopics.REQUEST_SEND_EMAIL, eventData, true);
 					EventManager.getInstance().postEvent(event);
-				//	RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message.toString(), attachments, r.getR_Request_ID());
-				//	Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
-				//	EventManager.getInstance().postEvent(event);
+					//	RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message.toString(), attachments, r.getR_Request_ID());
+					//	Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
+					//	EventManager.getInstance().postEvent(event);
 				}
 				//	Send Note
 				/*
@@ -462,7 +465,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			rs = null; pstmt = null;
 		}
 	}	//	sendNotice
-	
+
 	/**
 	 * 	Get mail trailer text
 	 * 	@param serverAddress server address
@@ -471,11 +474,11 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 	private String getMailTrailer(MRequest r, String serverAddress)
 	{
 		StringBuilder sb = new StringBuilder("\n").append(MRequest.SEPARATOR)
-			.append(Msg.translate(r.getCtx(), "R_Request_ID"))
-			.append(": ").append(r.getDocumentNo())
-			.append("  ").append(r.getMailTag())
-			.append("\n")
-			.append(Msg.getMsg(r.getCtx(), "RequestSentBy"));
+				.append(Msg.translate(r.getCtx(), "R_Request_ID"))
+				.append(": ").append(r.getDocumentNo())
+				.append("  ").append(r.getMailTag())
+				.append("\n")
+				.append(Msg.getMsg(r.getCtx(), "RequestSentBy"));
 		if (serverAddress != null) {
 			sb.append(" from ").append(serverAddress);
 		}
@@ -484,7 +487,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 
 	public static final String IGNORE_REQUEST_TYPES = "ignoreRequestTypes";
 	private static ArrayList<String> ignoreRequestTypes = new ArrayList<String>();
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void updated(Dictionary properties) throws ConfigurationException {
@@ -492,7 +495,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			String p = (String) properties.get(IGNORE_REQUEST_TYPES);
 			if (!Util.isEmpty(p)) {
 				ignoreRequestTypes.clear();
-				
+
 				StringTokenizer st = new StringTokenizer(p, ";");
 				while (st.hasMoreTokens()) {
 					ignoreRequestTypes.add(st.nextToken().trim());

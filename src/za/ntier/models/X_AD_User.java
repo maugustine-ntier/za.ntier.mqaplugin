@@ -33,7 +33,7 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20241004L;
+	private static final long serialVersionUID = 20241011L;
 
     /** Standard Constructor */
     public X_AD_User (Properties ctx, int AD_User_ID, String trxName)
@@ -48,6 +48,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 // N
 			setIsBillTo (false);
 // N
+			setIsEmployee (false);
+// N
 			setIsExpired (false);
 // N
 			setIsFullBPAccess (true);
@@ -61,6 +63,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 			setIsNoPasswordReset (false);
 // 'N'
 			setIsSalesLead (false);
+// N
+			setIsSalesRep (false);
 // N
 			setIsShipTo (false);
 // N
@@ -87,6 +91,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 // N
 			setIsBillTo (false);
 // N
+			setIsEmployee (false);
+// N
 			setIsExpired (false);
 // N
 			setIsFullBPAccess (true);
@@ -100,6 +106,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 			setIsNoPasswordReset (false);
 // 'N'
 			setIsSalesLead (false);
+// N
+			setIsSalesRep (false);
 // N
 			setIsShipTo (false);
 // N
@@ -126,6 +134,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 // N
 			setIsBillTo (false);
 // N
+			setIsEmployee (false);
+// N
 			setIsExpired (false);
 // N
 			setIsFullBPAccess (true);
@@ -139,6 +149,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 			setIsNoPasswordReset (false);
 // 'N'
 			setIsSalesLead (false);
+// N
+			setIsSalesRep (false);
 // N
 			setIsShipTo (false);
 // N
@@ -165,6 +177,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 // N
 			setIsBillTo (false);
 // N
+			setIsEmployee (false);
+// N
 			setIsExpired (false);
 // N
 			setIsFullBPAccess (true);
@@ -178,6 +192,8 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 			setIsNoPasswordReset (false);
 // 'N'
 			setIsSalesLead (false);
+// N
+			setIsSalesRep (false);
 // N
 			setIsShipTo (false);
 // N
@@ -803,6 +819,29 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 		return false;
 	}
 
+	/** Set Employee.
+		@param IsEmployee Indicates if  this Business Partner is an employee
+	*/
+	public void setIsEmployee (boolean IsEmployee)
+	{
+		set_Value (COLUMNNAME_IsEmployee, Boolean.valueOf(IsEmployee));
+	}
+
+	/** Get Employee.
+		@return Indicates if  this Business Partner is an employee
+	  */
+	public boolean isEmployee()
+	{
+		Object oo = get_Value(COLUMNNAME_IsEmployee);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Expired.
 		@param IsExpired Expired
 	*/
@@ -974,6 +1013,29 @@ public class X_AD_User extends PO implements I_AD_User, I_Persistent
 	public boolean isSalesLead()
 	{
 		Object oo = get_Value(COLUMNNAME_IsSalesLead);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Sales Representative.
+		@param IsSalesRep Indicates if  the business partner is a sales representative or company agent
+	*/
+	public void setIsSalesRep (boolean IsSalesRep)
+	{
+		set_Value (COLUMNNAME_IsSalesRep, Boolean.valueOf(IsSalesRep));
+	}
+
+	/** Get Sales Representative.
+		@return Indicates if  the business partner is a sales representative or company agent
+	  */
+	public boolean isSalesRep()
+	{
+		Object oo = get_Value(COLUMNNAME_IsSalesRep);
 		if (oo != null)
 		{
 			 if (oo instanceof Boolean)

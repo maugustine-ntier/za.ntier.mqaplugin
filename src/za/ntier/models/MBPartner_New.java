@@ -61,9 +61,9 @@ import org.compiere.util.Util;
 public class MBPartner_New extends MBPartner {
 
 	private static final long serialVersionUID = 4154740391812230437L;
-	
-	final private static String insertConversionId = "INSERT INTO T_MoveClient (AD_PInstance_ID, TableName, Source_Key, Target_Key) VALUES (?, ?, ?, ?)";
-	final private static String queryT_MoveClient = "SELECT Target_Key FROM T_MoveClient WHERE AD_PInstance_ID=? AND TableName=? AND Source_Key=?";
+
+	final private static String insertConversionId = "INSERT INTO T_MoveClient (AD_PInstance_ID, TableName, Source_Key, Target_Key,Target_AD_Client_ID) VALUES (?, ?, ?, ?, ?)"; // Martin added target_ad_client_id
+	final private static String queryT_MoveClient = "SELECT Target_Key FROM T_MoveClient WHERE AD_PInstance_ID=? AND TableName=? AND Source_Key=? AND Target_AD_Client_ID=?";
 
 	//private Connection externalConn;
 	private StringBuffer p_excludeTablesWhere = new StringBuffer();
@@ -82,7 +82,8 @@ public class MBPartner_New extends MBPartner {
 	private String p_ClientName;
 	/** New client value when copying from template */
 	private String p_ClientValue;
-	
+	private List tableList = new ArrayList<String>(); 
+
 
 
 	public MBPartner_New(Properties ctx) {
@@ -129,7 +130,7 @@ public class MBPartner_New extends MBPartner {
 		super(ctx, C_BPartner_ID, trxName, virtualColumns);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public static MBPartner getUpper (Properties ctx, String Value, String trxName)
 	{
 		Value = Value.toUpperCase();
@@ -138,8 +139,8 @@ public class MBPartner_New extends MBPartner {
 		}
 		final String whereClause = "Upper(Value)=? AND AD_Client_ID=?";
 		MBPartner retValue = new Query(ctx, I_C_BPartner.Table_Name, whereClause, trxName)
-		.setParameters(Value,Env.getAD_Client_ID(ctx))
-		.firstOnly();
+				.setParameters(Value,Env.getAD_Client_ID(ctx))
+				.firstOnly();
 		return retValue;
 	}
 
@@ -168,12 +169,12 @@ public class MBPartner_New extends MBPartner {
 		PO.clearCrossTenantSafe();
 		return true;
 	}	
-	
+
 	/**
 	 * Conduct data validations before proceeding with the actual inserts
 	 */
 	private void validate() {
-	
+
 
 		// create list of tables to ignore
 		// validate tables
@@ -200,9 +201,9 @@ public class MBPartner_New extends MBPartner {
 		}
 
 		//if (! p_IsSkipSomeValidations) {
-			for (String tableName : p_tablesVerifiedList) {
-				validateOrphan(tableName);
-			}
+		for (String tableName : p_tablesVerifiedList) {
+			validateOrphan(tableName);
+		}
 		//}
 
 	}
@@ -212,7 +213,7 @@ public class MBPartner_New extends MBPartner {
 	 * @param tableName
 	 */
 	private void validateExternalTable(String tableName) {
-	//	statusUpdate("Validating table " + tableName);
+		//	statusUpdate("Validating table " + tableName);
 
 		// if table is not present in target
 		// inform blocking as it has client data
@@ -268,7 +269,7 @@ public class MBPartner_New extends MBPartner {
 		// statusUpdate("Validating column " + tableName + "." + columnName);
 		MColumn localColumn = MColumn.get(getCtx(), tableName, columnName);
 		if (localColumn == null || localColumn.getAD_Column_ID() <= 0) {
-		//	p_errorList.add("Column " + tableName + "." + columnName +  " doesn't exist");
+			//	p_errorList.add("Column " + tableName + "." + columnName +  " doesn't exist");
 			return;
 		}
 
@@ -300,7 +301,7 @@ public class MBPartner_New extends MBPartner {
 		// when the column is a foreign key
 		String foreignTableName = localColumn.getReferenceTableName();
 		if (   foreignTableName != null 
-			&& (foreignTableName.equalsIgnoreCase(tableName) || "AD_PInstance_Log".equalsIgnoreCase(tableName))) {
+				&& (foreignTableName.equalsIgnoreCase(tableName) || "AD_PInstance_Log".equalsIgnoreCase(tableName))) {
 			foreignTableName = "";
 		}
 		if (! Util.isEmpty(foreignTableName)) {
@@ -432,7 +433,7 @@ public class MBPartner_New extends MBPartner {
 						.append("       AND ( c.FKConstraintType IS NULL OR c.FKConstraintType=").append(DB.TO_STRING(MColumn.FKCONSTRAINTTYPE_DoNotCreate_Ignore)).append(")");
 				int cntFk = countInExternal(sqlVerifFKSB.toString());
 				if (cntFk > 0) {
-				//	statusUpdate("Validating orphans for " + table.getTableName() + "." + columnName);
+					//	statusUpdate("Validating orphans for " + table.getTableName() + "." + columnName);
 					// target database has not defined a foreign key, validate orphans
 					MTable foreignTable = MTable.get(getCtx(), foreignTableName);
 					StringBuilder sqlExternalOrgOrphanSB = new StringBuilder("SELECT COUNT(*) FROM ").append(tableName);
@@ -446,11 +447,11 @@ public class MBPartner_New extends MBPartner {
 						sqlExternalOrgOrphanSB.append(">0 AND ");
 					}
 					sqlExternalOrgOrphanSB.append(" ").append(tableName).append(".").append(columnName).append(" NOT IN (")
-						.append(" SELECT ").append(foreignTableName).append(".").append(foreignTable.getKeyColumns()[0])
-						.append(" FROM ").append(foreignTableName)
-						.append(" WHERE ").append(foreignTableName).append(".AD_Client_ID IN (0,").append(tableName).append(".AD_Client_ID)")
-						.append(")")
-						.append(" AND ").append(p_whereClient);
+					.append(" SELECT ").append(foreignTableName).append(".").append(foreignTable.getKeyColumns()[0])
+					.append(" FROM ").append(foreignTableName)
+					.append(" WHERE ").append(foreignTableName).append(".AD_Client_ID IN (0,").append(tableName).append(".AD_Client_ID)")
+					.append(")")
+					.append(" AND ").append(p_whereClient);
 					int cntOr = countInExternal(sqlExternalOrgOrphanSB.toString());
 					if (cntOr > 0) {
 						p_errorList.add("Column " + tableName + "." + columnName +  " has orphan records in table " + foreignTableName);
@@ -484,7 +485,7 @@ public class MBPartner_New extends MBPartner {
 		}
 		return cnt;
 	}
-	
+
 	private void moveClient() {
 		// first do the validation, process cannot be executed if there are blocking situations
 		// validation construct the list of tables and columns to process
@@ -513,8 +514,8 @@ public class MBPartner_New extends MBPartner {
 			if (! p_columnsVerifiedList.contains(tableName.toUpperCase() + "." + keyCol)) {
 				continue;
 			}
-			
-		//	statusUpdate("Converting IDs for table " + tableName);
+
+			//	statusUpdate("Converting IDs for table " + tableName);
 			StringBuilder selectVerifyIdSB = new StringBuilder()
 					.append("SELECT ").append(keyCol).append(" FROM ").append(tableName)
 					.append(" WHERE ").append(keyCol).append("=?");
@@ -559,14 +560,17 @@ public class MBPartner_New extends MBPartner {
 							if (table.isUUIDKeyTable()) {
 								target_Key = UUID.randomUUID().toString();
 							} else {
-								target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());
+								target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());   
 							}
 						}
 					}
 					if (target_Key != null || (target_Key instanceof Number && ((Number)target_Key).intValue() >= 0)) {
+						//if (tableList == null || !tableList.contains(tableName.toUpperCase())) {
 						DB.executeUpdateEx(insertConversionId,
-								new Object[] {mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), source_Key, target_Key},
+								new Object[] {mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), source_Key, target_Key, p_ClientsToInclude},
 								get_TrxName());
+						//	tableList.add(tableName.toUpperCase());
+						//}
 					}
 				}
 			} catch (SQLException e) {
@@ -594,7 +598,7 @@ public class MBPartner_New extends MBPartner {
 			}
 			newADClientID = DB.getSQLValueEx(get_TrxName(),
 					queryT_MoveClient,
-					mPInstance.getAD_PInstance_ID(), "AD_CLIENT", String.valueOf(clientInt));
+					mPInstance.getAD_PInstance_ID(), "AD_CLIENT", String.valueOf(clientInt),p_ClientsToInclude);
 			oldClientValue = DB.getSQLValueStringEx(get_TrxName(),
 					"SELECT Value FROM AD_Client WHERE AD_Client_ID=?", clientInt);
 		}
@@ -656,7 +660,7 @@ public class MBPartner_New extends MBPartner {
 					for (int i = 0; i < ncols; i++) {
 						MColumn column = columns.get(i);
 						String columnName = column.getColumnName();
-                       // Martin added
+						// Martin added
 						// Obtain which is the table to convert the ID (the foreign table)
 						String convertTable = column.getReferenceTableName();
 						if ((tableName + "_ID").equalsIgnoreCase(columnName)) {
@@ -749,14 +753,14 @@ public class MBPartner_New extends MBPartner {
 						}
 
 						// Fill the target value
-						if (! Util.isEmpty(convertTable)) {
+						if (! Util.isEmpty(convertTable) && !columnName.equalsIgnoreCase("ad_client_id")) {  // Martin added ad_client_id
 							// Foreign - potential ID conversion
 							Object key = rsGD.getObject(i + 1);
 							if (rsGD.wasNull()) {
 								parameters[i] = null;
 							} else {
 								if (   ! (key instanceof Number && ((Number)key).intValue() == 0 && ("Parent_ID".equalsIgnoreCase(columnName) || "Node_ID".equalsIgnoreCase(columnName)))  // Parent_ID/Node_ID=0 is valid
-									&& (key instanceof String || (key instanceof Number && ((Number)key).intValue() >= MTable.MAX_OFFICIAL_ID))) {
+										&& (key instanceof String || (key instanceof Number && ((Number)key).intValue() >= MTable.MAX_OFFICIAL_ID))) {
 									Object convertedId = null;
 
 									if (DisplayType.isMultiID(column.getAD_Reference_ID())) {
@@ -813,7 +817,8 @@ public class MBPartner_New extends MBPartner {
 							int clientIntNew = Integer.parseInt(p_ClientsToInclude);
 							parameters[i] = rsGD.getObject(i + 1);
 							String uuidCol2 = PO.getUUIDColumnName(tableName);
-							if (columnName.equalsIgnoreCase(uuidCol2)) {
+							if (columnName.equalsIgnoreCase(tableName + "ID")) {
+							} if (columnName.equalsIgnoreCase(uuidCol2)) {
 								parameters[i] = UUID.randomUUID().toString();
 							} else if (columnName.equalsIgnoreCase("ad_client_id")) {
 								parameters[i] = clientIntNew;
@@ -828,7 +833,7 @@ public class MBPartner_New extends MBPartner {
 								if (columnName.equals(uuidCol)) {
 									String oldUUID = (String) parameters[i];
 									// it is possible that the UUID has been resolved before because of a foreign key Record_UU, so search in T_MoveClient first
-									String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), oldUUID);
+									String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), oldUUID,p_ClientsToInclude);
 									if (newUUID == null) {
 										newUUID = UUID.randomUUID().toString();
 									}
@@ -846,17 +851,17 @@ public class MBPartner_New extends MBPartner {
 								} else if ("AD_Client".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName)) {
 									parameters[i] = p_ClientName;
 								} else if (
-										   ("W_Store".equalsIgnoreCase(tableName) && "WebContext".equalsIgnoreCase(columnName))
+										("W_Store".equalsIgnoreCase(tableName) && "WebContext".equalsIgnoreCase(columnName))
 										|| ("AD_User".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName))
 										) {
 									parameters[i] = p_ClientValue.toLowerCase();
 								} else if (
-										   ("AD_User".equalsIgnoreCase(tableName) && "Password".equalsIgnoreCase(columnName))
+										("AD_User".equalsIgnoreCase(tableName) && "Password".equalsIgnoreCase(columnName))
 										|| ("AD_User".equalsIgnoreCase(tableName) && "Salt".equalsIgnoreCase(columnName))
 										) {
 									parameters[i] = null; // do not assign passwords to new users, must be managed by SuperUser or plugin
 								} else if (
-										   ("AD_Org".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName))
+										("AD_Org".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName))
 										|| ("AD_Org".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
 										|| ("AD_Role".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
 										|| ("AD_Tree".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
@@ -897,13 +902,13 @@ public class MBPartner_New extends MBPartner {
 
 		// commit - here it can throw errors because of foreign keys, verify and inform
 		//statusUpdate("Committing.  Validating foreign keys");
-	//	try {
+		//	try {
 		//	commitEx();
 		//} catch (SQLException e) {
-	//		throw new AdempiereException("Could not commit,\nCause: " + e.getLocalizedMessage());
-	//	}
+		//		throw new AdempiereException("Could not commit,\nCause: " + e.getLocalizedMessage());
+		//	}
 	}
-	
+
 	/**
 	 * Get the local ID or UUID based on a UUID
 	 * @param foreignTableName
@@ -934,13 +939,13 @@ public class MBPartner_New extends MBPartner {
 			return -1;
 		}
 		DB.executeUpdateEx(insertConversionId,
-				new Object[] {mPInstance.getAD_PInstance_ID(), foreignTableName.toUpperCase(), foreign_Key, local_Key},
+				new Object[] {mPInstance.getAD_PInstance_ID(), foreignTableName.toUpperCase(), foreign_Key, local_Key,p_ClientsToInclude},
 				get_TrxName());
 		p_idSystemConversionList.add(foreignTableName.toUpperCase() + "." + foreign_Key);
 		return local_Key;
 	}
-	
-	
+
+
 	private String getExternalTableName(int tableId) {
 		String tableName = null;
 		String sql = DB.getDatabase().convertStatement("SELECT TableName FROM AD_Table WHERE AD_Table_ID=?");
@@ -993,8 +998,8 @@ public class MBPartner_New extends MBPartner {
 		}
 		return detailTableName;
 	}
-	
-	
+
+
 	/**
 	 * Return the table name of the table driving a tree 
 	 * @param treeId
@@ -1045,7 +1050,7 @@ public class MBPartner_New extends MBPartner {
 		}
 		return tableName;
 	}
-	
+
 
 	/**
 	 * Return a converted ID
@@ -1059,7 +1064,7 @@ public class MBPartner_New extends MBPartner {
 		Object convertedId = null;
 		try {
 			List<Object> list = DB.getSQLValueObjectsEx(get_TrxName(), queryT_MoveClient,
-					mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), String.valueOf(key));
+					mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), String.valueOf(key),p_ClientsToInclude);
 			if (list != null && list.size() == 1) {
 				convertedId = list.get(0);
 			}
@@ -1073,7 +1078,7 @@ public class MBPartner_New extends MBPartner {
 			if (key instanceof String && ! cTable.isUUIDKeyTable() && columnName.equals("Record_UU")) {
 				convertedId = UUID.randomUUID().toString();
 				DB.executeUpdateEx(insertConversionId,
-						new Object[] {mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), key, convertedId},
+						new Object[] {mPInstance.getAD_PInstance_ID(), convertTable.toUpperCase(), key, convertedId,p_ClientsToInclude},
 						get_TrxName());
 			} else {
 				// not found in the T_MoveClient table - try to get it again - could be missed in first pass
@@ -1082,14 +1087,14 @@ public class MBPartner_New extends MBPartner {
 		}
 		return convertedId;
 	}
-	
+
 	/**
 	 * Define if is acceptable to ignore a non existing converted ID
 	 * @return
 	 */
 	private boolean canIgnoreNullConvertedId(MTable table, String tableName, String columnName, String convertTable) {
 		if (   (("Record_ID".equalsIgnoreCase(columnName) || "Record_UU".equalsIgnoreCase(columnName)) && table.columnExistsInDB("AD_Table_ID"))
-			|| ("Line_ID".equalsIgnoreCase(columnName) && "Fact_Acct".equalsIgnoreCase(tableName))
+				|| ("Line_ID".equalsIgnoreCase(columnName) && "Fact_Acct".equalsIgnoreCase(tableName))
 				|| (("Node_ID".equalsIgnoreCase(columnName) || "Parent_ID".equalsIgnoreCase(columnName))
 						&& (   "AD_TreeNode".equalsIgnoreCase(tableName)
 								|| "AD_TreeNodeMM".equalsIgnoreCase(tableName)
@@ -1111,15 +1116,15 @@ public class MBPartner_New extends MBPartner {
 			}
 		}
 		if (   "AD_ChangeLog".equalsIgnoreCase(tableName)
-			|| "AD_PInstance".equalsIgnoreCase(tableName)
-			|| "AD_PInstance_Log".equalsIgnoreCase(tableName)) {
+				|| "AD_PInstance".equalsIgnoreCase(tableName)
+				|| "AD_PInstance_Log".equalsIgnoreCase(tableName)) {
 			// skip orphan records in AD_ChangeLog, AD_PInstance and AD_PInstance_Log, can be log of deleted records, skip
 			return true;
 		}
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Get the local converted ID or UUID for a record
 	 * @param tableName
@@ -1135,17 +1140,19 @@ public class MBPartner_New extends MBPartner {
 			remoteUUID = foreign_Key.toString();
 		} else {
 			StringBuilder sqlRemoteUUSB = new StringBuilder()
-					.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
-					.append(" WHERE ").append(tableName).append("_ID=?");
+					.append("SELECT ").append("Value").append(" FROM ").append(tableName)
+					.append(" WHERE ").append(tableName).append("_ID=?");  // Martin added AD_client_id
 			String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
 			PreparedStatement stmtUU = null;
 			ResultSet rs = null;
 			try {
 				stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				stmtUU.setObject(1, foreign_Key);
+				stmtUU.setObject(2, remoteUUID);
 				rs = stmtUU.executeQuery();
 				if (rs.next()) {
-					remoteUUID = rs.getString(1);
+					//remoteUUID = rs.getString(1);
+					remoteUUID = (String) getLocalKeyForValue(tableName,rs.getString(1),foreign_Key);
 				}
 			} catch (SQLException e) {
 				throw new AdempiereException("Could not execute external query for table " + tableNameSource + ": " + sqlRemoteUU + "\nCause = " + e.getLocalizedMessage());
@@ -1153,6 +1160,39 @@ public class MBPartner_New extends MBPartner {
 				DB.close(rs, stmtUU);
 			}
 		}
+		Object local_Key = null;
+		if (remoteUUID != null) {
+			local_Key = getFromUUID(tableName, uuidCol, null, null, remoteUUID, foreign_Key);
+		}
+		return local_Key;
+	}
+
+	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key) {
+		String uuidCol = PO.getUUIDColumnName(tableName);
+		MTable table = MTable.get(getCtx(), tableName);
+		String remoteUUID = null;
+
+
+		StringBuilder sqlRemoteUUSB = new StringBuilder()
+				.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
+				.append(" WHERE ").append("Value = ?").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
+		String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
+		PreparedStatement stmtUU = null;
+		ResultSet rs = null;
+		try {
+			stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmtUU.setObject(1, val);
+			stmtUU.setObject(2, p_ClientsToInclude);
+			rs = stmtUU.executeQuery();
+			if (rs.next()) {
+				remoteUUID = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			throw new AdempiereException("Could not execute external query for table " + sqlRemoteUU + "\nCause = " + e.getLocalizedMessage());
+		} finally {
+			DB.close(rs, stmtUU);
+		}
+
 		Object local_Key = null;
 		if (remoteUUID != null) {
 			local_Key = getFromUUID(tableName, uuidCol, null, null, remoteUUID, foreign_Key);

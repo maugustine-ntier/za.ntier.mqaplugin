@@ -452,6 +452,19 @@ public interface I_AD_User
 	  */
 	public boolean isBillTo();
 
+    /** Column name IsEmployee */
+    public static final String COLUMNNAME_IsEmployee = "IsEmployee";
+
+	/** Set Employee.
+	  * Indicates if  this Business Partner is an employee
+	  */
+	public void setIsEmployee (boolean IsEmployee);
+
+	/** Get Employee.
+	  * Indicates if  this Business Partner is an employee
+	  */
+	public boolean isEmployee();
+
     /** Column name IsExpired */
     public static final String COLUMNNAME_IsExpired = "IsExpired";
 
@@ -539,6 +552,19 @@ public interface I_AD_User
 	  * This contact is a sales lead
 	  */
 	public boolean isSalesLead();
+
+    /** Column name IsSalesRep */
+    public static final String COLUMNNAME_IsSalesRep = "IsSalesRep";
+
+	/** Set Sales Representative.
+	  * Indicates if  the business partner is a sales representative or company agent
+	  */
+	public void setIsSalesRep (boolean IsSalesRep);
+
+	/** Get Sales Representative.
+	  * Indicates if  the business partner is a sales representative or company agent
+	  */
+	public boolean isSalesRep();
 
     /** Column name IsShipTo */
     public static final String COLUMNNAME_IsShipTo = "IsShipTo";
