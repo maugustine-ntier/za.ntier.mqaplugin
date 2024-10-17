@@ -102,7 +102,11 @@ public class MUser_New extends MUser implements I_AD_User {
 		} catch (Exception e) {
 			return false;
 		}
-		return super.afterSave(newRecord, success);
+		super.afterSave(newRecord, success);
+		if (getC_BPartner_ID() != 0 && newRecord) {
+			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
+		}
+		return true;
 	}
 
 	public boolean isValidPhoneNumber(String phoneNumber) {

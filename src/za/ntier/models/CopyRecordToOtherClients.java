@@ -81,14 +81,16 @@ public class CopyRecordToOtherClients {
 	private Properties ctx = null;
 	private int record_ID = -1;
 	private int ad_Client_ID = -1;
+	private String tableName = "";
 	protected transient CLogger	log = CLogger.getCLogger (getClass());
 	
 	
-	public CopyRecordToOtherClients(Properties ctx,String trxName,int ad_Client_ID,int record_ID) {
+	public CopyRecordToOtherClients(Properties ctx,String trxName,int ad_Client_ID,int record_ID,String tableName) {
 		this.trxName = trxName;
 		this.ctx = ctx;
 		this.record_ID = record_ID;
 		this.ad_Client_ID = ad_Client_ID;
+		this.tableName = tableName;
 		p_whereClient.append("AD_Client.AD_Client_ID NOT IN (0)"); // by default exclude System
 		MProcess mProcess = MProcess.get(1000045);
 		MClient[] mclients = MClient.getAll(getCtx());
@@ -117,7 +119,7 @@ public class CopyRecordToOtherClients {
 		// for each source table not excluded
 		StringBuilder sqlTablesSB = new StringBuilder()
 				.append("SELECT TableName FROM AD_Table WHERE IsActive='Y' AND IsView='N' AND ")
-				.append("TableName in ('C_BPartner')")
+				.append("TableName in ('").append(tableName).append("')")
 				.append(" ORDER BY TableName");
 
 		String sqlRemoteTables = DB.getDatabase().convertStatement(sqlTablesSB.toString());
@@ -428,7 +430,7 @@ public class CopyRecordToOtherClients {
 		// NOTE that the whole process will be done in a single transaction, foreign keys will be validated on commit
 
 		List<MTable> tables = new Query(getCtx(), MTable.Table_Name,
-				"IsView='N' AND TableName in ('C_BPartner')",
+				"IsView='N' AND TableName in ('" + tableName + "')",
 				get_TrxName())
 				.setOnlyActiveRecords(true)
 				.setOrderBy("TableName")
@@ -582,7 +584,7 @@ public class CopyRecordToOtherClients {
 			} else if (! "AD_Client".equalsIgnoreCase(tableName)) {
 				selectGetDataSB.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
 			}
-			selectGetDataSB.append(" WHERE ").append(p_whereClient).append(" and ").append("C_BPartner_ID").append(" = ?") ;
+			selectGetDataSB.append(" WHERE ").append(p_whereClient).append(" and ").append(tableName).append("_ID").append(" = ?") ;
 			String selectGetData = DB.getDatabase().convertStatement(selectGetDataSB.toString());
 			PreparedStatement stmtGD = null;
 			ResultSet rsGD = null;
