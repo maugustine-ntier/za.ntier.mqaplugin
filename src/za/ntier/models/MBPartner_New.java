@@ -942,7 +942,7 @@ public class MBPartner_New extends MBPartner {
 				new Object[] {mPInstance.getAD_PInstance_ID(), foreignTableName.toUpperCase(), foreign_Key, local_Key,p_ClientsToInclude},
 				get_TrxName());
 		p_idSystemConversionList.add(foreignTableName.toUpperCase() + "." + foreign_Key);
-		return local_Key;
+		return local_Key + "";
 	}
 
 
@@ -1121,7 +1121,12 @@ public class MBPartner_New extends MBPartner {
 			// skip orphan records in AD_ChangeLog, AD_PInstance and AD_PInstance_Log, can be log of deleted records, skip
 			return true;
 		}
-		return false;
+		MColumn mColumn = table.getColumn(columnName);
+		if (mColumn.isMandatory()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 
@@ -1135,12 +1140,17 @@ public class MBPartner_New extends MBPartner {
 	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
+		MColumn mColumn = table.getColumn("Value");
+		if (mColumn == null) {
+			mColumn = table.getColumn("Name");
+		}
 		String remoteUUID = null;
 		if (! table.isIDKeyTable()) {
 			remoteUUID = foreign_Key.toString();
-		} else {
+		} else if (mColumn != null){
+			
 			StringBuilder sqlRemoteUUSB = new StringBuilder()
-					.append("SELECT ").append("Value").append(" FROM ").append(tableName)
+					.append("SELECT ").append(mColumn.getColumnName()).append(" FROM ").append(tableName)
 					.append(" WHERE ").append(tableName).append("_ID=?");  // Martin added AD_client_id
 			String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
 			PreparedStatement stmtUU = null;
@@ -1148,11 +1158,12 @@ public class MBPartner_New extends MBPartner {
 			try {
 				stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				stmtUU.setObject(1, foreign_Key);
-				stmtUU.setObject(2, remoteUUID);
+				//stmtUU.setObject(2, remoteUUID);
 				rs = stmtUU.executeQuery();
 				if (rs.next()) {
 					//remoteUUID = rs.getString(1);
-					remoteUUID = (String) getLocalKeyForValue(tableName,rs.getString(1),foreign_Key);
+					Object uuid = getLocalKeyForValue(tableName,rs.getString(1),foreign_Key,mColumn.getColumnName());
+					remoteUUID = (uuid == null) ? null : uuid.toString();
 				}
 			} catch (SQLException e) {
 				throw new AdempiereException("Could not execute external query for table " + tableNameSource + ": " + sqlRemoteUU + "\nCause = " + e.getLocalizedMessage());
@@ -1166,8 +1177,12 @@ public class MBPartner_New extends MBPartner {
 		}
 		return local_Key;
 	}
+	
+	
+	
+	
 
-	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key) {
+	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key,String colName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
 		String remoteUUID = null;
@@ -1175,14 +1190,52 @@ public class MBPartner_New extends MBPartner {
 
 		StringBuilder sqlRemoteUUSB = new StringBuilder()
 				.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
-				.append(" WHERE ").append("Value = ?").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
+				.append(" WHERE ").append(colName).append(" = ?").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
 		String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
 		PreparedStatement stmtUU = null;
 		ResultSet rs = null;
 		try {
 			stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			if (tableName.equalsIgnoreCase("AD_User")) {
+				val = "Standard";
+			}
 			stmtUU.setObject(1, val);
-			stmtUU.setObject(2, p_ClientsToInclude);
+			stmtUU.setInt(2, Integer.parseInt(p_ClientsToInclude));
+			rs = stmtUU.executeQuery();
+			if (rs.next()) {
+				remoteUUID = rs.getString(1);
+			} 
+			if (remoteUUID == null) {
+				remoteUUID = getLocalKeyUsingDefault(tableName);
+			}
+		} catch (SQLException e) {
+			throw new AdempiereException("Could not execute external query for table " + sqlRemoteUU + "\nCause = " + e.getLocalizedMessage());
+		} finally {
+			DB.close(rs, stmtUU);
+		}
+		return remoteUUID;
+	}
+	
+	private String getLocalKeyUsingDefault(String tableName) {
+		
+		String uuidCol = PO.getUUIDColumnName(tableName);
+		MTable table = MTable.get(getCtx(), tableName);
+		MColumn mColumn = table.getColumn("IsDefault");
+		if (mColumn == null) {
+			return null;
+		}
+		String remoteUUID = null;
+
+
+		StringBuilder sqlRemoteUUSB = new StringBuilder()
+				.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
+				.append(" WHERE ").append("ISDefault = 'Y'").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
+		String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
+		PreparedStatement stmtUU = null;
+		ResultSet rs = null;
+		try {
+			stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			stmtUU.setInt(1, Integer.parseInt(p_ClientsToInclude));
 			rs = stmtUU.executeQuery();
 			if (rs.next()) {
 				remoteUUID = rs.getString(1);
@@ -1192,12 +1245,7 @@ public class MBPartner_New extends MBPartner {
 		} finally {
 			DB.close(rs, stmtUU);
 		}
-
-		Object local_Key = null;
-		if (remoteUUID != null) {
-			local_Key = getFromUUID(tableName, uuidCol, null, null, remoteUUID, foreign_Key);
-		}
-		return local_Key;
+		return remoteUUID;
 	}
 
 }
