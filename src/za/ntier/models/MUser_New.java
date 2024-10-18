@@ -102,7 +102,10 @@ public class MUser_New extends MUser implements I_AD_User {
 		} catch (Exception e) {
 			return false;
 		}
-		super.afterSave(newRecord, success);
+		boolean done = super.afterSave(newRecord, success);
+		if (!done) {
+			return false;
+		}
 		if (getC_BPartner_ID() != 0 && newRecord) {
 			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
 		}

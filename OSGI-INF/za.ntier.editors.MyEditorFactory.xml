@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="za.ntier.editors.MyEditorFactory">
+   <property name="service.ranking" type="Integer" value="2"/>
+   <service>
+      <provide interface="org.adempiere.webui.factory.IEditorFactory"/>
+   </service>
+   <implementation class="za.ntier.editors.MyEditorFactory"/>
+</scr:component>

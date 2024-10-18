@@ -30,6 +30,8 @@ Require-Bundle: org.osgi.service.component.annotations;bundle-version="1.5.1",
  org.eclipse.osgi
 Service-Component: OSGI-INF/org.adempiere.base.event.NtierEventHandler.xml,
  OSGI-INF/za.ntier.callouts.CalloutFactory.xml,
+ OSGI-INF/za.ntier.editors.MyEditorFactory.xml,
+ OSGI-INF/za.ntier.editors.MyLookupFactory.xml,
  OSGI-INF/za.ntier.models.ModelValidatorFactory.xml,
  OSGI-INF/za.ntier.models.MyModelFactory.xml,
  OSGI-INF/za.ntier.process.MyProcessFactory.xml,

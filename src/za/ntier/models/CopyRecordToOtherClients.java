@@ -1020,7 +1020,7 @@ public class CopyRecordToOtherClients {
 						get_TrxName());
 			} else {
 				// not found in the T_MoveClient table - try to get it again - could be missed in first pass
-				convertedId = getLocalKeyFor(convertTable, key, tableName);
+				convertedId = getLocalKeyFor(convertTable, key, tableName, columnName);
 			}
 		}
 		return convertedId;
@@ -1075,11 +1075,11 @@ public class CopyRecordToOtherClients {
 	 * @param tableNameSource
 	 * @return
 	 */
-	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource) {
+	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource,String origColName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
 		MColumn mColumn = table.getColumn("Value");
-		if (mColumn == null) {
+		if (mColumn == null || tableName.equalsIgnoreCase("AD_User")) {
 			mColumn = table.getColumn("Name");
 		}
 		String remoteUUID = null;
@@ -1100,7 +1100,7 @@ public class CopyRecordToOtherClients {
 				rs = stmtUU.executeQuery();
 				if (rs.next()) {
 					//remoteUUID = rs.getString(1);
-					Object uuid = getLocalKeyForValue(tableName,rs.getString(1),foreign_Key,mColumn.getColumnName());
+					Object uuid = getLocalKeyForValue(tableName,rs.getString(1),foreign_Key,mColumn.getColumnName(),origColName);
 					remoteUUID = (uuid == null) ? null : uuid.toString();
 				}
 			} catch (SQLException e) {
@@ -1120,7 +1120,7 @@ public class CopyRecordToOtherClients {
 	
 	
 
-	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key,String colName) {
+	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key,String colName,String origColName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
 		String remoteUUID = null;
@@ -1128,16 +1128,16 @@ public class CopyRecordToOtherClients {
 
 		StringBuilder sqlRemoteUUSB = new StringBuilder()
 				.append("SELECT ").append(uuidCol).append(" FROM ").append(tableName)
-				.append(" WHERE ").append(colName).append(" = ?").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
+				.append(" WHERE upper(").append(colName).append(") = ?").append(" And AD_Client_ID = ?");  // Martin added AD_client_id
 		String sqlRemoteUU = DB.getDatabase().convertStatement(sqlRemoteUUSB.toString());
 		PreparedStatement stmtUU = null;
 		ResultSet rs = null;
 		try {
 			stmtUU = DB.prepareStatement(sqlRemoteUU, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,get_TrxName());
-			if (tableName.equalsIgnoreCase("AD_User")) {
+			if (tableName.equalsIgnoreCase("AD_User") && (val == null || !origColName.equalsIgnoreCase("AD_User_ID"))) {
 				val = "standard";
 			}
-			stmtUU.setObject(1, val);
+			stmtUU.setObject(1, val.toUpperCase());
 			stmtUU.setInt(2, Integer.parseInt(p_ClientsToInclude));
 			rs = stmtUU.executeQuery();
 			if (rs.next()) {
