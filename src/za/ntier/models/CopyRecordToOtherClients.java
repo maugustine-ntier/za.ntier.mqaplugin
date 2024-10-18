@@ -1078,9 +1078,13 @@ public class CopyRecordToOtherClients {
 	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource,String origColName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
+		
 		MColumn mColumn = table.getColumn("Value");
 		if (mColumn == null || tableName.equalsIgnoreCase("AD_User")) {
 			mColumn = table.getColumn("Name");
+		}
+		if (tableName.equalsIgnoreCase(MLocation_New.Table_Name)) {
+			mColumn = table.getColumn(MLocation_New.COLUMNNAME_Address1);
 		}
 		String remoteUUID = null;
 		if (! table.isIDKeyTable()) {

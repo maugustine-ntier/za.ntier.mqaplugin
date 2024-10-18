@@ -3,6 +3,7 @@ package za.ntier.models;
 import java.sql.ResultSet;
 
 import org.adempiere.base.IModelFactory;
+import org.compiere.model.I_C_BP_BankAccount;
 import org.compiere.model.I_C_BPartner;
 import org.compiere.model.I_C_BPartner_Location;
 import org.compiere.model.I_C_Location;
@@ -18,7 +19,10 @@ import org.osgi.service.component.annotations.Component;
 public class MyModelFactory implements IModelFactory {
 
 	@Override
-	public Class<?> getClass(String tableName) {		
+	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_C_BP_BankAccount.Table_Name)) {
+			return MBPBankAccount_New.class;
+		}
 		if (tableName.equals(I_C_BPartner_Location.Table_Name)) {
 			return MBPartnerLocation_New.class;
 		}
@@ -55,6 +59,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
+		if (tableName.equals(I_C_BP_BankAccount.Table_Name)) {
+			return new MBPBankAccount_New(Env.getCtx(),Record_ID,trxName);
+		}
 		if (tableName.equals(I_C_BPartner_Location.Table_Name)) {
 			return new MBPartnerLocation_New(Env.getCtx(),Record_ID,trxName);
 		}
@@ -91,6 +98,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_C_BP_BankAccount.Table_Name)) {
+			return new MBPBankAccount_New(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_C_BPartner_Location.Table_Name)) {
 			return new MBPartnerLocation_New(Env.getCtx(),rs,trxName);
 		}
