@@ -438,9 +438,17 @@ public class CopyRecordToOtherClients {
 
 		// create/verify the ID conversions
 		for (MTable table : tables) {
+			boolean insertRecord = true;
 			String tableName = table.getTableName();
 			if (! p_tablesVerifiedList.contains(tableName.toUpperCase())) {
 				continue;
+			}
+			MColumn mColumn = table.getColumn("Value");
+			if (mColumn == null || tableName.equalsIgnoreCase("AD_User")) {
+				mColumn = table.getColumn("Name");
+			}
+			if (tableName.equalsIgnoreCase(MLocation_New.Table_Name)) {
+				mColumn = table.getColumn(MLocation_New.COLUMNNAME_Address1);
 			}
 			String uuidCol = PO.getUUIDColumnName(tableName);
 			String keyCol;
@@ -458,7 +466,8 @@ public class CopyRecordToOtherClients {
 					.append("SELECT ").append(keyCol).append(" FROM ").append(tableName)
 					.append(" WHERE ").append(keyCol).append("=?");
 			StringBuilder selectGetIdsSB = new StringBuilder()
-					.append("SELECT ").append(tableName).append(".").append(keyCol).append(" FROM ").append(tableName);
+					.append("SELECT ").append(tableName).append(".").append(keyCol).append(",").append(tableName).append(".")
+					.append(mColumn.getColumnName()).append(" FROM ").append(tableName);
 			if (! "AD_Client".equalsIgnoreCase(tableName)) {
 				selectGetIdsSB.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
 			}
@@ -495,10 +504,27 @@ public class CopyRecordToOtherClients {
 							//	target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());
 							//}
 						} else {
+							
+							StringBuilder sql_check_If_Exists = new StringBuilder().append("Select ");
+							String keyColumn = "";
 							if (table.isUUIDKeyTable()) {
-								target_Key = UUID.randomUUID().toString();
+								keyColumn = (PO.getUUIDColumnName(tableName)).toString();
 							} else {
-								target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());   
+								keyColumn = (tableName + "_ID");
+							}
+							sql_check_If_Exists.append(keyColumn).append(" From ").append(tableName);
+							sql_check_If_Exists.append(" where ").append(mColumn.getColumnName()).append(" = ").append("?").append(" And AD_Client_ID = ").append(p_ClientsToInclude);
+							
+							int target_ID = DB.getSQLValue(get_TrxName(),sql_check_If_Exists.toString(), rsGI.getString(2) );
+							if (target_ID <= 0) {
+								if (table.isUUIDKeyTable()) {
+									target_Key = UUID.randomUUID().toString();
+								} else {
+									target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());   
+								}
+							} else {
+								target_Key = target_ID;
+								insertRecord = false;
 							}
 						}
 					}
@@ -549,6 +575,7 @@ public class CopyRecordToOtherClients {
 			}
 			//statusUpdate("Inserting data for table " + tableName);
 			StringBuilder valuesSB = new StringBuilder();
+			StringBuilder valuesUpdate = new StringBuilder();
 			StringBuilder columnsSB = new StringBuilder();
 			StringBuilder qColumnsSB = new StringBuilder();
 			int ncols = 0;
@@ -565,16 +592,20 @@ public class CopyRecordToOtherClients {
 					qColumnsSB.append(",");
 					columnsSB.append(",");
 					valuesSB.append(",");
+					valuesUpdate.append(",");
 				}
 				String quoteColumnName = DB.getDatabase().quoteColumnName(columnName);
 				qColumnsSB.append(tableName).append(".").append(quoteColumnName);
 				columnsSB.append(quoteColumnName);
 				valuesSB.append("?");
+				valuesUpdate.append(quoteColumnName).append(" = ? ");
 				columns.add(column);
 				ncols++;
 			}
 			StringBuilder insertSB = new StringBuilder()
 					.append("INSERT INTO ").append(tableName).append("(").append(columnsSB).append(") VALUES (").append(valuesSB).append(")");
+			StringBuilder updateSB = new StringBuilder()
+					.append("UPDATE ").append(tableName).append(" set ").append(valuesUpdate);
 			StringBuilder selectGetDataSB = new StringBuilder()
 					.append("SELECT ").append(qColumnsSB)
 					.append(" FROM ").append(tableName);
@@ -824,7 +855,11 @@ public class CopyRecordToOtherClients {
 					}
 					if (insertRecord) {
 						try {
-							DB.executeUpdateEx(insertSB.toString(), parameters, get_TrxName());
+							if (insertRecord) {
+								DB.executeUpdateEx(insertSB.toString(), parameters, get_TrxName());
+							} else {
+								DB.executeUpdateEx(updateSB.toString(), parameters, get_TrxName());
+							}
 						} catch (Exception e) {
 							throw new AdempiereException("Could not execute: " + insertSB + "\nCause = " + e.getLocalizedMessage());
 						}
