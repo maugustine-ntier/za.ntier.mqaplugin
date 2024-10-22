@@ -76,15 +76,15 @@ public class CopyRecordToOtherClients {
 	private String p_ClientName;
 	/** New client value when copying from template */
 	private String p_ClientValue;
-//	private List tableList = new ArrayList<String>(); 
+	//	private List tableList = new ArrayList<String>(); 
 	private String trxName = null;
 	private Properties ctx = null;
 	private int record_ID = -1;
 	private int ad_Client_ID = -1;
 	private String tableName = "";
 	protected transient CLogger	log = CLogger.getCLogger (getClass());
-	
-	
+
+
 	public CopyRecordToOtherClients(Properties ctx,String trxName,int ad_Client_ID,int record_ID,String tableName) {
 		this.trxName = trxName;
 		this.ctx = ctx;
@@ -105,9 +105,9 @@ public class CopyRecordToOtherClients {
 			moveClient();
 		}
 		PO.clearCrossTenantSafe();
-		
+
 	}
-	
+
 	/**
 	 * Conduct data validations before proceeding with the actual inserts
 	 */
@@ -437,13 +437,15 @@ public class CopyRecordToOtherClients {
 				.list();
 
 		// create/verify the ID conversions
+		boolean insertRecord = true;
+		MColumn mColumn = null;
 		for (MTable table : tables) {
-			boolean insertRecord = true;
+			
 			String tableName = table.getTableName();
 			if (! p_tablesVerifiedList.contains(tableName.toUpperCase())) {
 				continue;
 			}
-			MColumn mColumn = table.getColumn("Value");
+			mColumn = table.getColumn("Value");
 			if (mColumn == null || tableName.equalsIgnoreCase("AD_User")) {
 				mColumn = table.getColumn("Name");
 			}
@@ -504,7 +506,7 @@ public class CopyRecordToOtherClients {
 							//	target_Key = DB.getNextID(getAD_Client_ID(), tableName, get_TrxName());
 							//}
 						} else {
-							
+
 							StringBuilder sql_check_If_Exists = new StringBuilder().append("Select ");
 							String keyColumn = "";
 							if (table.isUUIDKeyTable()) {
@@ -514,7 +516,7 @@ public class CopyRecordToOtherClients {
 							}
 							sql_check_If_Exists.append(keyColumn).append(" From ").append(tableName);
 							sql_check_If_Exists.append(" where ").append(mColumn.getColumnName()).append(" = ").append("?").append(" And AD_Client_ID = ").append(p_ClientsToInclude);
-							
+
 							int target_ID = DB.getSQLValue(get_TrxName(),sql_check_If_Exists.toString(), rsGI.getString(2) );
 							if (target_ID <= 0) {
 								if (table.isUUIDKeyTable()) {
@@ -585,6 +587,9 @@ public class CopyRecordToOtherClients {
 					continue;
 				}
 				String columnName = column.getColumnName();
+				if (!insertRecord && columnName.equalsIgnoreCase(tableName + "_ID")) {
+					break;
+				}
 				if (! p_columnsVerifiedList.contains(tableName.toUpperCase() + "." + columnName.toUpperCase())) {
 					continue;
 				}
@@ -605,7 +610,8 @@ public class CopyRecordToOtherClients {
 			StringBuilder insertSB = new StringBuilder()
 					.append("INSERT INTO ").append(tableName).append("(").append(columnsSB).append(") VALUES (").append(valuesSB).append(")");
 			StringBuilder updateSB = new StringBuilder()
-					.append("UPDATE ").append(tableName).append(" set ").append(valuesUpdate);
+					.append("UPDATE ").append(tableName).append(" set ").append(valuesUpdate)
+					.append(" where ").append(mColumn.getColumnName()).append(" = ").append("?").append(" And AD_Client_ID = ").append(p_ClientsToInclude);
 			StringBuilder selectGetDataSB = new StringBuilder()
 					.append("SELECT ").append(qColumnsSB)
 					.append(" FROM ").append(tableName);
@@ -615,20 +621,23 @@ public class CopyRecordToOtherClients {
 			} else if (! "AD_Client".equalsIgnoreCase(tableName)) {
 				selectGetDataSB.append(" JOIN AD_Client ON (").append(tableName).append(".AD_Client_ID=AD_Client.AD_Client_ID)");
 			}
-			selectGetDataSB.append(" WHERE ").append(p_whereClient).append(" and ").append(tableName).append("_ID").append(" = ?") ;
+			selectGetDataSB.append(" WHERE ").append(p_whereClient).append(" and ").append(tableName).append(".").append(tableName).append("_ID").append(" = ?") ;
 			String selectGetData = DB.getDatabase().convertStatement(selectGetDataSB.toString());
 			PreparedStatement stmtGD = null;
 			ResultSet rsGD = null;
 			Object[] parameters = new Object[ncols];
+			int j = 0;
 			try {
 				stmtGD = DB.prepareStatement(selectGetData, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,get_TrxName());
 				stmtGD.setInt(1, record_ID);
 				rsGD = stmtGD.executeQuery();
 				while (rsGD.next()) {
-					boolean insertRecord = true;
 					for (int i = 0; i < ncols; i++) {
 						MColumn column = columns.get(i);
 						String columnName = column.getColumnName();
+						if (!insertRecord && columnName.equalsIgnoreCase(tableName + "_ID")) {
+							break;
+						}
 						// Martin added
 						// Obtain which is the table to convert the ID (the foreign table)
 						String convertTable = column.getReferenceTableName();
@@ -726,7 +735,7 @@ public class CopyRecordToOtherClients {
 							// Foreign - potential ID conversion
 							Object key = rsGD.getObject(i + 1);
 							if (rsGD.wasNull()) {
-								parameters[i] = null;
+								parameters[j] = null;
 							} else {
 								if (   ! (key instanceof Number && ((Number)key).intValue() == 0 && ("Parent_ID".equalsIgnoreCase(columnName) || "Node_ID".equalsIgnoreCase(columnName)))  // Parent_ID/Node_ID=0 is valid
 										&& (key instanceof String || (key instanceof Number && ((Number)key).intValue() >= MTable.MAX_OFFICIAL_ID))) {
@@ -773,40 +782,40 @@ public class CopyRecordToOtherClients {
 									key = convertedId instanceof Number ? ((Number)convertedId).intValue() : convertedId.toString();
 								}
 								if ("AD_Preference".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName)) {
-									parameters[i] = String.valueOf(key);
+									parameters[j] = String.valueOf(key);
 								} else {
 									if (DisplayType.isText(column.getAD_Reference_ID())) {
-										parameters[i] = key.toString();
+										parameters[j] = key.toString();
 									} else {
-										parameters[i] = Integer.valueOf(key.toString());
+										parameters[j] = Integer.valueOf(key.toString());
 									}
 								}
 							}
 						} else {
 							int clientIntNew = Integer.parseInt(p_ClientsToInclude);
-							parameters[i] = rsGD.getObject(i + 1);
+							parameters[j] = rsGD.getObject(i + 1);
 							String uuidCol2 = PO.getUUIDColumnName(tableName);
 							if (columnName.equalsIgnoreCase(tableName + "ID")) {
-							} if (columnName.equalsIgnoreCase(uuidCol2)) {
-								parameters[i] = UUID.randomUUID().toString();
+							} if (columnName.equalsIgnoreCase(uuidCol2) && insertRecord) {
+								parameters[j] = UUID.randomUUID().toString();
 							} else if (columnName.equalsIgnoreCase("ad_client_id")) {
-								parameters[i] = clientIntNew;
+								parameters[j] = clientIntNew;
 							}  
 							else {
 								if (rsGD.wasNull()) {
-									parameters[i] = null;
+									parameters[j] = null;
 								}
 							}
 							if (p_IsCopyClient) {
 								String uuidCol = PO.getUUIDColumnName(tableName);
 								if (columnName.equals(uuidCol)) {
-									String oldUUID = (String) parameters[i];
+									String oldUUID = (String) parameters[j];
 									// it is possible that the UUID has been resolved before because of a foreign key Record_UU, so search in T_MoveClient first
 									String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), oldUUID,p_ClientsToInclude);
 									if (newUUID == null) {
 										newUUID = UUID.randomUUID().toString();
 									}
-									parameters[i] = newUUID;
+									parameters[j] = newUUID;
 									if (! Util.isEmpty(oldUUID)) {
 										X_AD_Package_UUID_Map map = new X_AD_Package_UUID_Map(getCtx(), 0, get_TrxName());
 										map.setAD_Table_ID(table.getAD_Table_ID());
@@ -816,19 +825,19 @@ public class CopyRecordToOtherClients {
 										map.saveEx();
 									}
 								} else if ("AD_Client".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName)) {
-									parameters[i] = p_ClientValue;
+									parameters[j] = p_ClientValue;
 								} else if ("AD_Client".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName)) {
-									parameters[i] = p_ClientName;
+									parameters[j] = p_ClientName;
 								} else if (
 										("W_Store".equalsIgnoreCase(tableName) && "WebContext".equalsIgnoreCase(columnName))
 										|| ("AD_User".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName))
 										) {
-									parameters[i] = p_ClientValue.toLowerCase();
+									parameters[j] = p_ClientValue.toLowerCase();
 								} else if (
 										("AD_User".equalsIgnoreCase(tableName) && "Password".equalsIgnoreCase(columnName))
 										|| ("AD_User".equalsIgnoreCase(tableName) && "Salt".equalsIgnoreCase(columnName))
 										) {
-									parameters[i] = null; // do not assign passwords to new users, must be managed by SuperUser or plugin
+									parameters[j] = null; // do not assign passwords to new users, must be managed by SuperUser or plugin
 								} else if (
 										("AD_Org".equalsIgnoreCase(tableName) && "Value".equalsIgnoreCase(columnName))
 										|| ("AD_Org".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
@@ -845,25 +854,28 @@ public class CopyRecordToOtherClients {
 										|| ("M_CostType".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
 										|| ("R_RequestProcessor".equalsIgnoreCase(tableName) && "Name".equalsIgnoreCase(columnName))
 										) {
-									if (parameters[i] != null) {
+									if (parameters[j] != null) {
 										String value = parameters[i].toString();
-										parameters[i] = value.replaceFirst(oldClientValue, p_ClientValue);
+										parameters[j] = value.replaceFirst(oldClientValue, p_ClientValue);
 									}
 								}
 							}
 						}
+						j++;
 					}
-					if (insertRecord) {
-						try {
-							if (insertRecord) {
-								DB.executeUpdateEx(insertSB.toString(), parameters, get_TrxName());
-							} else {
-								DB.executeUpdateEx(updateSB.toString(), parameters, get_TrxName());
-							}
-						} catch (Exception e) {
-							throw new AdempiereException("Could not execute: " + insertSB + "\nCause = " + e.getLocalizedMessage());
+					//if (insertRecord) {
+					try {
+						if (insertRecord) {
+							DB.executeUpdateEx(insertSB.toString(), parameters, get_TrxName());
+						} else {
+							String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), record_ID,p_ClientsToInclude);
+							parameters[j] = newUUID;
+							DB.executeUpdateEx(updateSB.toString(), parameters, get_TrxName());
 						}
+					} catch (Exception e) {
+						throw new AdempiereException("Could not execute: " + insertSB + "\nCause = " + e.getLocalizedMessage());
 					}
+					//}
 				}
 			} catch (SQLException e) {
 				throw new AdempiereException("Could not execute external query: " + selectGetData + "\nCause = " + e.getLocalizedMessage());
@@ -1113,7 +1125,7 @@ public class CopyRecordToOtherClients {
 	private Object getLocalKeyFor(String tableName, Object foreign_Key, String tableNameSource,String origColName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
-		
+
 		MColumn mColumn = table.getColumn("Value");
 		if (mColumn == null || tableName.equalsIgnoreCase("AD_User")) {
 			mColumn = table.getColumn("Name");
@@ -1125,7 +1137,7 @@ public class CopyRecordToOtherClients {
 		if (! table.isIDKeyTable()) {
 			remoteUUID = foreign_Key.toString();
 		} else if (mColumn != null){
-			
+
 			StringBuilder sqlRemoteUUSB = new StringBuilder()
 					.append("SELECT ").append(mColumn.getColumnName()).append(" FROM ").append(tableName)
 					.append(" WHERE ").append(tableName).append("_ID=?");  // Martin added AD_client_id
@@ -1154,10 +1166,10 @@ public class CopyRecordToOtherClients {
 		}
 		return local_Key;
 	}
-	
-	
-	
-	
+
+
+
+
 
 	private Object getLocalKeyForValue(String tableName, String val,Object foreign_Key,String colName,String origColName) {
 		String uuidCol = PO.getUUIDColumnName(tableName);
@@ -1192,9 +1204,9 @@ public class CopyRecordToOtherClients {
 		}
 		return remoteUUID;
 	}
-	
+
 	private String getLocalKeyUsingDefault(String tableName) {
-		
+
 		String uuidCol = PO.getUUIDColumnName(tableName);
 		MTable table = MTable.get(getCtx(), tableName);
 		MColumn mColumn = table.getColumn("IsDefault");
@@ -1224,15 +1236,15 @@ public class CopyRecordToOtherClients {
 		}
 		return remoteUUID;
 	}
-	
+
 	private String get_TrxName() {
 		return trxName;
 	}
-	
+
 	private Properties getCtx() {
 		return ctx;
 	}
-	
+
 	private int getAD_Client_ID() {
 		return ad_Client_ID;
 	}
