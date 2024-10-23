@@ -452,6 +452,9 @@ public class CopyRecordToOtherClients {
 			if (tableName.equalsIgnoreCase(MLocation_New.Table_Name)) {
 				mColumn = table.getColumn(MLocation_New.COLUMNNAME_Address1);
 			}
+			if (tableName.equalsIgnoreCase(MBPBankAccount_New.Table_Name)) {
+				mColumn = table.getColumn(MBPBankAccount_New.COLUMNNAME_A_Name);
+			}
 			String uuidCol = PO.getUUIDColumnName(tableName);
 			String keyCol;
 			if (table.isUUIDKeyTable()) {
