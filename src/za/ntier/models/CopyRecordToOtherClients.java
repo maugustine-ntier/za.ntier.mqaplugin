@@ -581,14 +581,19 @@ public class CopyRecordToOtherClients {
 			StringBuilder columnsSB = new StringBuilder();
 			StringBuilder qColumnsSB = new StringBuilder();
 			int ncols = 0;
+			String uuidCol3 = PO.getUUIDColumnName(tableName);
 			List<MColumn> columns = new ArrayList<MColumn>();
 			for (MColumn column : table.getColumns(false)) {
 				if (!column.isActive() || column.getColumnSQL() != null) {
 					continue;
 				}
 				String columnName = column.getColumnName();
-				if (!insertRecord && columnName.equalsIgnoreCase(tableName + "_ID")) {
-					break;
+				if (!insertRecord ) {
+					if (columnName.equalsIgnoreCase(tableName + "_ID") || columnName.equalsIgnoreCase(uuidCol3)
+							|| columnName.equalsIgnoreCase("Created") || columnName.equalsIgnoreCase("CreatedBy") ||
+							columnName.equalsIgnoreCase("AD_Client_ID")) {						
+						continue;
+					}
 				}
 				if (! p_columnsVerifiedList.contains(tableName.toUpperCase() + "." + columnName.toUpperCase())) {
 					continue;
@@ -611,7 +616,7 @@ public class CopyRecordToOtherClients {
 					.append("INSERT INTO ").append(tableName).append("(").append(columnsSB).append(") VALUES (").append(valuesSB).append(")");
 			StringBuilder updateSB = new StringBuilder()
 					.append("UPDATE ").append(tableName).append(" set ").append(valuesUpdate)
-					.append(" where ").append(mColumn.getColumnName()).append(" = ").append("?").append(" And AD_Client_ID = ").append(p_ClientsToInclude);
+					.append(" where ").append(tableName).append("_ID").append(" = ").append("?").append(" And AD_Client_ID = ").append(p_ClientsToInclude);
 			StringBuilder selectGetDataSB = new StringBuilder()
 					.append("SELECT ").append(qColumnsSB)
 					.append(" FROM ").append(tableName);
@@ -625,19 +630,29 @@ public class CopyRecordToOtherClients {
 			String selectGetData = DB.getDatabase().convertStatement(selectGetDataSB.toString());
 			PreparedStatement stmtGD = null;
 			ResultSet rsGD = null;
-			Object[] parameters = new Object[ncols];
+			Object[] parameters = null;
+			if (insertRecord) {
+				parameters = new Object[ncols];
+			} else {
+				parameters = new Object[ncols + 1];
+			}
 			int j = 0;
 			try {
 				stmtGD = DB.prepareStatement(selectGetData, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,get_TrxName());
 				stmtGD.setInt(1, record_ID);
 				rsGD = stmtGD.executeQuery();
 				while (rsGD.next()) {
+					//String uuidCol3 = PO.getUUIDColumnName(tableName);
 					for (int i = 0; i < ncols; i++) {
 						MColumn column = columns.get(i);
 						String columnName = column.getColumnName();
-						if (!insertRecord && columnName.equalsIgnoreCase(tableName + "_ID")) {
-							break;
-						}
+						//if (!insertRecord ) {
+						//	if (columnName.equalsIgnoreCase(tableName + "_ID") || columnName.equalsIgnoreCase(uuidCol3)
+						//			|| columnName.equalsIgnoreCase("Created") || columnName.equalsIgnoreCase("CreatedBy") ||
+						//			columnName.equalsIgnoreCase("AD_Client_ID")) {						
+						//		continue;
+						//	}
+						//}
 						// Martin added
 						// Obtain which is the table to convert the ID (the foreign table)
 						String convertTable = column.getReferenceTableName();
@@ -868,8 +883,8 @@ public class CopyRecordToOtherClients {
 						if (insertRecord) {
 							DB.executeUpdateEx(insertSB.toString(), parameters, get_TrxName());
 						} else {
-							String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), record_ID,p_ClientsToInclude);
-							parameters[j] = newUUID;
+							String newUUID = DB.getSQLValueStringEx(get_TrxName(), queryT_MoveClient, mPInstance.getAD_PInstance_ID(), tableName.toUpperCase(), record_ID + "",p_ClientsToInclude);
+							parameters[j] = Integer.parseInt(newUUID);
 							DB.executeUpdateEx(updateSB.toString(), parameters, get_TrxName());
 						}
 					} catch (Exception e) {
