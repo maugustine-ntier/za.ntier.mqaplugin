@@ -61,7 +61,7 @@ public class MBPartnerLocation_New extends MBPartnerLocation {
 		if (!done) {
 			return false;
 		}
-		if (getC_BPartner_ID() != 0 && newRecord) {
+		if (getC_BPartner_ID() != 0 ) {
 			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_BPartner_Location_ID(),get_TableName());
 		}
 		return true;

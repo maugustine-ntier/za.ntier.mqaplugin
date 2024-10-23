@@ -1,5 +1,6 @@
 package za.ntier.models;
 
+
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
@@ -101,13 +102,26 @@ public class MUser_New extends MUser implements I_AD_User {
 			}
 		} catch (Exception e) {
 			return false;
-		}
+		}		
 		boolean done = super.afterSave(newRecord, success);
 		if (!done) {
 			return false;
 		}
-		if (getC_BPartner_ID() != 0 && newRecord) {
-			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
+		String calledClass = "";
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace(); 
+		for (int i = 1; i < stackTraceElements.length && i<=10; i++) { 
+			StackTraceElement stackTraceElement = stackTraceElements[i]; 
+			//System.out.println(stackTraceElement.getClassName() + " Method " + stackTraceElement.getMethodName()); 
+			//$NON-NLS-1$`
+			calledClass = stackTraceElement.getClassName();
+			if (calledClass.equalsIgnoreCase("org.compiere.util.Login")) {
+				break;
+			}
+		} 
+		if (!calledClass.equalsIgnoreCase("org.compiere.util.Login")) {
+			if (getC_BPartner_ID() != 0) {
+				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
+			}
 		}
 		return true;
 	}

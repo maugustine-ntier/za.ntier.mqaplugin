@@ -60,9 +60,8 @@ public class MLocation_New extends MLocation {
 		if (!done) {
 			return false;
 		}
-		if (newRecord) {
-			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
-		}
+		CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
+		
 		return true;
 	}
 	

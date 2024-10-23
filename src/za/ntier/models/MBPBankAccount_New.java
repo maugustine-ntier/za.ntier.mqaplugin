@@ -51,7 +51,7 @@ public class MBPBankAccount_New extends MBPBankAccount {
 		if (!done) {
 			return false;
 		}
-		if (getC_BPartner_ID() != 0 && newRecord) {
+		if (getC_BPartner_ID() != 0) {
 			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_BP_BankAccount_ID(),get_TableName());
 		}
 		return true;
