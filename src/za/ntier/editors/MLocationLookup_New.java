@@ -22,7 +22,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.Lookup;
-import org.compiere.model.MLocation;
+//import org.compiere.model.MLocation;
 import org.compiere.model.MTable;
 import org.compiere.util.DisplayType;
 import org.compiere.util.KeyNamePair;
@@ -163,7 +163,7 @@ public final class MLocationLookup_New extends Lookup
 	 */
 	@Override
 	public int getZoom() {
-		return MTable.get(MLocation.Table_ID).getAD_Window_ID();
+		return MTable.get(MLocation_New.Table_ID).getAD_Window_ID();
 	}
 	
 	/**

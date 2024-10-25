@@ -38,6 +38,7 @@ import org.adempiere.webui.util.ZKUpdateUtil;
 import org.adempiere.webui.window.WFieldRecordInfo;
 import org.adempiere.webui.window.WLocationDialog;
 import org.compiere.model.GridField;
+import org.compiere.model.GridFieldVO;
 import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
@@ -98,7 +99,9 @@ public class WLocationEditor_Ntier extends WEditor implements EventListener<Even
      */
     public WLocationEditor_Ntier(GridField gridField, boolean tableEditor, IEditorConfiguration editorConfiguration) {
 		super(new Locationbox(), gridField, tableEditor, editorConfiguration);
-		m_Location = (MLocationLookup_New)gridField.getLookup();
+		GridFieldVO gridFieldVO = gridField.getVO();
+		m_Location = new MLocationLookup_New (gridFieldVO.ctx, gridFieldVO.WindowNo);
+	//	m_Location = (MLocationLookup_New)gridField.getLookup();
         init();
 	}
 

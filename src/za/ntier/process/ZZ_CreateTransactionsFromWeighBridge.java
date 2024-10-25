@@ -52,12 +52,12 @@ public class ZZ_CreateTransactionsFromWeighBridge extends SvrProcess {
 			System.out.printf("%-10s %-20s %-20s %-30s %-20s%n", "Field1", "Field2", "Field3", "Field4", "Field5");
 
 			while (resultSet.next()) {
-				System.out.printf("%-10s %-20s %-20s %-30s %-20s%n",
-						resultSet.getString("Field1"),
-						resultSet.getString("Field2"),
-						resultSet.getString("Field3"),
-						resultSet.getString("Field4"),
-						resultSet.getString("Field5"));		
+			//	System.out.printf("%-10s %-20s %-20s %-30s %-20s%n",
+				//		resultSet.getString("Field1"),
+				//		resultSet.getString("Field2"),
+				//		resultSet.getString("Field3"),
+				//		resultSet.getString("Field4"),
+				//		resultSet.getString("Field5"));		
 				String client = resultSet.getString("Field7");
 				client = client.replaceAll("[^a-zA-Z]", "").trim();
 				String clientName = mClient.getName().replaceAll("[^a-zA-Z]", "").trim();

@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 
-		 property= {"service.ranking:Integer=2"},
+		 property= {"service.ranking:Integer=200"},
 		 service = org.adempiere.base.ILookupFactory.class
 		 )
 public class MyLookupFactory implements ILookupFactory{
@@ -52,6 +52,7 @@ public class MyLookupFactory implements ILookupFactory{
 		if (gridFieldVO.displayType == Location)   //  not cached
 		{
 			lookup = new MLocationLookup_New (gridFieldVO.ctx, gridFieldVO.WindowNo);
+			//lookup = new MLocationLookup (gridFieldVO.ctx, gridFieldVO.WindowNo);
 		}
 		else if (gridFieldVO.displayType == DisplayType.Locator)
 		{

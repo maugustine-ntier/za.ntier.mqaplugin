@@ -97,7 +97,7 @@ public class MUser_New extends MUser implements I_AD_User {
 
 		try {
 			String retMess = null;
-			if (getPhone() != null && !(getPhone().equals("")) && is_ValueChanged(I_AD_User.COLUMNNAME_Phone)) {
+			if (isEmployee() && getPhone() != null && !(getPhone().equals("")) && is_ValueChanged(I_AD_User.COLUMNNAME_Phone)) {
 				retMess = SendMessage.sendOptInMessage(getCtx(), Env.getAD_Client_ID(getCtx()), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, getPhone());
 			}
 		} catch (Exception e) {
