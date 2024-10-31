@@ -255,7 +255,7 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 	 */
 	private boolean isUseEscForTabClosing = MSysConfig.getBooleanValue(MSysConfig.USE_ESC_FOR_TAB_CLOSING, false, Env.getAD_Client_ID(Env.getCtx()));
 
-	private JasperPrintRenderer jasperPrintRenderer = null;
+	private JasperPrintRendererNtier jasperPrintRenderer = null;
 	
 	/**
 	 * @param re
@@ -781,7 +781,7 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 			previewType.getChildren().clear();
 		}
 		if (m_reportEngine.getPrintFormat().getJasperProcess_ID() > 0) {
-			for (ValueNamePair vnp : JasperPrintRenderer.getPreviewType(m_isCanExport)) {
+			for (ValueNamePair vnp : JasperPrintRendererNtier.getPreviewType(m_isCanExport)) {
 				ListItem li = previewType.appendItem(vnp.getName(), vnp.getValue());
 				if (selectedValue != null && selectedValue.equals(li.getValue()))
 					previewType.setSelectedItem(li);
@@ -1944,7 +1944,7 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 						ProcessCall pc = Core.getProcess("org.adempiere.report.jasper.ReportStarter");
 						pc.startProcess(Env.getCtx(), jasperProcessInfo, null);						
 						JasperPrint jasperPrint = (JasperPrint) jasperProcessInfo.getInternalReportObject();
-						viewer.jasperPrintRenderer = new JasperPrintRenderer(jasperPrint, viewer.getTitle());
+						viewer.jasperPrintRenderer = new JasperPrintRendererNtier(jasperPrint, viewer.getTitle());
 						viewer.jasperPrintRenderer.setRowCount(jasperProcessInfo.getRowCount());
 					}
 				} else {
@@ -1993,7 +1993,7 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 
 	public AMedia getMedia(String rendererId) {
 		if (jasperPrintRenderer != null) {
-			return jasperPrintRenderer.getMedia(JasperPrintRenderer.getMIMEType(rendererId), JasperPrintRenderer.getFileExtension(rendererId));
+			return jasperPrintRenderer.getMedia(JasperPrintRendererNtier.getMIMEType(rendererId), JasperPrintRendererNtier.getFileExtension(rendererId));
 		}
 		IReportViewerRenderer renderer = rendererMap.get(rendererId);
 	//	return null;  // Martin

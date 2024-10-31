@@ -73,15 +73,15 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 						eventData.getTo().getName(),eventData.getPriority(),eventData.getFrom().getName(),
 						((eventData.getDateLastAction() == null) ? (eventData.getUpdated() + "") : (eventData.getDateLastAction() + "")) ,
 						eventData.getSummary(),
-						eventData.getMessage()); 
+						eventData.getMessage(),eventData.getAttachments()); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 			
 		} else 	if (topic.equals(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL)) 
 		{
-			RequestSendEMailEventData eventData = (RequestSendEMailEventData) event.getProperty(EventManager.EVENT_DATA);
-			if (!eventData.getClient().sendEMail(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachment()))
+			RequestSendEMailEventDataNtier eventData = (RequestSendEMailEventDataNtier) event.getProperty(EventManager.EVENT_DATA);
+			if (!eventData.getClient().sendEMailAttachments(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachments(),false))
 			{
 				int AD_Message_ID = MESSAGE_REQUESTUPDATE;
 				MNote note = new MNote(Env.getCtx(), AD_Message_ID, eventData.getTo().getAD_User_ID(),
@@ -89,8 +89,37 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 						eventData.getSubject(), eventData.getMessage(), null);
 				note.saveEx();
 			}
+		} if (topic.equals(IEventTopics.PO_BEFORE_NEW) || topic.equals(IEventTopics.PO_BEFORE_CHANGE)
+				|| topic.equals(IEventTopics.PO_AFTER_NEW) || topic.equals(IEventTopics.PO_AFTER_CHANGE)) 
+		{
+			PO po = getPO(event);
+			if (po.get_TableName().equals(I_R_Request.Table_Name))
+			{
+				MRequest r = (MRequest) po;
+				
+				MRequestType rt = r.getRequestType();
+				if (ignoreRequestTypes.contains(rt.getName())) {
+					return;
+				}
+				
+				if (topic.equals(IEventTopics.PO_BEFORE_NEW) || topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {
+				//	beforeSaveRequest(r, topic.equals(IEventTopics.PO_BEFORE_NEW));
+				} else if (topic.equals(IEventTopics.PO_AFTER_NEW) || topic.equals(IEventTopics.PO_AFTER_CHANGE)) {
+					afterSaveRequest(r, topic.equals(IEventTopics.PO_AFTER_NEW));
+				}
+				if (topic.equals(IEventTopics.PO_BEFORE_CHANGE)) {  // Save old salesRep
+
+					//PO po = getPO(event);
+					if (po instanceof MRequest) {
+					//	MRequest r = (MRequest) po;
+						String sql = "Update R_Request set SalesRep_OLD_ID = ? where R_Request_ID = ?";
+						Integer [] arr = new Integer[] {r.get_ValueOldAsInt(I_R_Request.COLUMNNAME_SalesRep_ID),r.getR_Request_ID()};
+						DB.executeUpdate(sql, arr, false,po.get_TrxName());
+					}
+				}
+			}
 		}
-		else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
+		/* else if (topic.equals(IEventTopics.PO_AFTER_NEW)) 
 		{
 
 			PO po = getPO(event);
@@ -125,7 +154,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				DB.executeUpdate(sql, arr, false,po.get_TrxName());
 			}
 
-		}
+		} */
 	}
 
 	@Override
@@ -135,6 +164,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_Request.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_R_RequestUpdate.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_R_Request.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_R_Request.Table_Name);
 	}
 
 	/**
@@ -438,12 +468,19 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				//	Send Mail
 				if (X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType))
 				{
-					RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
-					Event event = EventManager.newEvent(IEventTopics.REQUEST_SEND_EMAIL, eventData, true);
+					String priorityValue = "";
+					if (r.getPriority() != null) {						
+						priorityValue = MRefList.getListName(r.getCtx(), X_R_Request.PRIORITY_AD_Reference_ID, r.getPriority()); 
+					}
+		
+					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), attachments, r.getR_Request_ID(),r.get_TrxName(),
+							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo());
+					//RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
+					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
+					//EventManager.getInstance().postEvent(event);
+					//RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message.toString(), attachments, r.getR_Request_ID());
+					//Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
 					EventManager.getInstance().postEvent(event);
-					//	RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message.toString(), attachments, r.getR_Request_ID());
-					//	Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
-					//	EventManager.getInstance().postEvent(event);
 				}
 				//	Send Note
 				/*

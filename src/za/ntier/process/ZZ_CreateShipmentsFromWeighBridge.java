@@ -46,7 +46,7 @@ public class ZZ_CreateShipmentsFromWeighBridge extends SvrProcess {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String selectQuery = "SELECT ZZ_WB_Transaction_ID FROM ZZ_WB_Transaction Where IsActive = 'Y' and M_InOut_ID is null and AD_Client_ID = ? "
-				+ " and DateTimeOut >= to_date('20082024','ddmmyyyy') and wb_transactionid = 4867";
+				+ " and DateTimeOut >= to_date('20082024','ddmmyyyy') ";
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setInt(1, getAD_Client_ID());

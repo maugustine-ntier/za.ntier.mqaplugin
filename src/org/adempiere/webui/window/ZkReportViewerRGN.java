@@ -255,7 +255,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 	 */
 	private boolean isUseEscForTabClosing = MSysConfig.getBooleanValue(MSysConfig.USE_ESC_FOR_TAB_CLOSING, false, Env.getAD_Client_ID(Env.getCtx()));
 
-	private JasperPrintRenderer jasperPrintRenderer = null;
+	private JasperPrintRendererNtier jasperPrintRenderer = null;
 	
 	/**
 	 * @param re
@@ -1972,7 +1972,7 @@ public class ZkReportViewerRGN extends Window implements EventListener<Event>, I
 
 	public AMedia getMedia(String rendererId) {
 		if (jasperPrintRenderer != null) {
-			return jasperPrintRenderer.getMedia(JasperPrintRenderer.getMIMEType(rendererId), JasperPrintRenderer.getFileExtension(rendererId));
+			return jasperPrintRenderer.getMedia(JasperPrintRendererNtier.getMIMEType(rendererId), JasperPrintRendererNtier.getFileExtension(rendererId));
 		}
 		IReportViewerRendererRGN renderer = rendererMap.get(rendererId);
 		return renderer != null ? renderer.renderMedia(this, false) : null;

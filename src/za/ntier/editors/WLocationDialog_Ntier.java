@@ -1097,9 +1097,10 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				|| (bplocname >= 2 && changedAddress2)
 				|| (bplocname >= 3 && changedRegion)
 				) {
-	        	if (   m_GridField != null && m_GridField.getGridTab() != null
-	        		&& "C_BPartner_Location".equals(m_GridField.getGridTab().getTableName()) 
-	        		&& !m_GridField.getGridTab().getValueAsBoolean("IsPreserveCustomName"))
+	        	if (   m_GridField != null && m_GridField.getGridTab() != null && 1 == 2 &&
+	       		 "C_BPartner_Location".equals(m_GridField.getGridTab().getTableName())  //   we want to save with the new name
+	        		&& !m_GridField.getGridTab().getValueAsBoolean("IsPreserveCustomName")
+	        		)
 	    		{
 	        		m_GridField.getGridTab().setValue("Name", ".");
 	    		} else {
