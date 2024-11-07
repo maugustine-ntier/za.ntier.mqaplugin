@@ -38,8 +38,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.event.Event;
 
-import za.co.ntier.twilio.models.X_TW_Message;
-import za.co.ntier.utils.SendMessage;
+import za.ntier.mesibo.MesiboRestCalls;
 import za.ntier.models.I_R_Request;
 import za.ntier.models.I_R_RequestUpdate;
 import za.ntier.models.MUser_New;
@@ -69,11 +68,16 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			// String To_Number = "+27844627361";
 			String To_Number = eventData.getTo().getPhone();
 			try {
-				String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,eventData.getDocumentNo(),
-						eventData.getTo().getName(),eventData.getPriority(),eventData.getFrom().getName(),
-						((eventData.getDateLastAction() == null) ? (eventData.getUpdated() + "") : (eventData.getDateLastAction() + "")) ,
-						eventData.getSummary(),
-						eventData.getMessage(),eventData.getAttachments()); 
+			//	String retMess = SendMessage.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, To_Number,eventData.getDocumentNo(),
+			//			eventData.getTo().getName(),eventData.getPriority(),eventData.getFrom().getName(),
+			//			((eventData.getDateLastAction() == null) ? (eventData.getUpdated() + "") : (eventData.getDateLastAction() + "")) ,
+			//			eventData.getSummary(),
+			//			eventData.getMessage(),eventData.getAttachments()); 
+			String retMess2 = MesiboRestCalls.send(Env.getCtx(), eventData.getClient().getAD_Client_ID(),  To_Number,eventData.getDocumentNo(),
+									eventData.getTo().getName(),eventData.getPriority(),eventData.getFrom().getName(),
+								((eventData.getDateLastAction() == null) ? (eventData.getUpdated() + "") : (eventData.getDateLastAction() + "")) ,
+								eventData.getSummary(),
+								eventData.getMessage(),eventData.getAttachments()); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -81,7 +85,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		} else 	if (topic.equals(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL)) 
 		{
 			RequestSendEMailEventDataNtier eventData = (RequestSendEMailEventDataNtier) event.getProperty(EventManager.EVENT_DATA);
-			if (!eventData.getClient().sendEMailAttachments(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), eventData.getMessage(), eventData.getAttachments(),false))
+			String emailMess = eventData.getEmailMessage().replaceAll("\n","<BR>");
+			if (!eventData.getClient().sendEMailAttachments(eventData.getFrom(), eventData.getTo(), eventData.getSubject(), emailMess, eventData.getAttachments(),true))
 			{
 				int AD_Message_ID = MESSAGE_REQUESTUPDATE;
 				MNote note = new MNote(Env.getCtx(), AD_Message_ID, eventData.getTo().getAD_User_ID(),
@@ -339,8 +344,12 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 		}
 		message.append(MRequest.SEPARATOR)
 		.append(r.getSummary() );
+		message.append("\n\n<b>Latest Response</b>\n");
 		if (ru != null && ru.getResult() != null) {
 			message.append("\n----------\n").append(ru.getResult());
+		} else {
+			MRequestUpdate[] updates = r.getUpdates(null);
+			message.append(updates != null && updates.length > 0 ? updates[0].getResult() : "None");
 		}
 		message.append(getMailTrailer(r, null));
 		MAttachment mAttachment = r.getAttachment();
@@ -369,7 +378,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 			message2.append(ru.getResult());
 		} else {
 			MRequestUpdate[] updates = r.getUpdates(null);
-			message2.append(updates != null && updates.length > 0 ? updates[0] : "None");
+			message2.append(updates != null && updates.length > 0 ? updates[0].getResult() : "None");
 		}
 		//
 		ArrayList<Integer> userList = new ArrayList<Integer>();
@@ -461,7 +470,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 						priorityValue = MRefList.getListName(r.getCtx(), X_R_Request.PRIORITY_AD_Reference_ID, r.getPriority());						
 					}
 					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), attachments, r.getR_Request_ID(),r.get_TrxName(),
-							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo());
+							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo(),message.toString());
 					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_WHATSAPP, eventData, true);
 					EventManager.getInstance().postEvent(event);
 				}
@@ -474,7 +483,7 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 					}
 		
 					RequestSendEMailEventDataNtier eventData = new RequestSendEMailEventDataNtier(client, from, to, subject, message2.toString(), attachments, r.getR_Request_ID(),r.get_TrxName(),
-							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo());
+							priorityValue, r.getUpdated() + "" , (r.getDateLastAction() == null) ? null : r.getDateLastAction() + "", r.getSummary(),r.getDocumentNo(),message.toString());
 					//RequestSendEMailEventData eventData = new RequestSendEMailEventData(client, from, to, subject, message.toString(), pdf, r.getR_Request_ID());
 					Event event = EventManager.newEvent(IEventTopicsNtier.REQUEST_SEND_ATTACHMENTS_EMAIL, eventData, true);
 					//EventManager.getInstance().postEvent(event);

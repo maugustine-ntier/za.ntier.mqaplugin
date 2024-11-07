@@ -86,25 +86,30 @@ public class CopyRecordToOtherClients {
 
 
 	public CopyRecordToOtherClients(Properties ctx,String trxName,int ad_Client_ID,int record_ID,String tableName) {
-		this.trxName = trxName;
-		this.ctx = ctx;
-		this.record_ID = record_ID;
-		this.ad_Client_ID = ad_Client_ID;
-		this.tableName = tableName;
-		p_whereClient.append("AD_Client.AD_Client_ID NOT IN (0)"); // by default exclude System
-		MProcess mProcess = MProcess.get(1000045);
-		MClient[] mclients = MClient.getAll(getCtx());
-		mPInstance = new MPInstance(mProcess, record_ID);
-		PO.setCrossTenantSafe();
-		for (MClient mClient:mclients) {
-			if (mClient.getAD_Client_ID() == 1000018 || mClient.getAD_Client_ID() < 1000000) {
-				continue;
+		if (ad_Client_ID == 1000018) {
+			this.trxName = trxName;
+			this.ctx = ctx;
+			this.record_ID = record_ID;
+			this.ad_Client_ID = ad_Client_ID;
+			this.tableName = tableName;
+			p_whereClient.append("AD_Client.AD_Client_ID NOT IN (0)"); // by default exclude System
+			MProcess mProcess = MProcess.get(1000045);
+			mPInstance = new MPInstance(mProcess, record_ID);
+
+			MClient[] mclients = MClient.getAll(getCtx());
+
+			PO.setCrossTenantSafe();
+			for (MClient mClient:mclients) {
+				if (mClient.getAD_Client_ID() == 1000018 || mClient.getAD_Client_ID() < 1000000) {
+					continue;
+				}
+
+				p_ClientsToInclude = mClient.getAD_Client_ID() + "";
+				validate();
+				moveClient();
 			}
-			p_ClientsToInclude = mClient.getAD_Client_ID() + "";
-			validate();
-			moveClient();
+			PO.clearCrossTenantSafe();
 		}
-		PO.clearCrossTenantSafe();
 
 	}
 
@@ -440,7 +445,7 @@ public class CopyRecordToOtherClients {
 		boolean insertRecord = true;
 		MColumn mColumn = null;
 		for (MTable table : tables) {
-			
+
 			String tableName = table.getTableName();
 			if (! p_tablesVerifiedList.contains(tableName.toUpperCase())) {
 				continue;
