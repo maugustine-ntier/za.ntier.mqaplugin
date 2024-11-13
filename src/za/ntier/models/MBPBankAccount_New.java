@@ -52,10 +52,13 @@ public class MBPBankAccount_New extends MBPBankAccount {
 			return false;
 		}
 		if (getC_BPartner_ID() != 0) {
-			CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_BP_BankAccount_ID(),get_TableName());
+			MBPartner_New bp = new MBPartner_New(getCtx(),getC_BPartner_ID(),get_TrxName());
+			if (bp.isZZ_Copy_To_Tenants()) {
+				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_BP_BankAccount_ID(),get_TableName());
+			}
 		}
 		return true;
 	}
-	
+
 
 }

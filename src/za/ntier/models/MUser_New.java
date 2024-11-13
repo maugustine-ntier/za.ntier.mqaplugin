@@ -120,7 +120,10 @@ public class MUser_New extends MUser implements I_AD_User {
 		} 
 		if (!calledClass.equalsIgnoreCase("org.compiere.util.Login")) {
 			if (getC_BPartner_ID() != 0) {
-				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
+				MBPartner_New bp = new MBPartner_New(getCtx(),getC_BPartner_ID(),get_TrxName());
+				if (bp.isZZ_Copy_To_Tenants()) {
+					CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getAD_User_ID(),get_TableName());
+				}
 			}
 		}
 		return true;

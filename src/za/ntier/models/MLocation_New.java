@@ -3,9 +3,12 @@ package za.ntier.models;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.compiere.model.I_C_BPartner_Location;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCountry;
 import org.compiere.model.MLocation;
 import org.compiere.model.MRegion;
+import org.compiere.model.Query;
 import org.compiere.util.Env;
 import org.idempiere.cache.ImmutableIntPOCache;
 
@@ -60,7 +63,13 @@ public class MLocation_New extends MLocation {
 		if (!done) {
 			return false;
 		}
-		CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
+		MBPartnerLocation bpLoc = getBPLocation_Obj(getCtx(), getC_Location_ID(), get_TrxName());
+		if (bpLoc != null) {
+			MBPartner_New bp = new MBPartner_New(getCtx(),bpLoc.getC_BPartner_ID(),get_TrxName());
+			if (bp.isZZ_Copy_To_Tenants()) {
+				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
+			}
+		}
 		
 		return true;
 	}
@@ -119,6 +128,25 @@ public class MLocation_New extends MLocation {
 		}
 		return loc;
 	}
+	
+	public MBPartnerLocation getBPLocation_Obj (Properties ctx, int c_BPartner_ID, String trxName)
+	{		
+		final String whereClause = "C_Location_ID = ? AND AD_Client_ID=?";
+		MBPartnerLocation retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
+				.setParameters(c_BPartner_ID,Env.getAD_Client_ID(ctx))
+				.firstOnly();
+		return retValue;
+	}
+	
+	public static int [] getBPLocation_IDs (Properties ctx, int c_BPartner_ID, String trxName)
+	{		
+		final String whereClause = "C_Location_ID = ? AND AD_Client_ID=?";
+		int [] retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
+				.setParameters(c_BPartner_ID,Env.getAD_Client_ID(ctx))
+				.getIDs();
+		return retValue;
+	}
+	
 	
 	
 	
