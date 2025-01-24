@@ -1,6 +1,7 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.compiere.model.I_C_BPartner_Location;
@@ -13,7 +14,7 @@ import org.compiere.util.Env;
 import org.idempiere.cache.ImmutableIntPOCache;
 
 public class MLocation_New extends MLocation {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static ImmutableIntPOCache<Integer,MLocation_New> s_cache = new ImmutableIntPOCache<Integer,MLocation_New>(Table_Name, 100, 30);
 
@@ -63,17 +64,22 @@ public class MLocation_New extends MLocation {
 		if (!done) {
 			return false;
 		}
-		MBPartnerLocation bpLoc = getBPLocation_Obj(getCtx(), getC_Location_ID(), get_TrxName());
-		if (bpLoc != null) {
-			MBPartner_New bp = new MBPartner_New(getCtx(),bpLoc.getC_BPartner_ID(),get_TrxName());
-			if (bp.isZZ_Copy_To_Tenants()) {
-				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
+		/*
+		List<MBPartnerLocation> bpLocs = getBPLocation_Obj(getCtx(), getC_Location_ID(), get_TrxName());
+		if (bpLocs != null) {
+			for (MBPartnerLocation bpLoc:bpLocs) {
+				MBPartner_New bp = new MBPartner_New(getCtx(),bpLoc.getC_BPartner_ID(),get_TrxName());
+				if (bp.isZZ_Copy_To_Tenants()) {
+					CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_Location_ID(),get_TableName());
+					break;  // We only need one
+				}
 			}
 		}
-		
+		*/
+
 		return true;
 	}
-	
+
 	/**
 	 * 	Get Location from Cache (Immutable)
 	 *	@param C_Location_ID id
@@ -84,7 +90,7 @@ public class MLocation_New extends MLocation {
 	{
 		return get(Env.getCtx(), C_Location_ID, trxName);
 	}
-	
+
 	/**
 	 * 	Get Location from Cache (immutable)
 	 *  @param ctx context
@@ -112,7 +118,7 @@ public class MLocation_New extends MLocation {
 		}
 		return null;					//	not found
 	}	
-	
+
 	/**
 	 * Get updateable copy of MLocation from cache
 	 * @param ctx context
@@ -128,27 +134,27 @@ public class MLocation_New extends MLocation {
 		}
 		return loc;
 	}
-	
-	public MBPartnerLocation getBPLocation_Obj (Properties ctx, int c_BPartner_ID, String trxName)
+
+	public List<MBPartnerLocation> getBPLocation_Obj (Properties ctx, int c_BPartner_ID, String trxName)
 	{		
 		final String whereClause = "C_Location_ID = ? AND AD_Client_ID=?";
-		MBPartnerLocation retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
+		List <MBPartnerLocation> retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
 				.setParameters(c_BPartner_ID,Env.getAD_Client_ID(ctx))
-				.firstOnly();
+				.list();
 		return retValue;
 	}
-	
-	public static int [] getBPLocation_IDs (Properties ctx, int c_BPartner_ID, String trxName)
+
+	public static List <MBPartnerLocation> getBPLocation_IDs (Properties ctx, int c_BPartner_ID, String trxName)
 	{		
-		final String whereClause = "C_Location_ID = ? AND AD_Client_ID=?";
-		int [] retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
+		final String whereClause = "C_BPartner_ID = ? AND AD_Client_ID=?";
+		List <MBPartnerLocation>  retValue = new Query(ctx, I_C_BPartner_Location.Table_Name, whereClause, trxName)
 				.setParameters(c_BPartner_ID,Env.getAD_Client_ID(ctx))
-				.getIDs();
+				.list();
 		return retValue;
 	}
-	
-	
-	
-	
+
+
+
+
 
 }

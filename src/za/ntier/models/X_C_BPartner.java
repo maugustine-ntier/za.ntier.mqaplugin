@@ -35,7 +35,7 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20241113L;
+	private static final long serialVersionUID = 20250116L;
 
     /** Standard Constructor */
     public X_C_BPartner (Properties ctx, int C_BPartner_ID, String trxName)
@@ -62,8 +62,6 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
-			setZZ_Copy_To_Tenants (false);
-// N
         } */
     }
 
@@ -92,8 +90,6 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
-			setZZ_Copy_To_Tenants (false);
-// N
         } */
     }
 
@@ -122,8 +118,6 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
-			setZZ_Copy_To_Tenants (false);
-// N
         } */
     }
 
@@ -152,8 +146,6 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
-			setZZ_Copy_To_Tenants (false);
-// N
         } */
     }
 
@@ -1672,27 +1664,5 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
-	}
-
-	/** Set Copy To Other Tenants.
-		@param ZZ_Copy_To_Tenants Copy To Other Tenants
-	*/
-	public void setZZ_Copy_To_Tenants (boolean ZZ_Copy_To_Tenants)
-	{
-		set_Value (COLUMNNAME_ZZ_Copy_To_Tenants, Boolean.valueOf(ZZ_Copy_To_Tenants));
-	}
-
-	/** Get Copy To Other Tenants.
-		@return Copy To Other Tenants	  */
-	public boolean isZZ_Copy_To_Tenants()
-	{
-		Object oo = get_Value(COLUMNNAME_ZZ_Copy_To_Tenants);
-		if (oo != null)
-		{
-			 if (oo instanceof Boolean)
-				 return ((Boolean)oo).booleanValue();
-			return "Y".equals(oo);
-		}
-		return false;
 	}
 }

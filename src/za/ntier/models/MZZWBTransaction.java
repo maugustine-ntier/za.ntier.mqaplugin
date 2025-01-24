@@ -36,7 +36,7 @@ public class MZZWBTransaction extends X_ZZ_WB_Transaction  {
 	
 	public static int getCount(int wb_TransactionID,String trxName) {
 		int cnt = 0;
-		String SQL = "select count(*) from ZZ_WB_Transaction m where m.WB_TransactionID = ?";
+		String SQL = "select count(*) from ZZ_WB_Transaction m where m.WB_TransactionID = ? and isActive = 'Y'";
 		cnt = DB.getSQLValue(trxName, SQL,wb_TransactionID );
 		return cnt;
 		

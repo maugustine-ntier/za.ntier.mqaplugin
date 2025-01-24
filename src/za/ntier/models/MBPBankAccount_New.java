@@ -7,8 +7,11 @@ import org.compiere.model.MBPBankAccount;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MLocation;
 import org.compiere.model.MUser;
+import org.compiere.util.Env;
 
-public class MBPBankAccount_New extends MBPBankAccount {
+public class MBPBankAccount_New extends MBPBankAccount implements za.ntier.models.I_C_BP_BankAccount{
+
+	private static final long serialVersionUID = 1L;
 
 	public MBPBankAccount_New(Properties ctx, String C_BP_BankAccount_UU, String trxName) {
 		super(ctx, C_BP_BankAccount_UU, trxName);
@@ -46,19 +49,87 @@ public class MBPBankAccount_New extends MBPBankAccount {
 	}
 
 	@Override
-	protected boolean afterSave(boolean newRecord, boolean success) {
-		boolean done =  super.afterSave(newRecord, success);
-		if (!done) {
+	protected boolean beforeSave(boolean newRecord) {
+		// Only a Manager - OPS Finance and Manager - SDL Finance can approve/unapprove a created bank record.
+		//Snr Admin - Finance and Admin - Finance
+		if (getComments() != null && getComments().trim().equals("Initial Import")) {
+			return super.beforeSave(newRecord);
+		}
+		if (newRecord && (Env.getAD_Role_ID(getCtx()) != 1000003 && Env.getAD_Role_ID(getCtx()) != 1000002)) {
+			log.saveError("Error", "Only Snr Admin Finance or Admin Finance can create new Bank Accounts ");
 			return false;
 		}
-		if (getC_BPartner_ID() != 0) {
-			MBPartner_New bp = new MBPartner_New(getCtx(),getC_BPartner_ID(),get_TrxName());
-			if (bp.isZZ_Copy_To_Tenants()) {
-				CopyRecordToOtherClients copyRecordToOtherClients = new CopyRecordToOtherClients(getCtx(),get_TrxName(),getAD_Client_ID(),getC_BP_BankAccount_ID(),get_TableName());
-			}
+		if ((!newRecord || (newRecord && isZZ_Approve())) && is_ValueChanged(COLUMNNAME_ZZ_Approve) && Env.getAD_Role_ID(getCtx()) != 1000004 && Env.getAD_Role_ID(getCtx()) != 1000005) {
+			log.saveError("Error", "Only SDL/Ops Finance Manager can approve/unapprove a Bank Account Record ");
+			return false;
 		}
-		return true;
+		return super.beforeSave(newRecord);
 	}
+
+	@Override
+	public void setComments(String Comments) {
+		set_Value (COLUMNNAME_Comments, Comments);		
+	}
+
+	@Override
+	public String getComments() {
+		return (String)get_Value(COLUMNNAME_Comments);
+	}
+
+	/** Set Approve.
+	@param ZZ_Approve Approve
+	 */
+	public void setZZ_Approve (boolean ZZ_Approve)
+	{
+		set_Value (COLUMNNAME_ZZ_Approve, Boolean.valueOf(ZZ_Approve));
+	}
+
+	/** Get Approve.
+	@return Approve	  */
+	public boolean isZZ_Approve()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Approve);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Branch Name.
+	@param ZZ_Branch_Name Branch Name
+	 */
+	public void setZZ_Branch_Name (String ZZ_Branch_Name)
+	{
+		set_Value (COLUMNNAME_ZZ_Branch_Name, ZZ_Branch_Name);
+	}
+
+	/** Get Branch Name.
+	@return Branch Name	  */
+	public String getZZ_Branch_Name()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Branch_Name);
+	}
+
+	/** Set Branch Number.
+	@param ZZ_Branch_Number Branch Number
+	 */
+	public void setZZ_Branch_Number (String ZZ_Branch_Number)
+	{
+		set_Value (COLUMNNAME_ZZ_Branch_Number, ZZ_Branch_Number);
+	}
+
+	/** Get Branch Number.
+	@return Branch Number	  */
+	public String getZZ_Branch_Number()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Branch_Number);
+	}
+
+
+
 
 
 }

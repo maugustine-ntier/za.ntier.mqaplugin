@@ -66,30 +66,36 @@ public class CreateFromInvoice extends SvrProcess
 		for (int i = 0; i < para.length; i++)
 		{
 			String name = para[i].getParameterName();
-			if (para[i].getParameter() == null)
+			if (para[i].getParameter() == null) {
 				;
-			else if (name.equals("C_Invoice_ID"))
+			} else if (name.equals("C_Invoice_ID")) {
 				p_C_Invoice_ID = para[i].getParameterAsInt();
-			else
+			} else {
 				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
+			}
 		}
 	}
 
 	@Override
 	protected String doIt() throws Exception {
-		if (p_C_Invoice_ID == 0)
+		if (p_C_Invoice_ID == 0) {
 			throw new AdempiereUserError("@NotFound@ @C_Invoice_ID@");
+		}
 		
-		if (getProcessInfo().getAD_InfoWindow_ID() > 0)
+		if (getProcessInfo().getAD_InfoWindow_ID() > 0) {
 			return createLines();
-		else
+		} else {
 			throw new AdempiereException("@NotSupported@");
+		}
 	}
 	
 	private String createLines() {
+		//CacheMgt.get().reset("C_Order_PO_Ref_V");
 		// Get Invoice
 		MInvoice_New invoice = new MInvoice_New(getCtx(), p_C_Invoice_ID, get_TrxName());  // Martin changed for the batch no
-		if (log.isLoggable(Level.CONFIG)) log.config(invoice.toString());
+		if (log.isLoggable(Level.CONFIG)) {
+			log.config(invoice.toString());
+		}
 		
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT t.T_Selection_ID, t.ViewID, v.AD_Table_ID, v.Line, v.C_Order_ID, v.M_InOut_ID, v.M_RMA_ID, ");
@@ -109,8 +115,9 @@ public class CreateFromInvoice extends SvrProcess
 			while (rs.next())
 			{
 				int T_Selection_ID = rs.getInt("T_Selection_ID");				
-				if (!selectionIDList.contains(T_Selection_ID))
+				if (!selectionIDList.contains(T_Selection_ID)) {
 					selectionIDList.add(T_Selection_ID);
+				}
 				
 				String ColumnName = "AD_Table_ID";
 				String key = ColumnName + "_" + T_Selection_ID;
@@ -188,21 +195,23 @@ public class CreateFromInvoice extends SvrProcess
 				String Value_String = rs.getString("Value_String");
 				
 				Object Value_Number = null;
-				if (ColumnName.toUpperCase().endsWith("_ID"))
+				if (ColumnName.toUpperCase().endsWith("_ID")) {
 					Value_Number = rs.getInt("Value_Number");
-				else
+				} else {
 					Value_Number = rs.getBigDecimal("Value_Number");
+				}
 				
 				Timestamp Value_Date = rs.getTimestamp("Value_Date");
 				
 				String key = ColumnName + "_" + T_Selection_ID;
 				Object value = null;
-				if (Value_String != null)
+				if (Value_String != null) {
 					value = Value_String;
-				else if (Value_Number != null)
+				} else if (Value_Number != null) {
 					value = Value_Number;
-				else if (Value_Date != null)
+				} else if (Value_Date != null) {
 					value = Value_Date;
+				}
 				selectionValueMap.put(key, value);
 			}
 		}
@@ -292,9 +301,11 @@ public class CreateFromInvoice extends SvrProcess
 			}
 			QtyEntered = QtyEntered.setScale(precision, RoundingMode.HALF_DOWN);
 			//
-			if (log.isLoggable(Level.FINE)) log.fine("Line QtyEntered=" + QtyEntered
-					+ ", Product=" + M_Product_ID 
-					+ ", OrderLine=" + C_OrderLine_ID + ", InOutLine_ID=" + M_InOutLine_ID);
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Line QtyEntered=" + QtyEntered
+						+ ", Product=" + M_Product_ID 
+						+ ", OrderLine=" + C_OrderLine_ID + ", InOutLine_ID=" + M_InOutLine_ID);
+			}
 			
 			//	Create new Invoice Line
 			invoice.createLineFrom(C_OrderLine_ID, M_InOutLine_ID, M_RMALine_ID, M_Product_ID, C_UOM_ID, QtyEntered);

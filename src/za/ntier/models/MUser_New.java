@@ -14,9 +14,6 @@ import org.compiere.model.X_C_BPartner;
 import org.compiere.util.Env;
 import org.idempiere.cache.ImmutableIntPOCache;
 
-import za.co.ntier.twilio.models.X_TW_Message;
-import za.co.ntier.utils.SendMessage;
-
 public class MUser_New extends MUser implements I_AD_User {
 
 	private static final long serialVersionUID = -4202021985605290293L;
@@ -95,18 +92,20 @@ public class MUser_New extends MUser implements I_AD_User {
 	@Override
 	protected boolean afterSave(boolean newRecord, boolean success) {
 
-		try {
+		/* try {
 			String retMess = null;
 			if (isEmployee() && getPhone() != null && !(getPhone().equals("")) && is_ValueChanged(I_AD_User.COLUMNNAME_Phone)) {
 				retMess = SendMessage.sendOptInMessage(getCtx(), Env.getAD_Client_ID(getCtx()), X_TW_Message.TWILIO_MESSAGE_TYPE_Whatsapp, getPhone());
 			}
 		} catch (Exception e) {
 			return false;
-		}		
+		}
+		*/		
 		boolean done = super.afterSave(newRecord, success);
 		if (!done) {
 			return false;
 		}
+		/*
 		String calledClass = "";
 		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace(); 
 		for (int i = 1; i < stackTraceElements.length && i<=10; i++) { 
@@ -126,6 +125,7 @@ public class MUser_New extends MUser implements I_AD_User {
 				}
 			}
 		}
+		*/
 		return true;
 	}
 

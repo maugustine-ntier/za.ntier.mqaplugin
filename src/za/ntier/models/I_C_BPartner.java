@@ -981,13 +981,4 @@ s business as a percentage
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
-
-    /** Column name ZZ_Copy_To_Tenants */
-    public static final String COLUMNNAME_ZZ_Copy_To_Tenants = "ZZ_Copy_To_Tenants";
-
-	/** Set Copy To Other Tenants	  */
-	public void setZZ_Copy_To_Tenants (boolean ZZ_Copy_To_Tenants);
-
-	/** Get Copy To Other Tenants	  */
-	public boolean isZZ_Copy_To_Tenants();
 }

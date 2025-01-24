@@ -462,8 +462,8 @@ public class NtierEventHandler extends AbstractEventHandler implements ManagedSe
 				userList.add(ii);
 				//
 				MUser_New to = MUser_New.get (r.getCtx(), AD_User_ID);
-				if ((X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType)) && 
-						(to.getOpt_In_Date() != null && (to.getOpt_Out_Date() == null || (to.getOpt_In_Date().compareTo(to.getOpt_Out_Date())) > 0 )))
+				if ((X_AD_User.NOTIFICATIONTYPE_WhatsappPlusEmail.equals(NotificationType) || X_AD_User.NOTIFICATIONTYPE_Whatsapp.equals(NotificationType))) 
+					//	&& 						(to.getOpt_In_Date() != null && (to.getOpt_Out_Date() == null || (to.getOpt_In_Date().compareTo(to.getOpt_Out_Date())) > 0 )))
 				{
 					String priorityValue = "";
 					if (r.getPriority() != null) {						
