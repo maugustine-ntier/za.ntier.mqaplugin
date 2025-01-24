@@ -31,7 +31,31 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 	@Override
 	protected boolean beforeSave(boolean newRecord) {
 		String roles = MSysConfig.getValue("FINACE_ROLES");
-		checkRole(roles);
+		if (newRecord) {
+			if (checkRole(roles)) {
+				if (!(getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted))) {
+					log.saveError("Error", "Status must be drafted for New Records");
+					return false;
+				}
+			} else {
+				log.saveError("Error", "Only Finance Roles are allowed to create Invoice Batches.");
+				return false;
+			}
+		} else {
+			if (is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
+				if (!checkRole(roles)) {
+					log.saveError("Error", "Only Finance Roles can change to In Progress");
+					return false;
+				}
+			}
+			roles = MSysConfig.getValue("MANAGER_OPS_SDL_ROLES");
+			if (is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Completed)) {
+				if (!checkRole(roles)) {
+					log.saveError("Error", "Only Manager OPS/SDL Roles can change to Completed");
+					return false;
+				}
+			}
+		}
 		
 		return super.beforeSave(newRecord);
 	}
