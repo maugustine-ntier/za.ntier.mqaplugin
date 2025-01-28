@@ -56,6 +56,16 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setProcessed (false);
 			setSalesRep_ID (0);
+			setZZ_Account_Reconned (false);
+// N
+			setZZ_Auth_PO_Order (false);
+// N
+			setZZ_Calcs_Checked (false);
+// N
+			setZZ_Cred_Bank_Dets_Verified (false);
+// N
+			setZZ_GL_Allocation_Checked (false);
+// N
         } */
     }
 
@@ -78,6 +88,16 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setProcessed (false);
 			setSalesRep_ID (0);
+			setZZ_Account_Reconned (false);
+// N
+			setZZ_Auth_PO_Order (false);
+// N
+			setZZ_Calcs_Checked (false);
+// N
+			setZZ_Cred_Bank_Dets_Verified (false);
+// N
+			setZZ_GL_Allocation_Checked (false);
+// N
         } */
     }
 
@@ -100,6 +120,16 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setProcessed (false);
 			setSalesRep_ID (0);
+			setZZ_Account_Reconned (false);
+// N
+			setZZ_Auth_PO_Order (false);
+// N
+			setZZ_Calcs_Checked (false);
+// N
+			setZZ_Cred_Bank_Dets_Verified (false);
+// N
+			setZZ_GL_Allocation_Checked (false);
+// N
         } */
     }
 
@@ -122,6 +152,16 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setProcessed (false);
 			setSalesRep_ID (0);
+			setZZ_Account_Reconned (false);
+// N
+			setZZ_Auth_PO_Order (false);
+// N
+			setZZ_Calcs_Checked (false);
+// N
+			setZZ_Cred_Bank_Dets_Verified (false);
+// N
+			setZZ_GL_Allocation_Checked (false);
+// N
         } */
     }
 
@@ -434,6 +474,116 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Account Reconciled / O/S Invoices Verified.
+		@param ZZ_Account_Reconned Account Reconciled / O/S Invoices Verified
+	*/
+	public void setZZ_Account_Reconned (boolean ZZ_Account_Reconned)
+	{
+		set_Value (COLUMNNAME_ZZ_Account_Reconned, Boolean.valueOf(ZZ_Account_Reconned));
+	}
+
+	/** Get Account Reconciled / O/S Invoices Verified.
+		@return Account Reconciled / O/S Invoices Verified	  */
+	public boolean isZZ_Account_Reconned()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Account_Reconned);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Authorized Purchase Order/SLA Attached.
+		@param ZZ_Auth_PO_Order Authorized Purchase Order/SLA Attached
+	*/
+	public void setZZ_Auth_PO_Order (boolean ZZ_Auth_PO_Order)
+	{
+		set_Value (COLUMNNAME_ZZ_Auth_PO_Order, Boolean.valueOf(ZZ_Auth_PO_Order));
+	}
+
+	/** Get Authorized Purchase Order/SLA Attached.
+		@return Authorized Purchase Order/SLA Attached	  */
+	public boolean isZZ_Auth_PO_Order()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Auth_PO_Order);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Calculation Checked.
+		@param ZZ_Calcs_Checked Calculation Checked
+	*/
+	public void setZZ_Calcs_Checked (boolean ZZ_Calcs_Checked)
+	{
+		set_Value (COLUMNNAME_ZZ_Calcs_Checked, Boolean.valueOf(ZZ_Calcs_Checked));
+	}
+
+	/** Get Calculation Checked.
+		@return Calculation Checked	  */
+	public boolean isZZ_Calcs_Checked()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Calcs_Checked);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Creditor ID &amp; Banking Details Verified.
+		@param ZZ_Cred_Bank_Dets_Verified Creditor ID &amp; Banking Details Verified
+	*/
+	public void setZZ_Cred_Bank_Dets_Verified (boolean ZZ_Cred_Bank_Dets_Verified)
+	{
+		set_Value (COLUMNNAME_ZZ_Cred_Bank_Dets_Verified, Boolean.valueOf(ZZ_Cred_Bank_Dets_Verified));
+	}
+
+	/** Get Creditor ID &amp; Banking Details Verified.
+		@return Creditor ID &amp; Banking Details Verified	  */
+	public boolean isZZ_Cred_Bank_Dets_Verified()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Cred_Bank_Dets_Verified);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set GL Allocation Checked.
+		@param ZZ_GL_Allocation_Checked GL Allocation Checked
+	*/
+	public void setZZ_GL_Allocation_Checked (boolean ZZ_GL_Allocation_Checked)
+	{
+		set_Value (COLUMNNAME_ZZ_GL_Allocation_Checked, Boolean.valueOf(ZZ_GL_Allocation_Checked));
+	}
+
+	/** Get GL Allocation Checked.
+		@return GL Allocation Checked	  */
+	public boolean isZZ_GL_Allocation_Checked()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_GL_Allocation_Checked);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Policy Procedure Checklist.
