@@ -43,7 +43,7 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 		if (!checkRoleSetup(roles,FINACE_ROLES)) {
 			return false;
 		}
-		
+
 		int role_ID = Env.getAD_Role_ID(getCtx());
 		if (newRecord) {
 			if (Roles.checkRole(roles,role_ID)) {
@@ -73,13 +73,13 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 				}
 			}
 			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted)) {
-				if (!Roles.checkRole(roles,role_ID)) {
+				if (Roles.checkRole(roles,role_ID)) {
 					log.saveError("Error", Msg.getMsg(getCtx(), "MANAGERINVOICEBATCHDRAFT")); //"Only Manager OPS/SDL Roles can change to Completed");
 					return false;
 				}
 			}
 		}
-		
+
 		return super.beforeSave(newRecord);
 	}
 
@@ -91,8 +91,23 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 		return true;
 	}
 
+	/** Set Policy Procedure Checklist.
+	@param ZZ_Policy_Procedure_Ck Policy Procedure Checklist
+	 */
+	public void setZZ_Policy_Procedure_Ck (Object ZZ_Policy_Procedure_Ck)
+	{
+		set_Value (COLUMNNAME_ZZ_Policy_Procedure_Ck, ZZ_Policy_Procedure_Ck);
+	}
 
-	
-	
+	/** Get Policy Procedure Checklist.
+	@return Policy Procedure Checklist	  */
+	public Object getZZ_Policy_Procedure_Ck()
+	{
+		return get_Value(COLUMNNAME_ZZ_Policy_Procedure_Ck);
+	}
+
+
+
+
 
 }

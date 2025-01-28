@@ -42,6 +42,8 @@ import org.osgi.service.component.annotations.Component;
 		 service = org.adempiere.base.ILookupFactory.class
 		 )
 public class MyLookupFactory implements ILookupFactory{
+	
+	public static final int RadioGroupListVertical = 1000003;
 
 	@Override
 	public Lookup getLookup(GridFieldVO gridFieldVO) {
@@ -70,7 +72,7 @@ public class MyLookupFactory implements ILookupFactory{
 		{
 			lookup = new MPaymentLookup (gridFieldVO.ctx, gridFieldVO.WindowNo, gridFieldVO.ValidationCode);
 		}
-		else if (DisplayType.isLookup(gridFieldVO.displayType) && gridFieldVO.lookupInfo != null)
+		else if ((isLookup(gridFieldVO) || DisplayType.isLookup(gridFieldVO.displayType)) && gridFieldVO.lookupInfo != null)  // Martin added for radio group
 		{
 			lookup = new MLookup (gridFieldVO.lookupInfo, gridFieldVO.TabNo);
 		}
@@ -84,6 +86,7 @@ public class MyLookupFactory implements ILookupFactory{
 			|| gridFieldVO.displayType == Account
 			|| gridFieldVO.displayType == PAttribute
 			|| gridFieldVO.displayType == Payment
+			|| gridFieldVO.displayType == RadioGroupListVertical
 			|| DisplayType.isLookup(gridFieldVO.displayType)) {
 			return true;
 		}
@@ -99,6 +102,7 @@ public class MyLookupFactory implements ILookupFactory{
 				|| displayType == Account
 				|| displayType == PAttribute
 				|| displayType == Payment
+						|| displayType == RadioGroupListVertical
 				|| DisplayType.isLookup(displayType)) {
 			return true;
 		}

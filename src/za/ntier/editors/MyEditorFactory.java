@@ -55,6 +55,8 @@ import org.compiere.model.GridTab;
 import org.compiere.util.DisplayType;
 import org.osgi.service.component.annotations.Component;
 
+import za.ntier.webui.editor.WRadioGroupEditorVert;
+
 /**
  * Default implementation of {@link IEditorFactory}
  * @author hengsin
@@ -66,6 +68,8 @@ import org.osgi.service.component.annotations.Component;
 		 service = org.adempiere.webui.factory.IEditorFactory.class
 		 )
 public class MyEditorFactory implements IEditorFactory {
+	
+	public static final int RadiogroupListVert = 1000003;
 
 	@Override
 	public WEditor getEditor(GridTab gridTab, GridField gridField,
@@ -255,7 +259,10 @@ public class MyEditorFactory implements IEditorFactory {
         {
         	editor = new WJsonEditor(gridField, tableEditor, editorConfiguration);
         }
-        else
+        else   if (displayType == RadiogroupListVert)
+        {
+        	editor = new WRadioGroupEditorVert(gridField, tableEditor, editorConfiguration);
+        } else
         {
             editor = new WUnknownEditor(gridField, tableEditor, editorConfiguration);
         }

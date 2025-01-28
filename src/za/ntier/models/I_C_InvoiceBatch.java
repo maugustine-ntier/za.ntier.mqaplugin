@@ -276,6 +276,15 @@ public interface I_C_InvoiceBatch
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Policy_Procedure_Ck */
+    public static final String COLUMNNAME_ZZ_Policy_Procedure_Ck = "ZZ_Policy_Procedure_Ck";
+
+	/** Set Policy Procedure Checklist	  */
+	public void setZZ_Policy_Procedure_Ck (Object ZZ_Policy_Procedure_Ck);
+
+	/** Get Policy Procedure Checklist	  */
+	public Object getZZ_Policy_Procedure_Ck();
+
     /** Column name ZZ_Status */
     public static final String COLUMNNAME_ZZ_Status = "ZZ_Status";
 

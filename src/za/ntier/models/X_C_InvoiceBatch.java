@@ -35,7 +35,7 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250123L;
+	private static final long serialVersionUID = 20250128L;
 
     /** Standard Constructor */
     public X_C_InvoiceBatch (Properties ctx, int C_InvoiceBatch_ID, String trxName)
@@ -434,6 +434,21 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Policy Procedure Checklist.
+		@param ZZ_Policy_Procedure_Ck Policy Procedure Checklist
+	*/
+	public void setZZ_Policy_Procedure_Ck (Object ZZ_Policy_Procedure_Ck)
+	{
+		set_Value (COLUMNNAME_ZZ_Policy_Procedure_Ck, ZZ_Policy_Procedure_Ck);
+	}
+
+	/** Get Policy Procedure Checklist.
+		@return Policy Procedure Checklist	  */
+	public Object getZZ_Policy_Procedure_Ck()
+	{
+				return get_Value(COLUMNNAME_ZZ_Policy_Procedure_Ck);
 	}
 
 	/** Completed = C */
