@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Component;
 
 		 property= {"service.ranking:Integer=200"},
 		 service = org.adempiere.base.ILookupFactory.class
-		 )
+		 )  
 public class MyLookupFactory implements ILookupFactory{
 	
 	public static final int RadioGroupListVertical = 1000003;

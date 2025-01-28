@@ -537,6 +537,7 @@ public class WRadioGroupEditorVert extends WEditor implements ContextMenuListene
 		 */
 		private void newRadioGroup() {
 			radioGroup = new Radiogroup();
+			 radioGroup.setOrient("vertical"); // Force vertical orientation
 		}
 		
 		public boolean isEnabled() {

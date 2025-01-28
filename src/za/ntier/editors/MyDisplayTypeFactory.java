@@ -7,14 +7,12 @@ import org.adempiere.base.IDisplayTypeFactory;
 import org.compiere.db.AdempiereDatabase;
 import org.compiere.db.Database;
 import org.compiere.util.DB;
-import org.compiere.util.DisplayType;
 import org.compiere.util.Language;
 import org.osgi.service.component.annotations.Component;
 
-
 @Component(
 
-		 property= {"service.ranking:Integer=200"},
+		 property= {"service.ranking:Integer=200"}, 
 		 service = org.adempiere.base.IDisplayTypeFactory.class
 		 )
 public class MyDisplayTypeFactory implements IDisplayTypeFactory {
@@ -24,7 +22,7 @@ public class MyDisplayTypeFactory implements IDisplayTypeFactory {
 	public boolean isID(int displayType) {
 		// TODO Auto-generated method stub
 		return false;
-	}
+	} 
 
 	@Override
 	public boolean isList(int displayType) {
