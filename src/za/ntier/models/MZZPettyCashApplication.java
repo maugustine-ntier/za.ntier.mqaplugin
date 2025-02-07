@@ -1,15 +1,14 @@
-package za.ntier;
+package za.ntier.models;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempiere.webui.window.Dialog;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
-
-import za.ntier.models.X_ZZ_Petty_Cash_Application;
 
 public class MZZPettyCashApplication extends X_ZZ_Petty_Cash_Application implements DocAction,DocOptions {
 
@@ -142,8 +141,11 @@ public class MZZPettyCashApplication extends X_ZZ_Petty_Cash_Application impleme
 
 	@Override
 	public int getDoc_User_ID() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (getDocStatus().equals(DocumentEngine.STATUS_Drafted)) {
+			return getLine_Manager_ID();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override

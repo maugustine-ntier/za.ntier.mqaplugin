@@ -216,6 +216,17 @@ public interface I_ZZ_Petty_Cash_Application
 	  */
 	public boolean isApproved();
 
+    /** Column name Line_Manager_ID */
+    public static final String COLUMNNAME_Line_Manager_ID = "Line_Manager_ID";
+
+	/** Set Line Manager	  */
+	public void setLine_Manager_ID (int Line_Manager_ID);
+
+	/** Get Line Manager	  */
+	public int getLine_Manager_ID();
+
+	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException;
+
     /** Column name Name */
     public static final String COLUMNNAME_Name = "Name";
 

@@ -1,4 +1,4 @@
-package za.ntier;
+package za.ntier.models;
 
 import java.sql.ResultSet;
 

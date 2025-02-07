@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250203L;
+	private static final long serialVersionUID = 20250204L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)
@@ -50,6 +50,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // DR
 			setIsApproved (false);
 // N
+			setLine_Manager_ID (0);
 			setName (null);
 			setProcessed (false);
 // N
@@ -74,6 +75,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // DR
 			setIsApproved (false);
 // N
+			setLine_Manager_ID (0);
 			setName (null);
 			setProcessed (false);
 // N
@@ -98,6 +100,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // DR
 			setIsApproved (false);
 // N
+			setLine_Manager_ID (0);
 			setName (null);
 			setProcessed (false);
 // N
@@ -122,6 +125,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // DR
 			setIsApproved (false);
 // N
+			setLine_Manager_ID (0);
 			setName (null);
 			setProcessed (false);
 // N
@@ -402,6 +406,33 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getLine_Manager_ID(), get_TrxName());
+	}
+
+	/** Set Line Manager.
+		@param Line_Manager_ID Line Manager
+	*/
+	public void setLine_Manager_ID (int Line_Manager_ID)
+	{
+		if (Line_Manager_ID < 1)
+			set_Value (COLUMNNAME_Line_Manager_ID, null);
+		else
+			set_Value (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
+	}
+
+	/** Get Line Manager.
+		@return Line Manager	  */
+	public int getLine_Manager_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line_Manager_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Name.
