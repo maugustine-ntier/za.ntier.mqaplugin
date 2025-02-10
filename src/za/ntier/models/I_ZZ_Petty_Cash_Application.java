@@ -304,6 +304,24 @@ public interface I_ZZ_Petty_Cash_Application
 	  */
 	public String getValue();
 
+    /** Column name ZZ_DocAction */
+    public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
+
+	/** Set Document Action	  */
+	public void setZZ_DocAction (String ZZ_DocAction);
+
+	/** Get Document Action	  */
+	public String getZZ_DocAction();
+
+    /** Column name ZZ_DocStatus */
+    public static final String COLUMNNAME_ZZ_DocStatus = "ZZ_DocStatus";
+
+	/** Set Document Status	  */
+	public void setZZ_DocStatus (String ZZ_DocStatus);
+
+	/** Get Document Status	  */
+	public String getZZ_DocStatus();
+
     /** Column name ZZ_Petty_Cash_Application_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Application_ID = "ZZ_Petty_Cash_Application_ID";
 

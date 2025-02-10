@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250204L;
+	private static final long serialVersionUID = 20250210L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)
@@ -44,6 +44,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
 			setC_DocType_ID (0);
+// 0
 			setDocAction (null);
 // CO
 			setDocStatus (null);
@@ -51,11 +52,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setIsApproved (false);
 // N
 			setLine_Manager_ID (0);
-			setName (null);
 			setProcessed (false);
 // N
 			setProcessing (false);
 // N
+			setZZ_DocAction (null);
+// SU
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -69,6 +71,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
 			setC_DocType_ID (0);
+// 0
 			setDocAction (null);
 // CO
 			setDocStatus (null);
@@ -76,11 +79,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setIsApproved (false);
 // N
 			setLine_Manager_ID (0);
-			setName (null);
 			setProcessed (false);
 // N
 			setProcessing (false);
 // N
+			setZZ_DocAction (null);
+// SU
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -94,6 +98,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
 			setC_DocType_ID (0);
+// 0
 			setDocAction (null);
 // CO
 			setDocStatus (null);
@@ -101,11 +106,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setIsApproved (false);
 // N
 			setLine_Manager_ID (0);
-			setName (null);
 			setProcessed (false);
 // N
 			setProcessing (false);
 // N
+			setZZ_DocAction (null);
+// SU
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -119,6 +125,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
 			setC_DocType_ID (0);
+// 0
 			setDocAction (null);
 // CO
 			setDocStatus (null);
@@ -126,11 +133,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 			setIsApproved (false);
 // N
 			setLine_Manager_ID (0);
-			setName (null);
 			setProcessed (false);
 // N
 			setProcessing (false);
 // N
+			setZZ_DocAction (null);
+// SU
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -529,6 +537,50 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
+	}
+
+	/** Approve = AP */
+	public static final String ZZ_DOCACTION_Approve = "AP";
+	/** Submit to Line Manager = SU */
+	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
+	/** Set Document Action.
+		@param ZZ_DocAction Document Action
+	*/
+	public void setZZ_DocAction (String ZZ_DocAction)
+	{
+
+		set_Value (COLUMNNAME_ZZ_DocAction, ZZ_DocAction);
+	}
+
+	/** Get Document Action.
+		@return Document Action	  */
+	public String getZZ_DocAction()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
+	}
+
+	/** Approved = AP */
+	public static final String ZZ_DOCSTATUS_Approved = "AP";
+	/** Draft = DR */
+	public static final String ZZ_DOCSTATUS_Draft = "DR";
+	/** In Progress = IP */
+	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Submitted = SU */
+	public static final String ZZ_DOCSTATUS_Submitted = "SU";
+	/** Set Document Status.
+		@param ZZ_DocStatus Document Status
+	*/
+	public void setZZ_DocStatus (String ZZ_DocStatus)
+	{
+
+		set_Value (COLUMNNAME_ZZ_DocStatus, ZZ_DocStatus);
+	}
+
+	/** Get Document Status.
+		@return Document Status	  */
+	public String getZZ_DocStatus()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
 	/** Set Petty Cash Application.
