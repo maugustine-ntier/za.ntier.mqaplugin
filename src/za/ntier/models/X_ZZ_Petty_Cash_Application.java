@@ -19,6 +19,7 @@ package za.ntier.models;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
@@ -33,7 +34,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250210L;
+	private static final long serialVersionUID = 20250211L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)
@@ -43,6 +44,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
+// 1000000
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
@@ -70,6 +72,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
+// 1000000
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
@@ -97,6 +100,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
+// 1000000
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
@@ -124,6 +128,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
+// 1000000
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
@@ -539,8 +544,72 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 		return (String)get_Value(COLUMNNAME_Value);
 	}
 
+	/** Set Date Approved.
+		@param ZZ_Date_Approved Date Approved
+	*/
+	public void setZZ_Date_Approved (Timestamp ZZ_Date_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Approved, ZZ_Date_Approved);
+	}
+
+	/** Get Date Approved.
+		@return Date Approved	  */
+	public Timestamp getZZ_Date_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Approved);
+	}
+
+	/** Set Date Completed.
+		@param ZZ_Date_Completed Date Completed
+	*/
+	public void setZZ_Date_Completed (Timestamp ZZ_Date_Completed)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Completed, ZZ_Date_Completed);
+	}
+
+	/** Get Date Completed.
+		@return Date Completed	  */
+	public Timestamp getZZ_Date_Completed()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Completed);
+	}
+
+	/** Set Date LM Approved.
+		@param ZZ_Date_LM_Approved Date LM Approved
+	*/
+	public void setZZ_Date_LM_Approved (Timestamp ZZ_Date_LM_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_LM_Approved, ZZ_Date_LM_Approved);
+	}
+
+	/** Get Date LM Approved.
+		@return Date LM Approved	  */
+	public Timestamp getZZ_Date_LM_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_LM_Approved);
+	}
+
+	/** Set Date Submitted.
+		@param ZZ_Date_Submitted Date Submitted
+	*/
+	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Submitted, ZZ_Date_Submitted);
+	}
+
+	/** Get Date Submitted.
+		@return Date Submitted	  */
+	public Timestamp getZZ_Date_Submitted()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Submitted);
+	}
+
 	/** Approve = AP */
 	public static final String ZZ_DOCACTION_Approve = "AP";
+	/** Complete = CO */
+	public static final String ZZ_DOCACTION_Complete = "CO";
+	/** Final Approval = FA */
+	public static final String ZZ_DOCACTION_FinalApproval = "FA";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -561,6 +630,8 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
+	/** Completed = CO */
+	public static final String ZZ_DOCSTATUS_Completed = "CO";
 	/** Draft = DR */
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */

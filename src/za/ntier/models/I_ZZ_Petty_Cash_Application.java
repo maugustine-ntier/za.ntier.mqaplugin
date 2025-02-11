@@ -304,6 +304,42 @@ public interface I_ZZ_Petty_Cash_Application
 	  */
 	public String getValue();
 
+    /** Column name ZZ_Date_Approved */
+    public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
+
+	/** Set Date Approved	  */
+	public void setZZ_Date_Approved (Timestamp ZZ_Date_Approved);
+
+	/** Get Date Approved	  */
+	public Timestamp getZZ_Date_Approved();
+
+    /** Column name ZZ_Date_Completed */
+    public static final String COLUMNNAME_ZZ_Date_Completed = "ZZ_Date_Completed";
+
+	/** Set Date Completed	  */
+	public void setZZ_Date_Completed (Timestamp ZZ_Date_Completed);
+
+	/** Get Date Completed	  */
+	public Timestamp getZZ_Date_Completed();
+
+    /** Column name ZZ_Date_LM_Approved */
+    public static final String COLUMNNAME_ZZ_Date_LM_Approved = "ZZ_Date_LM_Approved";
+
+	/** Set Date LM Approved	  */
+	public void setZZ_Date_LM_Approved (Timestamp ZZ_Date_LM_Approved);
+
+	/** Get Date LM Approved	  */
+	public Timestamp getZZ_Date_LM_Approved();
+
+    /** Column name ZZ_Date_Submitted */
+    public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
+
+	/** Set Date Submitted	  */
+	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted);
+
+	/** Get Date Submitted	  */
+	public Timestamp getZZ_Date_Submitted();
+
     /** Column name ZZ_DocAction */
     public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
 
