@@ -331,6 +331,24 @@ public interface I_ZZ_Petty_Cash_Application
 	/** Get Date LM Approved	  */
 	public Timestamp getZZ_Date_LM_Approved();
 
+    /** Column name ZZ_Date_Not_Approved_by_LM */
+    public static final String COLUMNNAME_ZZ_Date_Not_Approved_by_LM = "ZZ_Date_Not_Approved_by_LM";
+
+	/** Set Date Not Approved by LM	  */
+	public void setZZ_Date_Not_Approved_by_LM (Timestamp ZZ_Date_Not_Approved_by_LM);
+
+	/** Get Date Not Approved by LM	  */
+	public Timestamp getZZ_Date_Not_Approved_by_LM();
+
+    /** Column name ZZ_Date_Not_Approved_by_Snr_Adm_Fin */
+    public static final String COLUMNNAME_ZZ_Date_Not_Approved_by_Snr_Adm_Fin = "ZZ_Date_Not_Approved_by_Snr_Adm_Fin";
+
+	/** Set Date Not Approved by Snr Admin Finance	  */
+	public void setZZ_Date_Not_Approved_by_Snr_Adm_Fin (Timestamp ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
+
+	/** Get Date Not Approved by Snr Admin Finance	  */
+	public Timestamp getZZ_Date_Not_Approved_by_Snr_Adm_Fin();
+
     /** Column name ZZ_Date_Submitted */
     public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
 

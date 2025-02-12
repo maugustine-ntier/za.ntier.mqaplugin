@@ -589,6 +589,36 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_LM_Approved);
 	}
 
+	/** Set Date Not Approved by LM.
+		@param ZZ_Date_Not_Approved_by_LM Date Not Approved by LM
+	*/
+	public void setZZ_Date_Not_Approved_by_LM (Timestamp ZZ_Date_Not_Approved_by_LM)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Approved_by_LM, ZZ_Date_Not_Approved_by_LM);
+	}
+
+	/** Get Date Not Approved by LM.
+		@return Date Not Approved by LM	  */
+	public Timestamp getZZ_Date_Not_Approved_by_LM()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved_by_LM);
+	}
+
+	/** Set Date Not Approved by Snr Admin Finance.
+		@param ZZ_Date_Not_Approved_by_Snr_Adm_Fin Date Not Approved by Snr Admin Finance
+	*/
+	public void setZZ_Date_Not_Approved_by_Snr_Adm_Fin (Timestamp ZZ_Date_Not_Approved_by_Snr_Adm_Fin)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Approved_by_Snr_Adm_Fin, ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
+	}
+
+	/** Get Date Not Approved by Snr Admin Finance.
+		@return Date Not Approved by Snr Admin Finance	  */
+	public Timestamp getZZ_Date_Not_Approved_by_Snr_Adm_Fin()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
+	}
+
 	/** Set Date Submitted.
 		@param ZZ_Date_Submitted Date Submitted
 	*/
