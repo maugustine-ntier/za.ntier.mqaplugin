@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.adempiere.util.ProcessUtil;
+import org.compiere.model.MProcessPara;
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
 
@@ -13,10 +15,24 @@ import za.ntier.models.MZZPettyCashApplication;
 @org.adempiere.base.annotation.Process
 public class PettyCashApplication extends SvrProcess {
 	private static final CLogger log = CLogger.getCLogger(ProcessUtil.class);
+	String p_ZZ_Approve_Rej_LM = "";
+	String p_ZZ_Approve_Rej_SAF = "";
 
 	@Override
 	protected void prepare() {
-		// TODO Auto-generated method stub
+		ProcessInfoParameter[] para = getParameter();
+		for (int i = 0; i < para.length; i++)
+		{
+			String name = para[i].getParameterName();
+			if (para[i].getParameter() == null)
+				;
+			else if (name.equals("ZZ_Approve_Rej_LM"))
+				p_ZZ_Approve_Rej_LM = (String)para[i].getParameter();
+			else if (name.equals("ZZ_Approve_Rej_SAF"))
+				p_ZZ_Approve_Rej_SAF = (String)para[i].getParameter();
+			else
+				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
+		}
 
 	}
 
@@ -31,12 +47,12 @@ public class PettyCashApplication extends SvrProcess {
 			mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_Submitted);
 			mZZPettyCashApplication.setZZ_DocAction(MZZPettyCashApplication.DOCACTION_Approve);
 			mZZPettyCashApplication.setZZ_Date_Submitted(new Timestamp(System.currentTimeMillis()));
-		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_Approve) && 
+		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_ApproveDoNotApprove) && 
 				mZZPettyCashApplication.getZZ_DocStatus().equals(MZZPettyCashApplication.ZZ_DOCSTATUS_Submitted)) {
 			mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_InProgress);
 			mZZPettyCashApplication.setZZ_DocAction(MZZPettyCashApplication.ZZ_DOCACTION_FinalApproval);
 			mZZPettyCashApplication.setZZ_Date_LM_Approved(new Timestamp(System.currentTimeMillis()));
-		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_FinalApproval) && 
+		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_FinalApprovalDoNotApprove) && 
 				mZZPettyCashApplication.getZZ_DocStatus().equals(MZZPettyCashApplication.ZZ_DOCSTATUS_InProgress)) {
 			mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_Approved);
 			mZZPettyCashApplication.setZZ_DocAction(MZZPettyCashApplication.ZZ_DOCACTION_Complete);

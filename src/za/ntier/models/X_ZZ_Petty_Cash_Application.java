@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250211L;
+	private static final long serialVersionUID = 20250212L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)
@@ -44,11 +44,11 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
-// 1000000
+// 1000047
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
-// CO
+// SU
 			setDocStatus (null);
 // DR
 			setIsApproved (false);
@@ -72,11 +72,11 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
-// 1000000
+// 1000047
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
-// CO
+// SU
 			setDocStatus (null);
 // DR
 			setIsApproved (false);
@@ -100,11 +100,11 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
-// 1000000
+// 1000047
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
-// CO
+// SU
 			setDocStatus (null);
 // DR
 			setIsApproved (false);
@@ -128,11 +128,11 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
         {
 			setAD_User_ID (0);
 			setC_DocTypeTarget_ID (0);
-// 1000000
+// 1000047
 			setC_DocType_ID (0);
 // 0
 			setDocAction (null);
-// CO
+// SU
 			setDocStatus (null);
 // DR
 			setIsApproved (false);
@@ -604,12 +604,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Submitted);
 	}
 
-	/** Approve = AP */
-	public static final String ZZ_DOCACTION_Approve = "AP";
+	/** Approve/Do Not Approve = AP */
+	public static final String ZZ_DOCACTION_ApproveDoNotApprove = "AP";
 	/** Complete = CO */
 	public static final String ZZ_DOCACTION_Complete = "CO";
-	/** Final Approval = FA */
-	public static final String ZZ_DOCACTION_FinalApproval = "FA";
+	/** Final Approval/Do not Approve = FA */
+	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -636,6 +636,10 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Approved by LM = NL */
+	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
