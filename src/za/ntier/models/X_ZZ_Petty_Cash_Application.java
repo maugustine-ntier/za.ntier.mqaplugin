@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250212L;
+	private static final long serialVersionUID = 20250213L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)
@@ -58,8 +58,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // N
 			setProcessing (false);
 // N
+			setZZ_AOR_Uploaded (false);
+// N
 			setZZ_DocAction (null);
 // SU
+			setZZ_ID_Copy_Uploaded (false);
+// N
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -86,8 +90,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // N
 			setProcessing (false);
 // N
+			setZZ_AOR_Uploaded (false);
+// N
 			setZZ_DocAction (null);
 // SU
+			setZZ_ID_Copy_Uploaded (false);
+// N
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -114,8 +122,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // N
 			setProcessing (false);
 // N
+			setZZ_AOR_Uploaded (false);
+// N
 			setZZ_DocAction (null);
 // SU
+			setZZ_ID_Copy_Uploaded (false);
+// N
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -142,8 +154,12 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 // N
 			setProcessing (false);
 // N
+			setZZ_AOR_Uploaded (false);
+// N
 			setZZ_DocAction (null);
 // SU
+			setZZ_ID_Copy_Uploaded (false);
+// N
 			setZZ_Petty_Cash_Application_ID (0);
         } */
     }
@@ -544,6 +560,28 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 		return (String)get_Value(COLUMNNAME_Value);
 	}
 
+	/** Set AOR Uploaded.
+		@param ZZ_AOR_Uploaded AOR Uploaded
+	*/
+	public void setZZ_AOR_Uploaded (boolean ZZ_AOR_Uploaded)
+	{
+		set_Value (COLUMNNAME_ZZ_AOR_Uploaded, Boolean.valueOf(ZZ_AOR_Uploaded));
+	}
+
+	/** Get AOR Uploaded.
+		@return AOR Uploaded	  */
+	public boolean isZZ_AOR_Uploaded()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_AOR_Uploaded);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Date Approved.
 		@param ZZ_Date_Approved Date Approved
 	*/
@@ -686,6 +724,28 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	public String getZZ_DocStatus()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
+	}
+
+	/** Set ID Copy Uploaded.
+		@param ZZ_ID_Copy_Uploaded ID Copy Uploaded
+	*/
+	public void setZZ_ID_Copy_Uploaded (boolean ZZ_ID_Copy_Uploaded)
+	{
+		set_Value (COLUMNNAME_ZZ_ID_Copy_Uploaded, Boolean.valueOf(ZZ_ID_Copy_Uploaded));
+	}
+
+	/** Get ID Copy Uploaded.
+		@return ID Copy Uploaded	  */
+	public boolean isZZ_ID_Copy_Uploaded()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_ID_Copy_Uploaded);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Petty Cash Application.

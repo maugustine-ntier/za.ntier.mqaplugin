@@ -304,6 +304,15 @@ public interface I_ZZ_Petty_Cash_Application
 	  */
 	public String getValue();
 
+    /** Column name ZZ_AOR_Uploaded */
+    public static final String COLUMNNAME_ZZ_AOR_Uploaded = "ZZ_AOR_Uploaded";
+
+	/** Set AOR Uploaded	  */
+	public void setZZ_AOR_Uploaded (boolean ZZ_AOR_Uploaded);
+
+	/** Get AOR Uploaded	  */
+	public boolean isZZ_AOR_Uploaded();
+
     /** Column name ZZ_Date_Approved */
     public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
 
@@ -375,6 +384,15 @@ public interface I_ZZ_Petty_Cash_Application
 
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
+
+    /** Column name ZZ_ID_Copy_Uploaded */
+    public static final String COLUMNNAME_ZZ_ID_Copy_Uploaded = "ZZ_ID_Copy_Uploaded";
+
+	/** Set ID Copy Uploaded	  */
+	public void setZZ_ID_Copy_Uploaded (boolean ZZ_ID_Copy_Uploaded);
+
+	/** Get ID Copy Uploaded	  */
+	public boolean isZZ_ID_Copy_Uploaded();
 
     /** Column name ZZ_Petty_Cash_Application_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Application_ID = "ZZ_Petty_Cash_Application_ID";
