@@ -783,4 +783,31 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Petty_Cash_Application_UU);
 	}
+
+	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_Snr_Admin_Fin_ID(), get_TrxName());
+	}
+
+	/** Set Snr Admin Finance User.
+		@param ZZ_Snr_Admin_Fin_ID Snr Admin Finance User
+	*/
+	public void setZZ_Snr_Admin_Fin_ID (int ZZ_Snr_Admin_Fin_ID)
+	{
+		if (ZZ_Snr_Admin_Fin_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Snr_Admin_Fin_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Snr_Admin_Fin_ID, Integer.valueOf(ZZ_Snr_Admin_Fin_ID));
+	}
+
+	/** Get Snr Admin Finance User.
+		@return Snr Admin Finance User	  */
+	public int getZZ_Snr_Admin_Fin_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Snr_Admin_Fin_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 }

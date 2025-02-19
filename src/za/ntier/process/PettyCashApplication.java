@@ -6,14 +6,17 @@ import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.adempiere.util.ProcessUtil;
+import org.compiere.model.MClient;
 import org.compiere.model.MNote;
 import org.compiere.model.MProcessPara;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MUser;
 import org.compiere.model.MUserRoles;
 import org.compiere.model.X_AD_User;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
+import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashApplication;
 import za.ntier.models.X_ZZ_Petty_Cash_Application;
@@ -25,6 +28,7 @@ public class PettyCashApplication extends SvrProcess {
 	public final static int MESSAGE_NEW_PETTYCASH_APP = 1000009;
 	public final static int MESSAGE_LM_APPROVED_PETTYCASH_APP = 1000010;
 	public final static int SNR_ADMIN_FIN_ROLE_ID = 1000003;
+	public final static int FROM_EMAIL_USER_ID = MSysConfig.getIntValue("FROM_EMAIL_USER_ID",1000011);
 	String p_ZZ_Approve_Rej_LM = "";
 	String p_ZZ_Approve_Rej_SAF = "";
 
@@ -89,6 +93,7 @@ public class PettyCashApplication extends SvrProcess {
 				mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_Approved);
 				mZZPettyCashApplication.setZZ_DocAction(MZZPettyCashApplication.ZZ_DOCACTION_Complete);
 				mZZPettyCashApplication.setZZ_Date_Approved(new Timestamp(System.currentTimeMillis()));
+				mZZPettyCashApplication.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
 				String subject = "Petty Cash  Application Has been Approved by the Snr Admin Finance";
 				String message = "Your application was approved, Petty Cash Application : " + mZZPettyCashApplication.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
@@ -127,6 +132,14 @@ public class PettyCashApplication extends SvrProcess {
 					X_ZZ_Petty_Cash_Application.Table_ID, zz_Petty_Cash_Application_ID, 
 					subject, message.toString(), get_TrxName());
 			note.saveEx();
+		}
+		if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(mUser.getNotificationType()) ||
+			X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())) {
+			MClient client = MClient.get(getCtx());
+			MUser from = MUser.get(getCtx(), FROM_EMAIL_USER_ID);
+			if (!client.sendEMail(from, mUser, subject, message, null)) {
+				if (log.isLoggable(Level.FINE)) log.fine("Problem Sending Email.  Please contact Support");
+			}
 		}
 	}
 

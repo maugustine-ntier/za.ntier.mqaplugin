@@ -411,4 +411,15 @@ public interface I_ZZ_Petty_Cash_Application
 
 	/** Get ZZ_Petty_Cash_Application_UU	  */
 	public String getZZ_Petty_Cash_Application_UU();
+
+    /** Column name ZZ_Snr_Admin_Fin_ID */
+    public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";
+
+	/** Set Snr Admin Finance User	  */
+	public void setZZ_Snr_Admin_Fin_ID (int ZZ_Snr_Admin_Fin_ID);
+
+	/** Get Snr Admin Finance User	  */
+	public int getZZ_Snr_Admin_Fin_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException;
 }
