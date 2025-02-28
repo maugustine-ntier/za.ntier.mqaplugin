@@ -183,4 +183,19 @@ public class MZZPettyCashApplication extends X_ZZ_Petty_Cash_Application impleme
 		return index;
 	}
 
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		return super.beforeSave(newRecord);		
+	}
+
+	@Override
+	protected boolean beforeDelete() {
+		if (!getZZ_DocStatus().equals(ZZ_DOCSTATUS_Draft)) {			
+			log.saveError("Error", "Only Drafted Applications can be deleted");
+			return false;
+		}
+		return super.beforeDelete();
+	}
+
+	
 }
