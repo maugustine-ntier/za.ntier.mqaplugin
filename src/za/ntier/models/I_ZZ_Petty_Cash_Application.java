@@ -291,19 +291,6 @@ public interface I_ZZ_Petty_Cash_Application
 	  */
 	public int getUpdatedBy();
 
-    /** Column name Value */
-    public static final String COLUMNNAME_Value = "Value";
-
-	/** Set Search Key.
-	  * Search key for the record in the format required - must be unique
-	  */
-	public void setValue (String Value);
-
-	/** Get Search Key.
-	  * Search key for the record in the format required - must be unique
-	  */
-	public String getValue();
-
     /** Column name ZZ_AOR_Uploaded */
     public static final String COLUMNNAME_ZZ_AOR_Uploaded = "ZZ_AOR_Uploaded";
 

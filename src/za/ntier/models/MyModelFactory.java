@@ -3,14 +3,11 @@ package za.ntier.models;
 import java.sql.ResultSet;
 
 import org.adempiere.base.IModelFactory;
-import org.compiere.model.I_AD_WF_Activity;
 import org.compiere.model.I_C_BP_BankAccount;
 import org.compiere.model.I_ZZ_Petty_Cash_Advance_Hdr;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.osgi.service.component.annotations.Component;
-
-import za.ntier.wf.MWFActivity;
 
 @Component(
 
