@@ -14,16 +14,18 @@
  * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
  * or via info@compiere.org or http://www.compiere.org/license.html           *
  *****************************************************************************/
-package org.compiere.model;
+package za.ntier.models;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for ZZ_Petty_Cash_Advance_Line
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
+@SuppressWarnings("all")
 public interface I_ZZ_Petty_Cash_Advance_Line 
 {
 

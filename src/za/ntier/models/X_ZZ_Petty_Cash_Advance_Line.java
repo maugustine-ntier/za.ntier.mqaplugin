@@ -15,11 +15,12 @@
  * or via info@compiere.org or http://www.compiere.org/license.html           *
  *****************************************************************************/
 /** Generated Model - DO NOT CHANGE */
-package org.compiere.model;
+package za.ntier.models;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
+import org.compiere.model.*;
 import org.compiere.util.Env;
 
 /** Generated Model for ZZ_Petty_Cash_Advance_Line
@@ -32,7 +33,7 @@ public class X_ZZ_Petty_Cash_Advance_Line extends PO implements I_ZZ_Petty_Cash_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250303L;
+	private static final long serialVersionUID = 20250311L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Line (Properties ctx, int ZZ_Petty_Cash_Advance_Line_ID, String trxName)

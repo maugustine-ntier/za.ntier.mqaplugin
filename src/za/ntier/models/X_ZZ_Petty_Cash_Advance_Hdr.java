@@ -15,11 +15,14 @@
  * or via info@compiere.org or http://www.compiere.org/license.html           *
  *****************************************************************************/
 /** Generated Model - DO NOT CHANGE */
-package org.compiere.model;
+package za.ntier.models;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
+import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for ZZ_Petty_Cash_Advance_Hdr
  *  @author iDempiere (generated)
@@ -31,7 +34,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250303L;
+	private static final long serialVersionUID = 20250311L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Hdr (Properties ctx, int ZZ_Petty_Cash_Advance_Hdr_ID, String trxName)
@@ -39,7 +42,6 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_ID, trxName);
       /** if (ZZ_Petty_Cash_Advance_Hdr_ID == 0)
         {
-			setName (null);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -50,7 +52,6 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_ID, trxName, virtualColumns);
       /** if (ZZ_Petty_Cash_Advance_Hdr_ID == 0)
         {
-			setName (null);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -61,7 +62,6 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_UU, trxName);
       /** if (ZZ_Petty_Cash_Advance_Hdr_UU == null)
         {
-			setName (null);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -72,7 +72,6 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_UU, trxName, virtualColumns);
       /** if (ZZ_Petty_Cash_Advance_Hdr_UU == null)
         {
-			setName (null);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -178,6 +177,25 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
 	public String getName()
 	{
 		return (String)get_Value(COLUMNNAME_Name);
+	}
+
+	/** Set Total Amount.
+		@param TotalAmt Total Amount
+	*/
+	public void setTotalAmt (BigDecimal TotalAmt)
+	{
+		set_ValueNoCheck (COLUMNNAME_TotalAmt, TotalAmt);
+	}
+
+	/** Get Total Amount.
+		@return Total Amount
+	  */
+	public BigDecimal getTotalAmt()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_TotalAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Date Approved.

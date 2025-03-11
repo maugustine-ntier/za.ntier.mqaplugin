@@ -3,8 +3,6 @@ package za.ntier.models;
 import java.sql.ResultSet;
 import java.util.Properties;
 
-import org.compiere.model.X_ZZ_Petty_Cash_Advance_Hdr;
-
 public class MZZPettyCashAdvanceHdr extends X_ZZ_Petty_Cash_Advance_Hdr {
 
 	private static final long serialVersionUID = 1L;

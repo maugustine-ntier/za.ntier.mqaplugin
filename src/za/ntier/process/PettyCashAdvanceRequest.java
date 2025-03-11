@@ -9,13 +9,13 @@ import org.adempiere.util.ProcessUtil;
 import org.compiere.model.MProcessPara;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.PO;
-import org.compiere.model.X_ZZ_Petty_Cash_Advance_Line;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashAdvanceHdr;
+import za.ntier.models.X_ZZ_Petty_Cash_Advance_Line;
 import za.ntier.utils.Notifications;
 
 
@@ -25,7 +25,7 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION = "Your application was rejected, Petty Cash Advance Request : ";
 	private static final CLogger log = CLogger.getCLogger(ProcessUtil.class);
 	private static final String PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION = "Please Approve or Reject the Petty Cash Advance Request : ";
-	private static final String PETTY_CASH_CARD_APPLICATION = "Petty Cash Advance Request For Advance ";
+	private static final String PETTY_CASH_CARD_APPLICATION = "Petty Cash Advance Request ";
 	public final static int MESSAGE_NEW_PETTYCASH_APP = 1000009;
 	public final static int MESSAGE_LM_APPROVED_PETTYCASH_APP = 1000010;
 	public final static int SNR_ADMIN_FIN_ROLE_ID = 1000003;

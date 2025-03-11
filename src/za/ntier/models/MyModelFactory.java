@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 
 import org.adempiere.base.IModelFactory;
 import org.compiere.model.I_C_BP_BankAccount;
-import org.compiere.model.I_ZZ_Petty_Cash_Advance_Hdr;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.osgi.service.component.annotations.Component;
@@ -17,7 +16,10 @@ import org.osgi.service.component.annotations.Component;
 public class MyModelFactory implements IModelFactory {
 
 	@Override
-	public Class<?> getClass(String tableName) {	
+	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Line.Table_Name)) {
+			return MZZPettyCashAdvanceLine.class;
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Hdr.Table_Name)) {
 			return MZZPettyCashAdvanceHdr.class;
 		}
@@ -35,6 +37,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Line.Table_Name)) {
+			return new MZZPettyCashAdvanceLine(Env.getCtx(),Record_ID,trxName);
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Hdr.Table_Name)) {
 			return new MZZPettyCashAdvanceHdr(Env.getCtx(),Record_ID,trxName);
 		}
@@ -53,6 +58,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Line.Table_Name)) {
+			return new MZZPettyCashAdvanceLine(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Advance_Hdr.Table_Name)) {
 			return new MZZPettyCashAdvanceHdr(Env.getCtx(),rs,trxName);
 		}
