@@ -6,15 +6,9 @@ import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.adempiere.util.ProcessUtil;
-import org.compiere.model.MClient;
-import org.compiere.model.MNote;
 import org.compiere.model.MProcessPara;
 import org.compiere.model.MSysConfig;
-import org.compiere.model.MUser;
-import org.compiere.model.MUserRoles;
 import org.compiere.model.PO;
-import org.compiere.model.X_AD_User;
-import org.compiere.model.X_ZZ_Petty_Cash_Advance_Hdr;
 import org.compiere.model.X_ZZ_Petty_Cash_Advance_Line;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -22,6 +16,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashAdvanceHdr;
+import za.ntier.utils.Notifications;
 
 
 @org.adempiere.base.annotation.Process
@@ -74,7 +69,7 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 			String subject = PETTY_CASH_CARD_APPLICATION + "awaiting LM Approval";
 			String message = PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 			int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-			sendNotification(mZZPettyCashAdvanceHdr.getLine_Manager_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
+			Notifications.sendNotification(mZZPettyCashAdvanceHdr.getLine_Manager_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
 		} else if (mZZPettyCashAdvanceHdr.getZZ_DocAction().equals(MZZPettyCashAdvanceHdr.ZZ_DOCACTION_ApproveDoNotApprove) && 
 				mZZPettyCashAdvanceHdr.getZZ_DocStatus().equals(MZZPettyCashAdvanceHdr.ZZ_DOCSTATUS_Submitted)) {
 			if (p_ZZ_Approve_Rej_LM.equals("Y")) {
@@ -84,14 +79,14 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 				String subject = PETTY_CASH_CARD_APPLICATION + "awaiting Finance Approval";
 				String message = PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_LM_APPROVED_PETTYCASH_APP;
-				sendNotificationToRole(SNR_ADMIN_FIN_ROLE_ID,zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
+				Notifications.sendNotificationToRole(SNR_ADMIN_FIN_ROLE_ID,zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
 			} else {
 				mZZPettyCashAdvanceHdr.setZZ_DocStatus(MZZPettyCashAdvanceHdr.ZZ_DOCSTATUS_NotApprovedByLM);
 				mZZPettyCashAdvanceHdr.setZZ_Date_Not_Approved_by_LM(new Timestamp(System.currentTimeMillis()));
 				String subject = PETTY_CASH_CARD_APPLICATION + "Rejected by the LM";
 				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
+				Notifications.sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
 			}
 
 		} else if (mZZPettyCashAdvanceHdr.getZZ_DocAction().equals(MZZPettyCashAdvanceHdr.ZZ_DOCACTION_FinalApprovalDoNotApprove) && 
@@ -103,15 +98,15 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 				String subject = PETTY_CASH_CARD_APPLICATION + "Has been Approved by Finance";
 				String message = YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
+				Notifications.sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
 			} else {
 				mZZPettyCashAdvanceHdr.setZZ_DocStatus(MZZPettyCashAdvanceHdr.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
 				mZZPettyCashAdvanceHdr.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(new Timestamp(System.currentTimeMillis()));
 				String subject = PETTY_CASH_CARD_APPLICATION + "Rejected by Finance";
 				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
-				sendNotification(mZZPettyCashAdvanceHdr.getLine_Manager_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
+				Notifications.sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+				Notifications.sendNotification(mZZPettyCashAdvanceHdr.getLine_Manager_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
 			}
 		} 
 		if (!mZZPettyCashAdvanceHdr.save()) {
@@ -123,33 +118,6 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 		return null;
 	}
 
-	private void sendNotification(int ad_User_ID,int zz_Petty_Cash_Advance_Hdr_ID,String subject,String message,int ad_Message_ID) {
-		MUser mUser = new MUser(getCtx(), ad_User_ID, null);
-		if (X_AD_User.NOTIFICATIONTYPE_Notice.equals(mUser.getNotificationType()) ||
-				X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())	) {
-			MNote note = new MNote(getCtx(), ad_Message_ID, ad_User_ID,
-					X_ZZ_Petty_Cash_Advance_Hdr.Table_ID, zz_Petty_Cash_Advance_Hdr_ID, 
-					subject, message.toString(), get_TrxName());
-			note.saveEx();
-		}
-		if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(mUser.getNotificationType()) ||
-			X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())) {
-			MClient client = MClient.get(getCtx());
-			MUser from = MUser.get(getCtx(), FROM_EMAIL_USER_ID);
-			if (!client.sendEMail(from, mUser, subject, message, null)) {
-				if (log.isLoggable(Level.FINE)) log.fine("Problem Sending Email.  Please contact Support");
-			}
-		}
-	}
-
-	private void sendNotificationToRole(int ad_Role_ID,int zz_Petty_Cash_Advance_Hdr_ID,String subject,String message,int ad_Message_ID) {
-		MUserRoles [] mUserRoles = MUserRoles.getOfRole(getCtx(), ad_Role_ID);
-		for (MUserRoles mUserRole : mUserRoles) {
-			if (mUserRole.isActive()) {
-				sendNotification(mUserRole.getAD_User_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
-			}
-		}
-	}
 
 
 }
