@@ -25,10 +25,9 @@ import za.ntier.models.MZZPettyCashAdvanceHdr;
 
 
 @org.adempiere.base.annotation.Process
-public class PettyCashAdvanceRequest extends SvrProcess {
-	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION2 = "Your application was rejected, Petty Cash Advance Request : ";
+public class PettyCashAdvanceRequest extends SvrProcess {	
 	private static final String YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CARD_APPLICATION = "Your application was approved, Petty Cash Advance Request : ";
-	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION = "Your application was rejected Petty Cash Advance Request : ";
+	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION = "Your application was rejected, Petty Cash Advance Request : ";
 	private static final CLogger log = CLogger.getCLogger(ProcessUtil.class);
 	private static final String PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION = "Please Approve or Reject the Petty Cash Advance Request : ";
 	private static final String PETTY_CASH_CARD_APPLICATION = "Petty Cash Advance Request For Advance ";
@@ -109,7 +108,7 @@ public class PettyCashAdvanceRequest extends SvrProcess {
 				mZZPettyCashAdvanceHdr.setZZ_DocStatus(MZZPettyCashAdvanceHdr.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
 				mZZPettyCashAdvanceHdr.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(new Timestamp(System.currentTimeMillis()));
 				String subject = PETTY_CASH_CARD_APPLICATION + "Rejected by Finance";
-				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION2 + mZZPettyCashAdvanceHdr.getDocumentNo();
+				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashAdvanceHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
 				sendNotification(mZZPettyCashAdvanceHdr.getCreatedBy(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);
 				sendNotification(mZZPettyCashAdvanceHdr.getLine_Manager_ID(),zz_Petty_Cash_Advance_Hdr_ID,subject,message,ad_Message_ID);

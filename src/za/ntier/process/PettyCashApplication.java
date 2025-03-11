@@ -24,7 +24,7 @@ import za.ntier.models.X_ZZ_Petty_Cash_Application;
 
 @org.adempiere.base.annotation.Process
 public class PettyCashApplication extends SvrProcess {
-	private static final String PLEASE_UPLOAD_THE_AOL_AND_TICK_THE_CHECKBOX_WHEN_DONE = "Please upload the AOL and tick the checkbox when done.";
+	private static final String PLEASE_UPLOAD_THE_AOR_AND_TICK_THE_CHECKBOX_WHEN_DONE = "Please upload the AOR and tick the checkbox when done.";
 	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION2 = "Your application was rejected, Petty Cash Card Application : ";
 	private static final String YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CARD_APPLICATION = "Your application was approved, Petty Cash Card Application : ";
 	private static final String YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION = "Your application was rejected Petty Cash Card Application : ";
@@ -116,7 +116,7 @@ public class PettyCashApplication extends SvrProcess {
 		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_Complete) && 
 				mZZPettyCashApplication.getZZ_DocStatus().equals(MZZPettyCashApplication.ZZ_DOCSTATUS_Approved)) {
 			if (!mZZPettyCashApplication.isZZ_AOR_Uploaded()) {
-				return PLEASE_UPLOAD_THE_AOL_AND_TICK_THE_CHECKBOX_WHEN_DONE;
+				return PLEASE_UPLOAD_THE_AOR_AND_TICK_THE_CHECKBOX_WHEN_DONE;
 			}
 			mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_Completed);
 			mZZPettyCashApplication.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
