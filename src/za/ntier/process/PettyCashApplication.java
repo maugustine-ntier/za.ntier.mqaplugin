@@ -14,6 +14,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashApplication;
+import za.ntier.models.X_ZZ_Petty_Cash_Application;
 import za.ntier.utils.Notifications;
 
 
@@ -68,7 +69,7 @@ public class PettyCashApplication extends SvrProcess {
 			String subject = PETTY_CASH_CARD_APPLICATION + "awaiting LM Approval";
 			String message = PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION + mZZPettyCashApplication.getDocumentNo();
 			int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-			Notifications.sendNotification(mZZPettyCashApplication.getLine_Manager_ID(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+			Notifications.sendNotification(mZZPettyCashApplication.getLine_Manager_ID(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
 		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_ApproveDoNotApprove) && 
 				mZZPettyCashApplication.getZZ_DocStatus().equals(MZZPettyCashApplication.ZZ_DOCSTATUS_Submitted)) {
 			if (p_ZZ_Approve_Rej_LM.equals("Y")) {
@@ -78,14 +79,14 @@ public class PettyCashApplication extends SvrProcess {
 				String subject = PETTY_CASH_CARD_APPLICATION + "awaiting Finance Approval";
 				String message = PLEASE_APPROVE_OR_REJECT_THE_PETTY_CASH_CARD_APPLICATION + mZZPettyCashApplication.getDocumentNo();
 				int ad_Message_ID = MESSAGE_LM_APPROVED_PETTYCASH_APP;
-				Notifications.sendNotificationToRole(SNR_ADMIN_FIN_ROLE_ID,zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+				Notifications.sendNotificationToRole(SNR_ADMIN_FIN_ROLE_ID,zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
 			} else {
 				mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_NotApprovedByLM);
 				mZZPettyCashApplication.setZZ_Date_Not_Approved_by_LM(new Timestamp(System.currentTimeMillis()));
 				String subject = PETTY_CASH_CARD_APPLICATION + "Rejected by the LM";
 				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashApplication.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
 			}
 
 		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_FinalApprovalDoNotApprove) && 
@@ -98,15 +99,15 @@ public class PettyCashApplication extends SvrProcess {
 				String subject = PETTY_CASH_CARD_APPLICATION + "Has been Approved by Finance";
 				String message = YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CARD_APPLICATION + mZZPettyCashApplication.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
 			} else {
 				mZZPettyCashApplication.setZZ_DocStatus(MZZPettyCashApplication.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
 				mZZPettyCashApplication.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(new Timestamp(System.currentTimeMillis()));
 				String subject = PETTY_CASH_CARD_APPLICATION + "Rejected by Finance";
 				String message = YOUR_APPLICATION_WAS_REJECTED_PETTY_CASH_CARD_APPLICATION2 + mZZPettyCashApplication.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
-				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
-				Notifications.sendNotification(mZZPettyCashApplication.getLine_Manager_ID(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName());
+				Notifications.sendNotification(mZZPettyCashApplication.getCreatedBy(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
+				Notifications.sendNotification(mZZPettyCashApplication.getLine_Manager_ID(),zz_Petty_Cash_Application_ID,subject,message,ad_Message_ID,getCtx(),get_TrxName(),X_ZZ_Petty_Cash_Application.Table_ID);
 			}
 		} else if (mZZPettyCashApplication.getZZ_DocAction().equals(MZZPettyCashApplication.ZZ_DOCACTION_Complete) && 
 				mZZPettyCashApplication.getZZ_DocStatus().equals(MZZPettyCashApplication.ZZ_DOCSTATUS_Approved)) {

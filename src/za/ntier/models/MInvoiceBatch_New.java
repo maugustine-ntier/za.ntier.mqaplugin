@@ -58,7 +58,13 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 		} else {
 			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
 				if (!Roles.checkRole(roles,role_ID)) {
+					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
 					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHINPROG")); //"Only Finance Roles can change to In Progress");
+					return false;
+				}
+				if(getZZ_Policy_Procedure_Ck() == null ) {
+					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
+					log.saveError("Error", Msg.getMsg(getCtx(), "PROCEDURECHECKLISTMUSTBETICKED")); //One of the policy procedure checklist must be ticked before the status is changed to ‘in progress’
 					return false;
 				}
 			}
