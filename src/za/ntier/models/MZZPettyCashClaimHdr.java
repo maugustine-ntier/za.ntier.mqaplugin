@@ -33,5 +33,13 @@ public class MZZPettyCashClaimHdr extends X_ZZ_Petty_Cash_Claim_Hdr {
 		super(ctx, rs, trxName);
 		// TODO Auto-generated constructor stub
 	}
+	@Override
+	protected boolean beforeDelete() {
+		if (!getZZ_DocStatus().equals(ZZ_DOCSTATUS_Draft)) {			
+			log.saveError("Error", "Only Drafted Cash Claim Requests can be deleted");
+			return false;
+		}
+		return super.beforeDelete();
+	}
 
 }
