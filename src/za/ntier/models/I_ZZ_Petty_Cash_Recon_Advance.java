@@ -21,18 +21,18 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_Petty_Cash_Claim_Line
+/** Generated Interface for ZZ_Petty_Cash_Recon_Advance
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_Petty_Cash_Claim_Line 
+public interface I_ZZ_Petty_Cash_Recon_Advance 
 {
 
-    /** TableName=ZZ_Petty_Cash_Claim_Line */
-    public static final String Table_Name = "ZZ_Petty_Cash_Claim_Line";
+    /** TableName=ZZ_Petty_Cash_Recon_Advance */
+    public static final String Table_Name = "ZZ_Petty_Cash_Recon_Advance";
 
-    /** AD_Table_ID=1000010 */
+    /** AD_Table_ID=1000012 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -63,34 +63,6 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
-
-    /** Column name Amount */
-    public static final String COLUMNNAME_Amount = "Amount";
-
-	/** Set Amount.
-	  * Amount in a defined currency
-	  */
-	public void setAmount (BigDecimal Amount);
-
-	/** Get Amount.
-	  * Amount in a defined currency
-	  */
-	public BigDecimal getAmount();
-
-    /** Column name C_Charge_ID */
-    public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
-
-	/** Set Charge.
-	  * Additional document charges
-	  */
-	public void setC_Charge_ID (int C_Charge_ID);
-
-	/** Get Charge.
-	  * Additional document charges
-	  */
-	public int getC_Charge_ID();
-
-	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -137,43 +109,25 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Petty_Cash_Claim_Hdr_ID */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Hdr_ID = "ZZ_Petty_Cash_Claim_Hdr_ID";
+    /** Column name ZZ_Petty_Cash_Advance_Hdr_ID */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID = "ZZ_Petty_Cash_Advance_Hdr_ID";
 
-	/** Set Petty Cash Claim	  */
-	public void setZZ_Petty_Cash_Claim_Hdr_ID (int ZZ_Petty_Cash_Claim_Hdr_ID);
+	/** Set Petty Cash Advance	  */
+	public void setZZ_Petty_Cash_Advance_Hdr_ID (int ZZ_Petty_Cash_Advance_Hdr_ID);
 
-	/** Get Petty Cash Claim	  */
-	public int getZZ_Petty_Cash_Claim_Hdr_ID();
+	/** Get Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Hdr_ID();
 
-	public I_ZZ_Petty_Cash_Claim_Hdr getZZ_Petty_Cash_Claim_Hdr() throws RuntimeException;
+	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException;
 
-    /** Column name ZZ_Petty_Cash_Claim_Line_ID */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Line_ID = "ZZ_Petty_Cash_Claim_Line_ID";
+    /** Column name ZZ_Petty_Cash_Recon_Advance_UU */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Advance_UU = "ZZ_Petty_Cash_Recon_Advance_UU";
 
-	/** Set Petty Cash Claim Line	  */
-	public void setZZ_Petty_Cash_Claim_Line_ID (int ZZ_Petty_Cash_Claim_Line_ID);
+	/** Set ZZ_Petty_Cash_Recon_Advance_UU	  */
+	public void setZZ_Petty_Cash_Recon_Advance_UU (String ZZ_Petty_Cash_Recon_Advance_UU);
 
-	/** Get Petty Cash Claim Line	  */
-	public int getZZ_Petty_Cash_Claim_Line_ID();
-
-    /** Column name ZZ_Petty_Cash_Claim_Line_UU */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Line_UU = "ZZ_Petty_Cash_Claim_Line_UU";
-
-	/** Set ZZ_Petty_Cash_Claim_Line_UU	  */
-	public void setZZ_Petty_Cash_Claim_Line_UU (String ZZ_Petty_Cash_Claim_Line_UU);
-
-	/** Get ZZ_Petty_Cash_Claim_Line_UU	  */
-	public String getZZ_Petty_Cash_Claim_Line_UU();
-
-    /** Column name ZZ_Petty_Cash_Motivation */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Motivation = "ZZ_Petty_Cash_Motivation";
-
-	/** Set Motivation	  */
-	public void setZZ_Petty_Cash_Motivation (String ZZ_Petty_Cash_Motivation);
-
-	/** Get Motivation	  */
-	public String getZZ_Petty_Cash_Motivation();
+	/** Get ZZ_Petty_Cash_Recon_Advance_UU	  */
+	public String getZZ_Petty_Cash_Recon_Advance_UU();
 
     /** Column name ZZ_Petty_Cash_Recon_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID = "ZZ_Petty_Cash_Recon_Hdr_ID";

@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Claim_Hdr extends PO implements I_ZZ_Petty_Cash_Cla
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250324L;
+	private static final long serialVersionUID = 20250328L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Claim_Hdr (Properties ctx, int ZZ_Petty_Cash_Claim_Hdr_ID, String trxName)
@@ -186,6 +186,21 @@ public class X_ZZ_Petty_Cash_Claim_Hdr extends PO implements I_ZZ_Petty_Cash_Cla
 		return bd;
 	}
 
+	/** Set Credit Card Number.
+		@param ZZ_Credit_Card_No Credit Card Number
+	*/
+	public void setZZ_Credit_Card_No (String ZZ_Credit_Card_No)
+	{
+		set_Value (COLUMNNAME_ZZ_Credit_Card_No, ZZ_Credit_Card_No);
+	}
+
+	/** Get Credit Card Number.
+		@return Credit Card Number	  */
+	public String getZZ_Credit_Card_No()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Credit_Card_No);
+	}
+
 	/** Set Date Approved.
 		@param ZZ_Date_Approved Date Approved
 	*/
@@ -328,6 +343,33 @@ public class X_ZZ_Petty_Cash_Claim_Hdr extends PO implements I_ZZ_Petty_Cash_Cla
 	public String getZZ_DocStatus()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
+	}
+
+	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException
+	{
+		return (I_ZZ_Petty_Cash_Advance_Hdr)MTable.get(getCtx(), I_ZZ_Petty_Cash_Advance_Hdr.Table_ID)
+			.getPO(getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+	}
+
+	/** Set Petty Cash Advance.
+		@param ZZ_Petty_Cash_Advance_Hdr_ID Petty Cash Advance
+	*/
+	public void setZZ_Petty_Cash_Advance_Hdr_ID (int ZZ_Petty_Cash_Advance_Hdr_ID)
+	{
+		if (ZZ_Petty_Cash_Advance_Hdr_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, Integer.valueOf(ZZ_Petty_Cash_Advance_Hdr_ID));
+	}
+
+	/** Get Petty Cash Advance.
+		@return Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Hdr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Petty Cash Claim.

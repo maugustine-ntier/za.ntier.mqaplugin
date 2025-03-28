@@ -21,18 +21,18 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_Petty_Cash_Claim_Line
+/** Generated Interface for ZZ_Petty_Cash_Recon_Hdr
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_Petty_Cash_Claim_Line 
+public interface I_ZZ_Petty_Cash_Recon_Hdr 
 {
 
-    /** TableName=ZZ_Petty_Cash_Claim_Line */
-    public static final String Table_Name = "ZZ_Petty_Cash_Claim_Line";
+    /** TableName=ZZ_Petty_Cash_Recon_Hdr */
+    public static final String Table_Name = "ZZ_Petty_Cash_Recon_Hdr";
 
-    /** AD_Table_ID=1000010 */
+    /** AD_Table_ID=1000011 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -64,34 +64,6 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name Amount */
-    public static final String COLUMNNAME_Amount = "Amount";
-
-	/** Set Amount.
-	  * Amount in a defined currency
-	  */
-	public void setAmount (BigDecimal Amount);
-
-	/** Get Amount.
-	  * Amount in a defined currency
-	  */
-	public BigDecimal getAmount();
-
-    /** Column name C_Charge_ID */
-    public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
-
-	/** Set Charge.
-	  * Additional document charges
-	  */
-	public void setC_Charge_ID (int C_Charge_ID);
-
-	/** Get Charge.
-	  * Additional document charges
-	  */
-	public int getC_Charge_ID();
-
-	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException;
-
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -108,6 +80,32 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  */
 	public int getCreatedBy();
 
+    /** Column name Description */
+    public static final String COLUMNNAME_Description = "Description";
+
+	/** Set Description.
+	  * Optional short description of the record
+	  */
+	public void setDescription (String Description);
+
+	/** Get Description.
+	  * Optional short description of the record
+	  */
+	public String getDescription();
+
+    /** Column name EndDate */
+    public static final String COLUMNNAME_EndDate = "EndDate";
+
+	/** Set End Date.
+	  * Last effective date (inclusive)
+	  */
+	public void setEndDate (Timestamp EndDate);
+
+	/** Get End Date.
+	  * Last effective date (inclusive)
+	  */
+	public Timestamp getEndDate();
+
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
 
@@ -120,6 +118,19 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name StartDate */
+    public static final String COLUMNNAME_StartDate = "StartDate";
+
+	/** Set Start Date.
+	  * First effective day (inclusive)
+	  */
+	public void setStartDate (Timestamp StartDate);
+
+	/** Get Start Date.
+	  * First effective day (inclusive)
+	  */
+	public Timestamp getStartDate();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
@@ -137,43 +148,14 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Petty_Cash_Claim_Hdr_ID */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Hdr_ID = "ZZ_Petty_Cash_Claim_Hdr_ID";
+    /** Column name ZZ_Float_Amt */
+    public static final String COLUMNNAME_ZZ_Float_Amt = "ZZ_Float_Amt";
 
-	/** Set Petty Cash Claim	  */
-	public void setZZ_Petty_Cash_Claim_Hdr_ID (int ZZ_Petty_Cash_Claim_Hdr_ID);
+	/** Set Float	  */
+	public void setZZ_Float_Amt (BigDecimal ZZ_Float_Amt);
 
-	/** Get Petty Cash Claim	  */
-	public int getZZ_Petty_Cash_Claim_Hdr_ID();
-
-	public I_ZZ_Petty_Cash_Claim_Hdr getZZ_Petty_Cash_Claim_Hdr() throws RuntimeException;
-
-    /** Column name ZZ_Petty_Cash_Claim_Line_ID */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Line_ID = "ZZ_Petty_Cash_Claim_Line_ID";
-
-	/** Set Petty Cash Claim Line	  */
-	public void setZZ_Petty_Cash_Claim_Line_ID (int ZZ_Petty_Cash_Claim_Line_ID);
-
-	/** Get Petty Cash Claim Line	  */
-	public int getZZ_Petty_Cash_Claim_Line_ID();
-
-    /** Column name ZZ_Petty_Cash_Claim_Line_UU */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Line_UU = "ZZ_Petty_Cash_Claim_Line_UU";
-
-	/** Set ZZ_Petty_Cash_Claim_Line_UU	  */
-	public void setZZ_Petty_Cash_Claim_Line_UU (String ZZ_Petty_Cash_Claim_Line_UU);
-
-	/** Get ZZ_Petty_Cash_Claim_Line_UU	  */
-	public String getZZ_Petty_Cash_Claim_Line_UU();
-
-    /** Column name ZZ_Petty_Cash_Motivation */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Motivation = "ZZ_Petty_Cash_Motivation";
-
-	/** Set Motivation	  */
-	public void setZZ_Petty_Cash_Motivation (String ZZ_Petty_Cash_Motivation);
-
-	/** Get Motivation	  */
-	public String getZZ_Petty_Cash_Motivation();
+	/** Get Float	  */
+	public BigDecimal getZZ_Float_Amt();
 
     /** Column name ZZ_Petty_Cash_Recon_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID = "ZZ_Petty_Cash_Recon_Hdr_ID";
@@ -184,5 +166,12 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	/** Get Petty Cash Recon	  */
 	public int getZZ_Petty_Cash_Recon_Hdr_ID();
 
-	public I_ZZ_Petty_Cash_Recon_Hdr getZZ_Petty_Cash_Recon_Hdr() throws RuntimeException;
+    /** Column name ZZ_Petty_Cash_Recon_Hdr_UU */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_UU = "ZZ_Petty_Cash_Recon_Hdr_UU";
+
+	/** Set ZZ_Petty_Cash_Recon_Hdr_UU	  */
+	public void setZZ_Petty_Cash_Recon_Hdr_UU (String ZZ_Petty_Cash_Recon_Hdr_UU);
+
+	/** Get ZZ_Petty_Cash_Recon_Hdr_UU	  */
+	public String getZZ_Petty_Cash_Recon_Hdr_UU();
 }

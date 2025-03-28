@@ -172,6 +172,15 @@ public interface I_ZZ_Petty_Cash_Advance_Hdr
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Credit_Card_No */
+    public static final String COLUMNNAME_ZZ_Credit_Card_No = "ZZ_Credit_Card_No";
+
+	/** Set Credit Card Number	  */
+	public void setZZ_Credit_Card_No (String ZZ_Credit_Card_No);
+
+	/** Get Credit Card Number	  */
+	public String getZZ_Credit_Card_No();
+
     /** Column name ZZ_Date_Approved */
     public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
 

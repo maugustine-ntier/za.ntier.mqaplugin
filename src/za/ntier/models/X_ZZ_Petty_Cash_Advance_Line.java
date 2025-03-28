@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Advance_Line extends PO implements I_ZZ_Petty_Cash_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250311L;
+	private static final long serialVersionUID = 20250328L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Line (Properties ctx, int ZZ_Petty_Cash_Advance_Line_ID, String trxName)

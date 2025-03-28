@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250324L;
+	private static final long serialVersionUID = 20250328L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, int ZZ_Petty_Cash_Claim_Line_ID, String trxName)
@@ -226,5 +226,32 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 	public String getZZ_Petty_Cash_Motivation()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Petty_Cash_Motivation);
+	}
+
+	public I_ZZ_Petty_Cash_Recon_Hdr getZZ_Petty_Cash_Recon_Hdr() throws RuntimeException
+	{
+		return (I_ZZ_Petty_Cash_Recon_Hdr)MTable.get(getCtx(), I_ZZ_Petty_Cash_Recon_Hdr.Table_ID)
+			.getPO(getZZ_Petty_Cash_Recon_Hdr_ID(), get_TrxName());
+	}
+
+	/** Set Petty Cash Recon.
+		@param ZZ_Petty_Cash_Recon_Hdr_ID Petty Cash Recon
+	*/
+	public void setZZ_Petty_Cash_Recon_Hdr_ID (int ZZ_Petty_Cash_Recon_Hdr_ID)
+	{
+		if (ZZ_Petty_Cash_Recon_Hdr_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID, Integer.valueOf(ZZ_Petty_Cash_Recon_Hdr_ID));
+	}
+
+	/** Get Petty Cash Recon.
+		@return Petty Cash Recon	  */
+	public int getZZ_Petty_Cash_Recon_Hdr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }

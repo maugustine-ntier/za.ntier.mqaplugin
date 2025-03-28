@@ -159,6 +159,15 @@ public interface I_ZZ_Petty_Cash_Claim_Hdr
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Credit_Card_No */
+    public static final String COLUMNNAME_ZZ_Credit_Card_No = "ZZ_Credit_Card_No";
+
+	/** Set Credit Card Number	  */
+	public void setZZ_Credit_Card_No (String ZZ_Credit_Card_No);
+
+	/** Get Credit Card Number	  */
+	public String getZZ_Credit_Card_No();
+
     /** Column name ZZ_Date_Approved */
     public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
 
@@ -230,6 +239,17 @@ public interface I_ZZ_Petty_Cash_Claim_Hdr
 
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
+
+    /** Column name ZZ_Petty_Cash_Advance_Hdr_ID */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID = "ZZ_Petty_Cash_Advance_Hdr_ID";
+
+	/** Set Petty Cash Advance	  */
+	public void setZZ_Petty_Cash_Advance_Hdr_ID (int ZZ_Petty_Cash_Advance_Hdr_ID);
+
+	/** Get Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Hdr_ID();
+
+	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException;
 
     /** Column name ZZ_Petty_Cash_Claim_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Hdr_ID = "ZZ_Petty_Cash_Claim_Hdr_ID";

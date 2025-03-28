@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250311L;
+	private static final long serialVersionUID = 20250328L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Hdr (Properties ctx, int ZZ_Petty_Cash_Advance_Hdr_ID, String trxName)
@@ -42,6 +42,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_ID, trxName);
       /** if (ZZ_Petty_Cash_Advance_Hdr_ID == 0)
         {
+			setLine_Manager_ID (0);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -52,6 +53,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_ID, trxName, virtualColumns);
       /** if (ZZ_Petty_Cash_Advance_Hdr_ID == 0)
         {
+			setLine_Manager_ID (0);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -62,6 +64,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_UU, trxName);
       /** if (ZZ_Petty_Cash_Advance_Hdr_UU == null)
         {
+			setLine_Manager_ID (0);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -72,6 +75,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
       super (ctx, ZZ_Petty_Cash_Advance_Hdr_UU, trxName, virtualColumns);
       /** if (ZZ_Petty_Cash_Advance_Hdr_UU == null)
         {
+			setLine_Manager_ID (0);
 			setZZ_Petty_Cash_Advance_Hdr_ID (0);
         } */
     }
@@ -196,6 +200,21 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** Set Credit Card Number.
+		@param ZZ_Credit_Card_No Credit Card Number
+	*/
+	public void setZZ_Credit_Card_No (String ZZ_Credit_Card_No)
+	{
+		set_Value (COLUMNNAME_ZZ_Credit_Card_No, ZZ_Credit_Card_No);
+	}
+
+	/** Get Credit Card Number.
+		@return Credit Card Number	  */
+	public String getZZ_Credit_Card_No()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Credit_Card_No);
 	}
 
 	/** Set Date Approved.
