@@ -2,6 +2,8 @@ package za.ntier.process;
 
 
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -12,9 +14,11 @@ import org.compiere.model.PO;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashClaimHdr;
+import za.ntier.models.MZZPettyCashClaimLine;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Line;
 import za.ntier.utils.Notifications;
@@ -96,6 +100,7 @@ public class PettyCashClaimRequest extends SvrProcess {
 				mZZPettyCashClaimHdr.setZZ_DocStatus(MZZPettyCashClaimHdr.ZZ_DOCSTATUS_Completed);
 				mZZPettyCashClaimHdr.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 				mZZPettyCashClaimHdr.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
+				mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(findAdvance());  // Link to advance for recons
 				String subject = PETTY_CASH_CLAIM_REQUEST + "Has been Approved by Finance";
 				String message = YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CLAIM_REQUEST + mZZPettyCashClaimHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
@@ -117,6 +122,31 @@ public class PettyCashClaimRequest extends SvrProcess {
 
 
 		return null;
+	}
+	
+	private int findAdvance() throws Exception{
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID from ZZ_Petty_Cash_Advance_Hdr ca "
+				+ " where ca.ZZ_DocStatus = 'CO' and "
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID)"; 
+		try {
+			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (Exception ex)	{
+			log.log(Level.SEVERE, selectQuery, ex);
+			throw ex;
+		}
+		finally
+		{
+			DB.close(rs,pstmt);
+			rs = null;pstmt = null;
+		}
+		return -1;
 	}
 
 
