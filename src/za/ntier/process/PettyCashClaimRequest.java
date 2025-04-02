@@ -100,7 +100,7 @@ public class PettyCashClaimRequest extends SvrProcess {
 				mZZPettyCashClaimHdr.setZZ_DocStatus(MZZPettyCashClaimHdr.ZZ_DOCSTATUS_Completed);
 				mZZPettyCashClaimHdr.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 				mZZPettyCashClaimHdr.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
-				mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(findAdvance());  // Link to advance for recons
+				mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(findAdvance(mZZPettyCashClaimHdr.getZZ_Credit_Card_No()));  // Link to advance for recons
 				String subject = PETTY_CASH_CLAIM_REQUEST + "Has been Approved by Finance";
 				String message = YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CLAIM_REQUEST + mZZPettyCashClaimHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;
@@ -124,14 +124,16 @@ public class PettyCashClaimRequest extends SvrProcess {
 		return null;
 	}
 	
-	private int findAdvance() throws Exception{
+	private int findAdvance(String zz_Credit_Card_No) throws Exception{
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID from ZZ_Petty_Cash_Advance_Hdr ca "
-				+ " where ca.ZZ_DocStatus = 'CO' and "
-				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID)"; 
+				+ " where ca.ZZ_DocStatus = 'CO' and ca.ZZ_Credit_Card_No = ? and"
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID)"
+				+ " order by ca.created"; 
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
+			pstmt.setString(1, zz_Credit_Card_No);
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {

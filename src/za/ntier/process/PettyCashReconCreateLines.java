@@ -20,6 +20,7 @@ import za.ntier.models.X_ZZ_Petty_Cash_Advance_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Line;
 import za.ntier.models.X_ZZ_Petty_Cash_Recon_Advance;
+import za.ntier.models.X_ZZ_Petty_Cash_Recon_Hdr;
 
 
 @org.adempiere.base.annotation.Process
@@ -54,6 +55,9 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		int zz_Petty_Cash_Recon_Hdr_ID = getRecord_ID();
+		X_ZZ_Petty_Cash_Recon_Hdr x_ZZ_Petty_Cash_Recon_Hdr = new X_ZZ_Petty_Cash_Recon_Hdr(getCtx(),zz_Petty_Cash_Recon_Hdr_ID,get_TrxName());
+		start_Date = simpleDateFormat.format(x_ZZ_Petty_Cash_Recon_Hdr.getStartDate());
+		end_Date = simpleDateFormat.format(x_ZZ_Petty_Cash_Recon_Hdr.getEndDate());
 		processClaims(zz_Petty_Cash_Recon_Hdr_ID);
 		processAdvances(zz_Petty_Cash_Recon_Hdr_ID);
 		return null;
@@ -62,10 +66,11 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processClaims(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID from ZZ_Petty_Cash_Claim_Line cl join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = cl. ZZ_Petty_Cash_Claim_Hdr_ID "
-				+ " where ch.ZZ_Petty_Cash_Advance_ID is not null and ch.ZZ_Petty_Cash_Advance_ID > 0 and ch.ZZ_DocStatus = 'CO' and "
-				+ " ch.ZZ_Date_Completed >= to_date(' " + start_Date + ",'ddmmyyyy') and "
-				+ " ch.ZZ_Date_Completed < to_date(' " + end_Date + ",'ddmmyyyy') + 1";
+		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID from ZZ_Petty_Cash_Claim_Line cl join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
+				+ " where ch.ZZ_Petty_Cash_Advance_Hdr_ID is not null and ch.ZZ_Petty_Cash_Advance_Hdr_ID > 0 and ch.ZZ_DocStatus = 'CO' and "
+				+ " ch.ZZ_Date_Completed >= to_date('%s','ddmmyyyy') and "
+				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1";
+		selectQuery = String.format(selectQuery, start_Date,end_Date);
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			rs = pstmt.executeQuery();

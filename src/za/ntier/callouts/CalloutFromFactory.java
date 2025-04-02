@@ -23,13 +23,13 @@ public class CalloutFromFactory implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		if (mTab.getTableName().equals(X_ZZ_Petty_Cash_Claim_Hdr.Table_Name) && mField.getColumnName().equals(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Credit_Card_No)) {
+		/* if (mTab.getTableName().equals(X_ZZ_Petty_Cash_Claim_Hdr.Table_Name) && mField.getColumnName().equals(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Credit_Card_No)) {
 			int ids[] = PO.getAllIDs(X_ZZ_Petty_Cash_Advance_Hdr.Table_Name, "ZZ_Petty_Cash_Advance_Hdr.ZZ_Credit_Card_No = '" + value + "'"  
 					+ " and not exists (Select 'x' from ZZ_Petty_Cash_Claim_Hdr cl where cl.ZZ_Credit_Card_No = '" + value + "' order BY created desc)",null);
 			if (ids != null && ids.length > 0) {
 				mTab.setValue(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, ids[0]);
 			}
-		}		
+		}	*/	
 		return null;
 	}
 
