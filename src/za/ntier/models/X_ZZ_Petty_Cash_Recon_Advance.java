@@ -118,6 +118,25 @@ public class X_ZZ_Petty_Cash_Recon_Advance extends PO implements I_ZZ_Petty_Cash
 		return bd;
 	}
 
+	/** Set Line No.
+		@param Line Unique line for this document
+	*/
+	public void setLine (int Line)
+	{
+		set_ValueNoCheck (COLUMNNAME_Line, Integer.valueOf(Line));
+	}
+
+	/** Get Line No.
+		@return Unique line for this document
+	  */
+	public int getLine()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException
 	{
 		return (I_ZZ_Petty_Cash_Advance_Hdr)MTable.get(getCtx(), I_ZZ_Petty_Cash_Advance_Hdr.Table_ID)
@@ -140,6 +159,33 @@ public class X_ZZ_Petty_Cash_Recon_Advance extends PO implements I_ZZ_Petty_Cash
 	public int getZZ_Petty_Cash_Advance_Hdr_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_ZZ_Petty_Cash_Advance_Line getZZ_Petty_Cash_Advance_Line() throws RuntimeException
+	{
+		return (I_ZZ_Petty_Cash_Advance_Line)MTable.get(getCtx(), I_ZZ_Petty_Cash_Advance_Line.Table_ID)
+			.getPO(getZZ_Petty_Cash_Advance_Line_ID(), get_TrxName());
+	}
+
+	/** Set Petty Cash Advance.
+		@param ZZ_Petty_Cash_Advance_Line_ID Petty Cash Advance
+	*/
+	public void setZZ_Petty_Cash_Advance_Line_ID (int ZZ_Petty_Cash_Advance_Line_ID)
+	{
+		if (ZZ_Petty_Cash_Advance_Line_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Line_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Line_ID, Integer.valueOf(ZZ_Petty_Cash_Advance_Line_ID));
+	}
+
+	/** Get Petty Cash Advance.
+		@return Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Line_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Advance_Line_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

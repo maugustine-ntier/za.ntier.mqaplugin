@@ -106,6 +106,19 @@ public interface I_ZZ_Petty_Cash_Recon_Advance
 	  */
 	public boolean isActive();
 
+    /** Column name Line */
+    public static final String COLUMNNAME_Line = "Line";
+
+	/** Set Line No.
+	  * Unique line for this document
+	  */
+	public void setLine (int Line);
+
+	/** Get Line No.
+	  * Unique line for this document
+	  */
+	public int getLine();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -132,6 +145,17 @@ public interface I_ZZ_Petty_Cash_Recon_Advance
 	public int getZZ_Petty_Cash_Advance_Hdr_ID();
 
 	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException;
+
+    /** Column name ZZ_Petty_Cash_Advance_Line_ID */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Advance_Line_ID = "ZZ_Petty_Cash_Advance_Line_ID";
+
+	/** Set Petty Cash Advance	  */
+	public void setZZ_Petty_Cash_Advance_Line_ID (int ZZ_Petty_Cash_Advance_Line_ID);
+
+	/** Get Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Line_ID();
+
+	public I_ZZ_Petty_Cash_Advance_Line getZZ_Petty_Cash_Advance_Line() throws RuntimeException;
 
     /** Column name ZZ_Petty_Cash_Recon_Advance_UU */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Advance_UU = "ZZ_Petty_Cash_Recon_Advance_UU";
