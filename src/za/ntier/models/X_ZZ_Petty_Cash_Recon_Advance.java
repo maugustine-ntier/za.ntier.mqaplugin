@@ -17,9 +17,11 @@
 /** Generated Model - DO NOT CHANGE */
 package za.ntier.models;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for ZZ_Petty_Cash_Recon_Advance
  *  @author iDempiere (generated)
@@ -31,7 +33,7 @@ public class X_ZZ_Petty_Cash_Recon_Advance extends PO implements I_ZZ_Petty_Cash
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250328L;
+	private static final long serialVersionUID = 20250402L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Recon_Advance (Properties ctx, int ZZ_Petty_Cash_Recon_Advance_ID, String trxName)
@@ -96,6 +98,25 @@ public class X_ZZ_Petty_Cash_Recon_Advance extends PO implements I_ZZ_Petty_Cash
         .append(get_UUID()).append("]");
       return sb.toString();
     }
+
+	/** Set Amount.
+		@param Amount Amount in a defined currency
+	*/
+	public void setAmount (BigDecimal Amount)
+	{
+		set_ValueNoCheck (COLUMNNAME_Amount, Amount);
+	}
+
+	/** Get Amount.
+		@return Amount in a defined currency
+	  */
+	public BigDecimal getAmount()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_Amount);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
 
 	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException
 	{

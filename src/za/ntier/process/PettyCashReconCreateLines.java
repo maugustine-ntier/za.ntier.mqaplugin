@@ -94,7 +94,7 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processAdvances(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID from ZZ_Petty_Cash_Advance_Hdr ca "
+		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID,ca.amount from ZZ_Petty_Cash_Advance_Hdr ca "
 				+ " where ca.ZZ_DocStatus = 'CO' and "
 				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID) and "
 				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_Advance ra where ra.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID"
@@ -108,6 +108,7 @@ public class PettyCashReconCreateLines extends SvrProcess {
 				X_ZZ_Petty_Cash_Recon_Advance x_ZZ_Petty_Cash_Recon_Advance = new X_ZZ_Petty_Cash_Recon_Advance(getCtx(), 0, get_TrxName());
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Advance_Hdr_ID(rs.getInt(1));
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
+				x_ZZ_Petty_Cash_Recon_Advance.setAmount(rs.getBigDecimal(2));
 				x_ZZ_Petty_Cash_Recon_Advance.saveEx();
 			}
 		} catch (Exception ex)	{

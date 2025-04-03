@@ -93,6 +93,19 @@ public interface I_ZZ_Petty_Cash_Recon_Hdr
 	  */
 	public String getDescription();
 
+    /** Column name DocumentNo */
+    public static final String COLUMNNAME_DocumentNo = "DocumentNo";
+
+	/** Set Document No.
+	  * Document sequence number of the document
+	  */
+	public void setDocumentNo (String DocumentNo);
+
+	/** Get Document No.
+	  * Document sequence number of the document
+	  */
+	public String getDocumentNo();
+
     /** Column name EndDate */
     public static final String COLUMNNAME_EndDate = "EndDate";
 
@@ -147,6 +160,51 @@ public interface I_ZZ_Petty_Cash_Recon_Hdr
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
+
+    /** Column name ZZ_Actual_COH */
+    public static final String COLUMNNAME_ZZ_Actual_COH = "ZZ_Actual_COH";
+
+	/** Set Actual Cash On Hand	  */
+	public void setZZ_Actual_COH (BigDecimal ZZ_Actual_COH);
+
+	/** Get Actual Cash On Hand	  */
+	public BigDecimal getZZ_Actual_COH();
+
+    /** Column name ZZ_Advance_Total */
+    public static final String COLUMNNAME_ZZ_Advance_Total = "ZZ_Advance_Total";
+
+	/** Set Advance Total	  */
+	public void setZZ_Advance_Total (BigDecimal ZZ_Advance_Total);
+
+	/** Get Advance Total	  */
+	public BigDecimal getZZ_Advance_Total();
+
+    /** Column name ZZ_Calculated_COH */
+    public static final String COLUMNNAME_ZZ_Calculated_COH = "ZZ_Calculated_COH";
+
+	/** Set Calculated Cash On Hand	  */
+	public void setZZ_Calculated_COH (BigDecimal ZZ_Calculated_COH);
+
+	/** Get Calculated Cash On Hand	  */
+	public BigDecimal getZZ_Calculated_COH();
+
+    /** Column name ZZ_Claim_Total */
+    public static final String COLUMNNAME_ZZ_Claim_Total = "ZZ_Claim_Total";
+
+	/** Set Claim Total	  */
+	public void setZZ_Claim_Total (BigDecimal ZZ_Claim_Total);
+
+	/** Get Claim Total	  */
+	public BigDecimal getZZ_Claim_Total();
+
+    /** Column name ZZ_Create_Lines */
+    public static final String COLUMNNAME_ZZ_Create_Lines = "ZZ_Create_Lines";
+
+	/** Set Create Lines	  */
+	public void setZZ_Create_Lines (String ZZ_Create_Lines);
+
+	/** Get Create Lines	  */
+	public String getZZ_Create_Lines();
 
     /** Column name ZZ_Float_Amt */
     public static final String COLUMNNAME_ZZ_Float_Amt = "ZZ_Float_Amt";

@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Recon_Hdr extends PO implements I_ZZ_Petty_Cash_Rec
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250328L;
+	private static final long serialVersionUID = 20250403L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Recon_Hdr (Properties ctx, int ZZ_Petty_Cash_Recon_Hdr_ID, String trxName)
@@ -120,6 +120,22 @@ public class X_ZZ_Petty_Cash_Recon_Hdr extends PO implements I_ZZ_Petty_Cash_Rec
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
+	/** Set Document No.
+		@param DocumentNo Document sequence number of the document
+	*/
+	public void setDocumentNo (String DocumentNo)
+	{
+		set_ValueNoCheck (COLUMNNAME_DocumentNo, DocumentNo);
+	}
+
+	/** Get Document No.
+		@return Document sequence number of the document
+	  */
+	public String getDocumentNo()
+	{
+		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
+
 	/** Set End Date.
 		@param EndDate Last effective date (inclusive)
 	*/
@@ -150,6 +166,93 @@ public class X_ZZ_Petty_Cash_Recon_Hdr extends PO implements I_ZZ_Petty_Cash_Rec
 	public Timestamp getStartDate()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_StartDate);
+	}
+
+	/** Set Actual Cash On Hand.
+		@param ZZ_Actual_COH Actual Cash On Hand
+	*/
+	public void setZZ_Actual_COH (BigDecimal ZZ_Actual_COH)
+	{
+		set_Value (COLUMNNAME_ZZ_Actual_COH, ZZ_Actual_COH);
+	}
+
+	/** Get Actual Cash On Hand.
+		@return Actual Cash On Hand	  */
+	public BigDecimal getZZ_Actual_COH()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Actual_COH);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Advance Total.
+		@param ZZ_Advance_Total Advance Total
+	*/
+	public void setZZ_Advance_Total (BigDecimal ZZ_Advance_Total)
+	{
+		set_Value (COLUMNNAME_ZZ_Advance_Total, ZZ_Advance_Total);
+	}
+
+	/** Get Advance Total.
+		@return Advance Total	  */
+	public BigDecimal getZZ_Advance_Total()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Advance_Total);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Calculated Cash On Hand.
+		@param ZZ_Calculated_COH Calculated Cash On Hand
+	*/
+	public void setZZ_Calculated_COH (BigDecimal ZZ_Calculated_COH)
+	{
+		set_Value (COLUMNNAME_ZZ_Calculated_COH, ZZ_Calculated_COH);
+	}
+
+	/** Get Calculated Cash On Hand.
+		@return Calculated Cash On Hand	  */
+	public BigDecimal getZZ_Calculated_COH()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Calculated_COH);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Claim Total.
+		@param ZZ_Claim_Total Claim Total
+	*/
+	public void setZZ_Claim_Total (BigDecimal ZZ_Claim_Total)
+	{
+		set_Value (COLUMNNAME_ZZ_Claim_Total, ZZ_Claim_Total);
+	}
+
+	/** Get Claim Total.
+		@return Claim Total	  */
+	public BigDecimal getZZ_Claim_Total()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Claim_Total);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Create Lines.
+		@param ZZ_Create_Lines Create Lines
+	*/
+	public void setZZ_Create_Lines (String ZZ_Create_Lines)
+	{
+		set_Value (COLUMNNAME_ZZ_Create_Lines, ZZ_Create_Lines);
+	}
+
+	/** Get Create Lines.
+		@return Create Lines	  */
+	public String getZZ_Create_Lines()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Create_Lines);
 	}
 
 	/** Set Float.
