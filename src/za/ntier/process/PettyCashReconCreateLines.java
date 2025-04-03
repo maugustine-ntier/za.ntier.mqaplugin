@@ -16,6 +16,7 @@ import org.compiere.util.DB;
 
 import za.ntier.models.MZZPettyCashClaimHdr;
 import za.ntier.models.MZZPettyCashClaimLine;
+import za.ntier.models.MZZPettyCashReconHdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Advance_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Line;
@@ -60,6 +61,9 @@ public class PettyCashReconCreateLines extends SvrProcess {
 		end_Date = simpleDateFormat.format(x_ZZ_Petty_Cash_Recon_Hdr.getEndDate());
 		processClaims(zz_Petty_Cash_Recon_Hdr_ID);
 		processAdvances(zz_Petty_Cash_Recon_Hdr_ID);
+		MZZPettyCashReconHdr mZZPettyCashReconHdr = new MZZPettyCashReconHdr(getCtx(), zz_Petty_Cash_Recon_Hdr_ID, get_TrxName());
+		mZZPettyCashReconHdr.updateTotals();
+		mZZPettyCashReconHdr.saveEx();
 		return null;
 	}
 

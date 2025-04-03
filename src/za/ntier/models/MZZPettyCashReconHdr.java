@@ -32,6 +32,18 @@ public class MZZPettyCashReconHdr extends X_ZZ_Petty_Cash_Recon_Hdr {
 		super(ctx, rs, trxName);
 	}
 	
+	
+	
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		BigDecimal claimTotal = (getZZ_Claim_Total() == null) ? BigDecimal.ZERO: getZZ_Claim_Total();
+		BigDecimal advanceTotal = (getZZ_Advance_Total() == null) ? BigDecimal.ZERO : getZZ_Advance_Total();
+		BigDecimal floatAmt = (getZZ_Float_Amt() == null) ? BigDecimal.ZERO : getZZ_Float_Amt();
+		BigDecimal calcCashOnHand = floatAmt.subtract(claimTotal).subtract(advanceTotal);
+		setZZ_Calculated_COH(calcCashOnHand);
+		return super.beforeSave(newRecord);
+	}
+
 	public void updateTotals() throws Exception {
 		String SQL = "Select sum(ch.amount) from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Recon_Hdr_ID = ?";
 		BigDecimal claimTotal = DB.getSQLValueBD(get_TrxName(), SQL, getZZ_Petty_Cash_Recon_Hdr_ID());
@@ -43,8 +55,7 @@ public class MZZPettyCashReconHdr extends X_ZZ_Petty_Cash_Recon_Hdr {
 		BigDecimal calcCashOnHand = floatAmt.subtract(claimTotal).subtract(advanceTotal);
 		setZZ_Claim_Total(claimTotal);
 		setZZ_Advance_Total(advanceTotal);
-		setZZ_Calculated_COH(calcCashOnHand);
-		saveEx();
+		setZZ_Calculated_COH(calcCashOnHand);		
 	}
 
 }
