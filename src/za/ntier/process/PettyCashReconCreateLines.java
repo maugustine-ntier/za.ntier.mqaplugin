@@ -71,7 +71,8 @@ public class PettyCashReconCreateLines extends SvrProcess {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID from ZZ_Petty_Cash_Claim_Line cl join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
-				+ " where ch.ZZ_Petty_Cash_Advance_Hdr_ID is not null and ch.ZZ_Petty_Cash_Advance_Hdr_ID > 0 and ch.ZZ_DocStatus = 'CO' and "
+				//+ " where ch.ZZ_Petty_Cash_Advance_Hdr_ID is not null and ch.ZZ_Petty_Cash_Advance_Hdr_ID > 0 and ch.ZZ_DocStatus = 'CO' and "
+				+ " where ch.ZZ_DocStatus = 'CO' and "
 				+ " ch.ZZ_Date_Completed >= to_date('%s','ddmmyyyy') and "
 				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1";
 		selectQuery = String.format(selectQuery, start_Date,end_Date);
@@ -98,7 +99,7 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processAdvances(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID,ca.amount from ZZ_Petty_Cash_Advance_Hdr ca "
+		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID,ca.totalAmt from ZZ_Petty_Cash_Advance_Hdr ca "
 				+ " where ca.ZZ_DocStatus = 'CO' and "
 				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID) and "
 				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_Advance ra where ra.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID"
