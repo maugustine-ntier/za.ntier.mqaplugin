@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Application extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250402L;
+	private static final long serialVersionUID = 20250403L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Application (Properties ctx, int ZZ_Petty_Cash_Application_ID, String trxName)

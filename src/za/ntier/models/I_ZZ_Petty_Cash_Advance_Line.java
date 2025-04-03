@@ -121,6 +121,19 @@ public interface I_ZZ_Petty_Cash_Advance_Line
 	  */
 	public boolean isActive();
 
+    /** Column name Line */
+    public static final String COLUMNNAME_Line = "Line";
+
+	/** Set Line No.
+	  * Unique line for this document
+	  */
+	public void setLine (int Line);
+
+	/** Get Line No.
+	  * Unique line for this document
+	  */
+	public int getLine();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 

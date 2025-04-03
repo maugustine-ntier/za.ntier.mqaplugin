@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Advance_Line extends PO implements I_ZZ_Petty_Cash_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250402L;
+	private static final long serialVersionUID = 20250403L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Line (Properties ctx, int ZZ_Petty_Cash_Advance_Line_ID, String trxName)
@@ -145,6 +145,25 @@ public class X_ZZ_Petty_Cash_Advance_Line extends PO implements I_ZZ_Petty_Cash_
 	public int getC_Charge_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_C_Charge_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Line No.
+		@param Line Unique line for this document
+	*/
+	public void setLine (int Line)
+	{
+		set_ValueNoCheck (COLUMNNAME_Line, Integer.valueOf(Line));
+	}
+
+	/** Get Line No.
+		@return Unique line for this document
+	  */
+	public int getLine()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

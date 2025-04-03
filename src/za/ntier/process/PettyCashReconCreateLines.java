@@ -4,23 +4,17 @@ package za.ntier.process;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 
 import org.compiere.model.MProcessPara;
-import org.compiere.model.PO;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
-import za.ntier.models.MZZPettyCashClaimHdr;
-import za.ntier.models.MZZPettyCashClaimLine;
 import za.ntier.models.MZZPettyCashReconHdr;
-import za.ntier.models.X_ZZ_Petty_Cash_Advance_Hdr;
-import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
-import za.ntier.models.X_ZZ_Petty_Cash_Claim_Line;
 import za.ntier.models.X_ZZ_Petty_Cash_Recon_Advance;
+import za.ntier.models.X_ZZ_Petty_Cash_Recon_Claim;
 import za.ntier.models.X_ZZ_Petty_Cash_Recon_Hdr;
 
 
@@ -70,20 +64,25 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processClaims(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID from ZZ_Petty_Cash_Claim_Line cl join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
-				//+ " where ch.ZZ_Petty_Cash_Advance_Hdr_ID is not null and ch.ZZ_Petty_Cash_Advance_Hdr_ID > 0 and ch.ZZ_DocStatus = 'CO' and "
+		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID,cl.amount,cl.zz_Petty_Cash_Claim_Hdr_ID from ZZ_Petty_Cash_Claim_Line cl "
+				+ " join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
 				+ " where ch.ZZ_DocStatus = 'CO' and "
 				+ " ch.ZZ_Date_Completed >= to_date('%s','ddmmyyyy') and "
-				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1";
+				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1"
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_claim ra where ra.ZZ_Petty_Cash_Claim_Line_ID = ca.ZZ_Petty_Cash_Claim_Line_ID"
+				+ "   and ra.ZZ_Petty_Cash_Claim_Line_ID = ?)";
 		selectQuery = String.format(selectQuery, start_Date,end_Date);
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				MZZPettyCashClaimLine mZZPettyCashClaimLine = new MZZPettyCashClaimLine(getCtx(), rs.getInt(1), get_TrxName());
-				mZZPettyCashClaimLine.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
-				mZZPettyCashClaimLine.saveEx();
+				X_ZZ_Petty_Cash_Recon_Claim x_ZZ_Petty_Cash_Recon_Claim = new X_ZZ_Petty_Cash_Recon_Claim(getCtx(), 0, get_TrxName());
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Hdr_ID(rs.getInt(3));
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Line_ID(rs.getInt(1));
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
+				x_ZZ_Petty_Cash_Recon_Claim.setAmount(rs.getBigDecimal(2));
+				x_ZZ_Petty_Cash_Recon_Claim.saveEx();
 			}
 		} catch (Exception ex)	{
 			log.log(Level.SEVERE, selectQuery, ex);

@@ -23,11 +23,11 @@ import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
 
-/** Generated Model for ZZ_Petty_Cash_Claim_Line
+/** Generated Model for ZZ_Petty_Cash_Recon_Claim
  *  @author iDempiere (generated)
  *  @version Release 12 - $Id$ */
-@org.adempiere.base.Model(table="ZZ_Petty_Cash_Claim_Line")
-public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Claim_Line, I_Persistent
+@org.adempiere.base.Model(table="ZZ_Petty_Cash_Recon_Claim")
+public class X_ZZ_Petty_Cash_Recon_Claim extends PO implements I_ZZ_Petty_Cash_Recon_Claim, I_Persistent
 {
 
 	/**
@@ -36,47 +36,47 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 	private static final long serialVersionUID = 20250403L;
 
     /** Standard Constructor */
-    public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, int ZZ_Petty_Cash_Claim_Line_ID, String trxName)
+    public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, int ZZ_Petty_Cash_Recon_Claim_ID, String trxName)
     {
-      super (ctx, ZZ_Petty_Cash_Claim_Line_ID, trxName);
-      /** if (ZZ_Petty_Cash_Claim_Line_ID == 0)
+      super (ctx, ZZ_Petty_Cash_Recon_Claim_ID, trxName);
+      /** if (ZZ_Petty_Cash_Recon_Claim_ID == 0)
         {
-			setZZ_Petty_Cash_Claim_Line_ID (0);
+			setZZ_Petty_Cash_Recon_Claim_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, int ZZ_Petty_Cash_Claim_Line_ID, String trxName, String ... virtualColumns)
+    public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, int ZZ_Petty_Cash_Recon_Claim_ID, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_Petty_Cash_Claim_Line_ID, trxName, virtualColumns);
-      /** if (ZZ_Petty_Cash_Claim_Line_ID == 0)
+      super (ctx, ZZ_Petty_Cash_Recon_Claim_ID, trxName, virtualColumns);
+      /** if (ZZ_Petty_Cash_Recon_Claim_ID == 0)
         {
-			setZZ_Petty_Cash_Claim_Line_ID (0);
+			setZZ_Petty_Cash_Recon_Claim_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, String ZZ_Petty_Cash_Claim_Line_UU, String trxName)
+    public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, String ZZ_Petty_Cash_Recon_Claim_UU, String trxName)
     {
-      super (ctx, ZZ_Petty_Cash_Claim_Line_UU, trxName);
-      /** if (ZZ_Petty_Cash_Claim_Line_UU == null)
+      super (ctx, ZZ_Petty_Cash_Recon_Claim_UU, trxName);
+      /** if (ZZ_Petty_Cash_Recon_Claim_UU == null)
         {
-			setZZ_Petty_Cash_Claim_Line_ID (0);
+			setZZ_Petty_Cash_Recon_Claim_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, String ZZ_Petty_Cash_Claim_Line_UU, String trxName, String ... virtualColumns)
+    public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, String ZZ_Petty_Cash_Recon_Claim_UU, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_Petty_Cash_Claim_Line_UU, trxName, virtualColumns);
-      /** if (ZZ_Petty_Cash_Claim_Line_UU == null)
+      super (ctx, ZZ_Petty_Cash_Recon_Claim_UU, trxName, virtualColumns);
+      /** if (ZZ_Petty_Cash_Recon_Claim_UU == null)
         {
-			setZZ_Petty_Cash_Claim_Line_ID (0);
+			setZZ_Petty_Cash_Recon_Claim_ID (0);
         } */
     }
 
     /** Load Constructor */
-    public X_ZZ_Petty_Cash_Claim_Line (Properties ctx, ResultSet rs, String trxName)
+    public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, ResultSet rs, String trxName)
     {
       super (ctx, rs, trxName);
     }
@@ -98,7 +98,7 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 
     public String toString()
     {
-      StringBuilder sb = new StringBuilder ("X_ZZ_Petty_Cash_Claim_Line[")
+      StringBuilder sb = new StringBuilder ("X_ZZ_Petty_Cash_Recon_Claim[")
         .append(get_ID()).append("]");
       return sb.toString();
     }
@@ -196,6 +196,12 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 		return ii.intValue();
 	}
 
+	public I_ZZ_Petty_Cash_Claim_Line getZZ_Petty_Cash_Claim_Line() throws RuntimeException
+	{
+		return (I_ZZ_Petty_Cash_Claim_Line)MTable.get(getCtx(), I_ZZ_Petty_Cash_Claim_Line.Table_ID)
+			.getPO(getZZ_Petty_Cash_Claim_Line_ID(), get_TrxName());
+	}
+
 	/** Set Petty Cash Claim Line.
 		@param ZZ_Petty_Cash_Claim_Line_ID Petty Cash Claim Line
 	*/
@@ -217,21 +223,6 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 		return ii.intValue();
 	}
 
-	/** Set ZZ_Petty_Cash_Claim_Line_UU.
-		@param ZZ_Petty_Cash_Claim_Line_UU ZZ_Petty_Cash_Claim_Line_UU
-	*/
-	public void setZZ_Petty_Cash_Claim_Line_UU (String ZZ_Petty_Cash_Claim_Line_UU)
-	{
-		set_Value (COLUMNNAME_ZZ_Petty_Cash_Claim_Line_UU, ZZ_Petty_Cash_Claim_Line_UU);
-	}
-
-	/** Get ZZ_Petty_Cash_Claim_Line_UU.
-		@return ZZ_Petty_Cash_Claim_Line_UU	  */
-	public String getZZ_Petty_Cash_Claim_Line_UU()
-	{
-		return (String)get_Value(COLUMNNAME_ZZ_Petty_Cash_Claim_Line_UU);
-	}
-
 	/** Set Motivation.
 		@param ZZ_Petty_Cash_Motivation Motivation
 	*/
@@ -245,6 +236,42 @@ public class X_ZZ_Petty_Cash_Claim_Line extends PO implements I_ZZ_Petty_Cash_Cl
 	public String getZZ_Petty_Cash_Motivation()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Petty_Cash_Motivation);
+	}
+
+	/** Set Petty Cash Recon Claim.
+		@param ZZ_Petty_Cash_Recon_Claim_ID Petty Cash Recon Claim
+	*/
+	public void setZZ_Petty_Cash_Recon_Claim_ID (int ZZ_Petty_Cash_Recon_Claim_ID)
+	{
+		if (ZZ_Petty_Cash_Recon_Claim_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_ID, Integer.valueOf(ZZ_Petty_Cash_Recon_Claim_ID));
+	}
+
+	/** Get Petty Cash Recon Claim.
+		@return Petty Cash Recon Claim	  */
+	public int getZZ_Petty_Cash_Recon_Claim_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set ZZ_Petty_Cash_Recon_Claim_UU.
+		@param ZZ_Petty_Cash_Recon_Claim_UU ZZ_Petty_Cash_Recon_Claim_UU
+	*/
+	public void setZZ_Petty_Cash_Recon_Claim_UU (String ZZ_Petty_Cash_Recon_Claim_UU)
+	{
+		set_Value (COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_UU, ZZ_Petty_Cash_Recon_Claim_UU);
+	}
+
+	/** Get ZZ_Petty_Cash_Recon_Claim_UU.
+		@return ZZ_Petty_Cash_Recon_Claim_UU	  */
+	public String getZZ_Petty_Cash_Recon_Claim_UU()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_UU);
 	}
 
 	public I_ZZ_Petty_Cash_Recon_Hdr getZZ_Petty_Cash_Recon_Hdr() throws RuntimeException

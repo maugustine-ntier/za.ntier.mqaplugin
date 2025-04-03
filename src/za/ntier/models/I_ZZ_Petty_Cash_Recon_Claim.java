@@ -21,18 +21,18 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_Petty_Cash_Claim_Line
+/** Generated Interface for ZZ_Petty_Cash_Recon_Claim
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_Petty_Cash_Claim_Line 
+public interface I_ZZ_Petty_Cash_Recon_Claim 
 {
 
-    /** TableName=ZZ_Petty_Cash_Claim_Line */
-    public static final String Table_Name = "ZZ_Petty_Cash_Claim_Line";
+    /** TableName=ZZ_Petty_Cash_Recon_Claim */
+    public static final String Table_Name = "ZZ_Petty_Cash_Recon_Claim";
 
-    /** AD_Table_ID=1000010 */
+    /** AD_Table_ID=1000016 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -170,14 +170,7 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 	/** Get Petty Cash Claim Line	  */
 	public int getZZ_Petty_Cash_Claim_Line_ID();
 
-    /** Column name ZZ_Petty_Cash_Claim_Line_UU */
-    public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Line_UU = "ZZ_Petty_Cash_Claim_Line_UU";
-
-	/** Set ZZ_Petty_Cash_Claim_Line_UU	  */
-	public void setZZ_Petty_Cash_Claim_Line_UU (String ZZ_Petty_Cash_Claim_Line_UU);
-
-	/** Get ZZ_Petty_Cash_Claim_Line_UU	  */
-	public String getZZ_Petty_Cash_Claim_Line_UU();
+	public I_ZZ_Petty_Cash_Claim_Line getZZ_Petty_Cash_Claim_Line() throws RuntimeException;
 
     /** Column name ZZ_Petty_Cash_Motivation */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Motivation = "ZZ_Petty_Cash_Motivation";
@@ -187,6 +180,24 @@ public interface I_ZZ_Petty_Cash_Claim_Line
 
 	/** Get Motivation	  */
 	public String getZZ_Petty_Cash_Motivation();
+
+    /** Column name ZZ_Petty_Cash_Recon_Claim_ID */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_ID = "ZZ_Petty_Cash_Recon_Claim_ID";
+
+	/** Set Petty Cash Recon Claim	  */
+	public void setZZ_Petty_Cash_Recon_Claim_ID (int ZZ_Petty_Cash_Recon_Claim_ID);
+
+	/** Get Petty Cash Recon Claim	  */
+	public int getZZ_Petty_Cash_Recon_Claim_ID();
+
+    /** Column name ZZ_Petty_Cash_Recon_Claim_UU */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Claim_UU = "ZZ_Petty_Cash_Recon_Claim_UU";
+
+	/** Set ZZ_Petty_Cash_Recon_Claim_UU	  */
+	public void setZZ_Petty_Cash_Recon_Claim_UU (String ZZ_Petty_Cash_Recon_Claim_UU);
+
+	/** Get ZZ_Petty_Cash_Recon_Claim_UU	  */
+	public String getZZ_Petty_Cash_Recon_Claim_UU();
 
     /** Column name ZZ_Petty_Cash_Recon_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Recon_Hdr_ID = "ZZ_Petty_Cash_Recon_Hdr_ID";
