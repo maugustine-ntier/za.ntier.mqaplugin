@@ -45,7 +45,7 @@ public class MZZPettyCashReconHdr extends X_ZZ_Petty_Cash_Recon_Hdr {
 	}
 
 	public void updateTotals() throws Exception {
-		String SQL = "Select sum(cl.amount) from ZZ_Petty_Cash_Claim_Line cl where cl.ZZ_Petty_Cash_Recon_Hdr_ID = ?";
+		String SQL = "Select sum(cl.amount) from ZZ_Petty_Cash_Recon_Claim cl where cl.ZZ_Petty_Cash_Recon_Hdr_ID = ?";
 		BigDecimal claimTotal = DB.getSQLValueBD(get_TrxName(), SQL, getZZ_Petty_Cash_Recon_Hdr_ID());
 		String SQL2 = "Select sum(ca.amount) from ZZ_Petty_Cash_Recon_Advance ca where ca.ZZ_Petty_Cash_Recon_Hdr_ID = ?";
 		BigDecimal advanceTotal = DB.getSQLValueBD(get_TrxName(), SQL2, getZZ_Petty_Cash_Recon_Hdr_ID());

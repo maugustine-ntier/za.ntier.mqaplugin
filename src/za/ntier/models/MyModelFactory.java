@@ -17,6 +17,12 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Advance.Table_Name)) {
+			return MZZPettyCashReconAdvance.class;
+		}
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Claim.Table_Name)) {
+			return MZZPettyCashReconClaim.class;
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Hdr.Table_Name)) {
 			return MZZPettyCashReconHdr.class;
 		}
@@ -46,6 +52,12 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Advance.Table_Name)) {
+			return new MZZPettyCashReconAdvance(Env.getCtx(),Record_ID,trxName);
+		}
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Claim.Table_Name)) {
+			return new MZZPettyCashReconClaim(Env.getCtx(),Record_ID,trxName);
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Hdr.Table_Name)) {
 			return new MZZPettyCashReconHdr(Env.getCtx(),Record_ID,trxName);
 		}
@@ -76,6 +88,12 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Advance.Table_Name)) {
+			return new MZZPettyCashReconAdvance(Env.getCtx(),rs,trxName);
+		}
+		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Claim.Table_Name)) {
+			return new MZZPettyCashReconClaim(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_ZZ_Petty_Cash_Recon_Hdr.Table_Name)) {
 			return new MZZPettyCashReconHdr(Env.getCtx(),rs,trxName);
 		}

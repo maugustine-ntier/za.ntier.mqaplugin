@@ -64,17 +64,21 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processClaims(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID,cl.amount,cl.zz_Petty_Cash_Claim_Hdr_ID,cl.Line from ZZ_Petty_Cash_Claim_Line cl "
+		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID,cl.amount,cl.zz_Petty_Cash_Claim_Hdr_ID,cl.Line "
+				+ " from ZZ_Petty_Cash_Claim_Line cl "
 				+ " join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
 				+ " where ch.ZZ_DocStatus = 'CO' and "
 				+ " ch.ZZ_Date_Completed >= to_date('%s','ddmmyyyy') and "
-				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1"
-				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_claim ra where ra.ZZ_Petty_Cash_Claim_Line_ID = ca.ZZ_Petty_Cash_Claim_Line_ID"
-				+ "   and ra.zz_Petty_Cash_Recon_Hdr_ID = ?)";
+				+ " ch.ZZ_Date_Completed < to_date('%s','ddmmyyyy') + 1 and"
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_claim ra where ra.ZZ_Petty_Cash_Claim_Line_ID = cl.ZZ_Petty_Cash_Claim_Line_ID"  // Same line not repeated
+				+ "   and ra.zz_Petty_Cash_Recon_Hdr_ID = ?) and"
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_claim ra where ra.ZZ_Petty_Cash_Claim_Hdr_ID = cl.ZZ_Petty_Cash_Claim_Hdr_ID"  // Claim can only be on one recon
+				+ "   and ra.zz_Petty_Cash_Recon_Hdr_ID <> ?) ";
 		selectQuery = String.format(selectQuery, start_Date,end_Date);
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setInt(1, zz_Petty_Cash_Recon_Hdr_ID);
+			pstmt.setInt(2, zz_Petty_Cash_Recon_Hdr_ID);
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
@@ -100,11 +104,12 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processAdvances(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Advance_Line_ID,cl.Amount,cl.ZZ_Petty_Cash_Advance_Hdr_ID,cl.Line from ZZ_Petty_Cash_Advance_Line cl "
-				+ " join ZZ_Petty_Cash_Advance_Hdr ch on cl.ZZ_Petty_Cash_Advance_Hdr_ID = ch. ZZ_Petty_Cash_Advance_Hdr_ID "
-				+ " where ca.ZZ_DocStatus = 'CO' and "
-				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID) and "
-				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_Advance ra where ra.ZZ_Petty_Cash_Advance_Line_ID = ca.ZZ_Petty_Cash_Advance_Line_ID"
+		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Advance_Line_ID,cl.Amount,cl.ZZ_Petty_Cash_Advance_Hdr_ID,cl.Line "
+				+ " from ZZ_Petty_Cash_Advance_Line cl "
+				+ " join ZZ_Petty_Cash_Advance_Hdr cah on cl.ZZ_Petty_Cash_Advance_Hdr_ID = cah. ZZ_Petty_Cash_Advance_Hdr_ID "
+				+ " where cah.ZZ_DocStatus = 'CO' and "
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = cah.ZZ_Petty_Cash_Advance_Hdr_ID) and "
+				+ " not exists (select 'x' from ZZ_Petty_Cash_Recon_Advance ra where ra.ZZ_Petty_Cash_Advance_Line_ID = cl.ZZ_Petty_Cash_Advance_Line_ID"
 				+ "   and ra.zz_Petty_Cash_Recon_Hdr_ID = ?)"; 
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
