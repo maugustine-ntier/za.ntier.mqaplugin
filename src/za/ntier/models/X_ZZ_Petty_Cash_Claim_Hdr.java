@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Claim_Hdr extends PO implements I_ZZ_Petty_Cash_Cla
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250403L;
+	private static final long serialVersionUID = 20250404L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Claim_Hdr (Properties ctx, int ZZ_Petty_Cash_Claim_Hdr_ID, String trxName)
@@ -181,6 +181,24 @@ public class X_ZZ_Petty_Cash_Claim_Hdr extends PO implements I_ZZ_Petty_Cash_Cla
 	public BigDecimal getTotalAmt()
 	{
 		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_TotalAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Advance Balance.
+		@param ZZ_Advance_Balance Advance Balance
+	*/
+	public void setZZ_Advance_Balance (BigDecimal ZZ_Advance_Balance)
+	{
+		set_Value (COLUMNNAME_ZZ_Advance_Balance, ZZ_Advance_Balance);
+	}
+
+	/** Get Advance Balance.
+		@return Advance Balance	  */
+	public BigDecimal getZZ_Advance_Balance()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Advance_Balance);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;

@@ -33,7 +33,7 @@ public class X_ZZ_Petty_Cash_Recon_Claim extends PO implements I_ZZ_Petty_Cash_R
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250403L;
+	private static final long serialVersionUID = 20250404L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Recon_Claim (Properties ctx, int ZZ_Petty_Cash_Recon_Claim_ID, String trxName)
@@ -164,6 +164,51 @@ public class X_ZZ_Petty_Cash_Recon_Claim extends PO implements I_ZZ_Petty_Cash_R
 	public int getLine()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_Line);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Advance Balance.
+		@param ZZ_Advance_Balance Advance Balance
+	*/
+	public void setZZ_Advance_Balance (BigDecimal ZZ_Advance_Balance)
+	{
+		set_Value (COLUMNNAME_ZZ_Advance_Balance, ZZ_Advance_Balance);
+	}
+
+	/** Get Advance Balance.
+		@return Advance Balance	  */
+	public BigDecimal getZZ_Advance_Balance()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Advance_Balance);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException
+	{
+		return (I_ZZ_Petty_Cash_Advance_Hdr)MTable.get(getCtx(), I_ZZ_Petty_Cash_Advance_Hdr.Table_ID)
+			.getPO(getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+	}
+
+	/** Set Petty Cash Advance.
+		@param ZZ_Petty_Cash_Advance_Hdr_ID Petty Cash Advance
+	*/
+	public void setZZ_Petty_Cash_Advance_Hdr_ID (int ZZ_Petty_Cash_Advance_Hdr_ID)
+	{
+		if (ZZ_Petty_Cash_Advance_Hdr_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, Integer.valueOf(ZZ_Petty_Cash_Advance_Hdr_ID));
+	}
+
+	/** Get Petty Cash Advance.
+		@return Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Hdr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

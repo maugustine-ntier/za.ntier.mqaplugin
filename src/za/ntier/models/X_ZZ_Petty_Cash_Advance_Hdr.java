@@ -34,7 +34,7 @@ public class X_ZZ_Petty_Cash_Advance_Hdr extends PO implements I_ZZ_Petty_Cash_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250403L;
+	private static final long serialVersionUID = 20250404L;
 
     /** Standard Constructor */
     public X_ZZ_Petty_Cash_Advance_Hdr (Properties ctx, int ZZ_Petty_Cash_Advance_Hdr_ID, String trxName)

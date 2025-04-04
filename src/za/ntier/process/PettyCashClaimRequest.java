@@ -2,6 +2,7 @@ package za.ntier.process;
 
 
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -17,6 +18,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+import za.ntier.models.MZZPettyCashAdvanceHdr;
 import za.ntier.models.MZZPettyCashClaimHdr;
 import za.ntier.models.MZZPettyCashClaimLine;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
@@ -101,6 +103,16 @@ public class PettyCashClaimRequest extends SvrProcess {
 				mZZPettyCashClaimHdr.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 				mZZPettyCashClaimHdr.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
 				mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(findAdvance(mZZPettyCashClaimHdr.getZZ_Credit_Card_No()));  // Link to advance for recons
+				if (mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID() > 0) {
+					MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+					BigDecimal totalAmtAdvance = (mZZPettyCashAdvanceHdr.getTotalAmt() != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO;
+					BigDecimal totalAmtClaim = (mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO;
+					BigDecimal zz_Advance_Balance = totalAmtAdvance.subtract(totalAmtClaim);
+					if (zz_Advance_Balance.compareTo(BigDecimal.ZERO) < 0) {
+						zz_Advance_Balance = BigDecimal.ZERO;
+					}
+					mZZPettyCashClaimHdr.setZZ_Advance_Balance(zz_Advance_Balance);
+				}			
 				String subject = PETTY_CASH_CLAIM_REQUEST + "Has been Approved by Finance";
 				String message = YOUR_APPLICATION_WAS_APPROVED_PETTY_CASH_CLAIM_REQUEST + mZZPettyCashClaimHdr.getDocumentNo();
 				int ad_Message_ID = MESSAGE_NEW_PETTYCASH_APP;

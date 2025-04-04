@@ -1,11 +1,14 @@
 package za.ntier.models;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.util.DB;
 
 public class MZZPettyCashClaimLine extends X_ZZ_Petty_Cash_Claim_Line {
+
+	private static final long serialVersionUID = 1L;
 
 	public MZZPettyCashClaimLine(Properties ctx, int ZZ_Petty_Cash_Claim_Line_ID, String trxName) {
 		super(ctx, ZZ_Petty_Cash_Claim_Line_ID, trxName);
@@ -43,6 +46,18 @@ public class MZZPettyCashClaimLine extends X_ZZ_Petty_Cash_Claim_Line {
 					.append("WHERE h.ZZ_Petty_Cash_Claim_Hdr_ID=l.ZZ_Petty_Cash_Claim_Hdr_ID AND l.IsActive='Y'),0) ")
 				.append("WHERE ZZ_Petty_Cash_Claim_Hdr_ID=").append(getZZ_Petty_Cash_Claim_Hdr_ID());
 			DB.executeUpdate(sql.toString(), get_TrxName());
+			MZZPettyCashClaimHdr mZZPettyCashClaimHdr = new MZZPettyCashClaimHdr(getCtx(), getZZ_Petty_Cash_Claim_Hdr_ID(), get_TrxName());
+			if (mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID() > 0) {
+				MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+				BigDecimal totalAmtAdvance = (mZZPettyCashAdvanceHdr.getTotalAmt() != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO;
+				BigDecimal totalAmtClaim = (mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO;
+				BigDecimal zz_Advance_Balance = totalAmtAdvance.subtract(totalAmtClaim);
+				if (zz_Advance_Balance.compareTo(BigDecimal.ZERO) < 0) {
+					zz_Advance_Balance = BigDecimal.ZERO;
+				}
+				mZZPettyCashClaimHdr.setZZ_Advance_Balance(zz_Advance_Balance);
+				mZZPettyCashClaimHdr.saveEx();
+			}
 		}
 		return super.afterSave(newRecord, success);
 	}

@@ -64,7 +64,8 @@ public class PettyCashReconCreateLines extends SvrProcess {
 	private void processClaims(int zz_Petty_Cash_Recon_Hdr_ID) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID,cl.amount,cl.zz_Petty_Cash_Claim_Hdr_ID,cl.Line "
+		String selectQuery = "SELECT cl.ZZ_Petty_Cash_Claim_Line_ID,cl.amount,cl.zz_Petty_Cash_Claim_Hdr_ID,cl.Line ,cl.ad_org_id, cl.ZZ_Petty_Cash_Motivation,cl.C_Charge_ID"
+				+ " ,ch.ZZ_Petty_Cash_Advance_Hdr_ID,ch.ZZ_Advance_Balance"
 				+ " from ZZ_Petty_Cash_Claim_Line cl "
 				+ " join ZZ_Petty_Cash_Claim_Hdr ch on cl.ZZ_Petty_Cash_Claim_Hdr_ID = ch. ZZ_Petty_Cash_Claim_Hdr_ID "
 				+ " where ch.ZZ_DocStatus = 'CO' and "
@@ -88,6 +89,11 @@ public class PettyCashReconCreateLines extends SvrProcess {
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
 				x_ZZ_Petty_Cash_Recon_Claim.setAmount(rs.getBigDecimal(2));
 				x_ZZ_Petty_Cash_Recon_Claim.setLine(rs.getInt(4));
+				x_ZZ_Petty_Cash_Recon_Claim.setAD_Org_ID(rs.getInt(5));
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Motivation(rs.getString(6));
+				x_ZZ_Petty_Cash_Recon_Claim.setC_Charge_ID(rs.getInt(7));
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Advance_Hdr_ID(rs.getInt(8));
+				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Advance_Balance(rs.getBigDecimal(9));				
 				x_ZZ_Petty_Cash_Recon_Claim.saveEx();
 			}
 		} catch (Exception ex)	{

@@ -159,6 +159,15 @@ public interface I_ZZ_Petty_Cash_Claim_Hdr
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Advance_Balance */
+    public static final String COLUMNNAME_ZZ_Advance_Balance = "ZZ_Advance_Balance";
+
+	/** Set Advance Balance	  */
+	public void setZZ_Advance_Balance (BigDecimal ZZ_Advance_Balance);
+
+	/** Get Advance Balance	  */
+	public BigDecimal getZZ_Advance_Balance();
+
     /** Column name ZZ_Credit_Card_No */
     public static final String COLUMNNAME_ZZ_Credit_Card_No = "ZZ_Credit_Card_No";
 

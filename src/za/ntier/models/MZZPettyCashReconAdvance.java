@@ -35,7 +35,7 @@ public class MZZPettyCashReconAdvance extends X_ZZ_Petty_Cash_Recon_Advance {
 	}
 
 	@Override
-	protected boolean beforeDelete() {
+	protected boolean afterDelete(boolean success) {
 		try {
 			MZZPettyCashReconHdr mZZPettyCashReconHdr = new MZZPettyCashReconHdr(getCtx(), getZZ_Petty_Cash_Recon_Hdr_ID(), get_TrxName());
 			mZZPettyCashReconHdr.updateTotals();
@@ -43,6 +43,11 @@ public class MZZPettyCashReconAdvance extends X_ZZ_Petty_Cash_Recon_Advance {
 		} catch (Exception e) {
 			return false;
 		}
+		return super.afterDelete(success);
+	}
+	
+	@Override
+	protected boolean beforeDelete() {
 		return super.beforeDelete();
 	}
 

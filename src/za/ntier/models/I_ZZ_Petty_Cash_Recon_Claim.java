@@ -150,6 +150,26 @@ public interface I_ZZ_Petty_Cash_Recon_Claim
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Advance_Balance */
+    public static final String COLUMNNAME_ZZ_Advance_Balance = "ZZ_Advance_Balance";
+
+	/** Set Advance Balance	  */
+	public void setZZ_Advance_Balance (BigDecimal ZZ_Advance_Balance);
+
+	/** Get Advance Balance	  */
+	public BigDecimal getZZ_Advance_Balance();
+
+    /** Column name ZZ_Petty_Cash_Advance_Hdr_ID */
+    public static final String COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID = "ZZ_Petty_Cash_Advance_Hdr_ID";
+
+	/** Set Petty Cash Advance	  */
+	public void setZZ_Petty_Cash_Advance_Hdr_ID (int ZZ_Petty_Cash_Advance_Hdr_ID);
+
+	/** Get Petty Cash Advance	  */
+	public int getZZ_Petty_Cash_Advance_Hdr_ID();
+
+	public I_ZZ_Petty_Cash_Advance_Hdr getZZ_Petty_Cash_Advance_Hdr() throws RuntimeException;
+
     /** Column name ZZ_Petty_Cash_Claim_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Petty_Cash_Claim_Hdr_ID = "ZZ_Petty_Cash_Claim_Hdr_ID";
 
