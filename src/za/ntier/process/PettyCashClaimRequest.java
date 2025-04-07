@@ -39,6 +39,7 @@ public class PettyCashClaimRequest extends SvrProcess {
 	public final static int FROM_EMAIL_USER_ID = MSysConfig.getIntValue("FROM_EMAIL_USER_ID",1000011);
 	String p_ZZ_Approve_Rej_LM = "";
 	String p_ZZ_Approve_Rej_SAF = "";
+	int zz_Petty_Cash_claim_Hdr_ID = 0;
 
 	@Override
 	protected void prepare() {
@@ -60,7 +61,7 @@ public class PettyCashClaimRequest extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		int zz_Petty_Cash_claim_Hdr_ID = getRecord_ID();
+		zz_Petty_Cash_claim_Hdr_ID = getRecord_ID();
 		MZZPettyCashClaimHdr mZZPettyCashClaimHdr = new MZZPettyCashClaimHdr(getCtx(),zz_Petty_Cash_claim_Hdr_ID,get_TrxName());
 		int x_zz_Petty_Cash_claim_Line_IDs[] = PO.getAllIDs(X_ZZ_Petty_Cash_Claim_Line.Table_Name,MZZPettyCashClaimHdr.COLUMNNAME_ZZ_Petty_Cash_Claim_Hdr_ID + " = " + zz_Petty_Cash_claim_Hdr_ID , null);
 		if (x_zz_Petty_Cash_claim_Line_IDs == null || x_zz_Petty_Cash_claim_Line_IDs.length <= 0) {
@@ -102,11 +103,15 @@ public class PettyCashClaimRequest extends SvrProcess {
 				mZZPettyCashClaimHdr.setZZ_DocStatus(MZZPettyCashClaimHdr.ZZ_DOCSTATUS_Completed);
 				mZZPettyCashClaimHdr.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 				mZZPettyCashClaimHdr.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
-				mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(findAdvance(mZZPettyCashClaimHdr.getZZ_Credit_Card_No()));  // Link to advance for recons
+				int advanceID = findAdvance(mZZPettyCashClaimHdr.getZZ_Credit_Card_No(),mZZPettyCashClaimHdr.getTotalAmt());
+				if (advanceID > 0) {
+					mZZPettyCashClaimHdr.setZZ_Petty_Cash_Advance_Hdr_ID(advanceID);  // Link to advance for recons
+				}
 				if (mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID() > 0) {
 					MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+					BigDecimal totalAmtClaim =  getClaimTotalForAdvance(mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(),mZZPettyCashClaimHdr.getZZ_Petty_Cash_Claim_Hdr_ID());
 					BigDecimal totalAmtAdvance = (mZZPettyCashAdvanceHdr.getTotalAmt() != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO;
-					BigDecimal totalAmtClaim = (mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO;
+					totalAmtClaim = totalAmtClaim.add((mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO);
 					BigDecimal zz_Advance_Balance = totalAmtAdvance.subtract(totalAmtClaim);
 					if (zz_Advance_Balance.compareTo(BigDecimal.ZERO) < 0) {
 						zz_Advance_Balance = BigDecimal.ZERO;
@@ -135,21 +140,36 @@ public class PettyCashClaimRequest extends SvrProcess {
 
 		return null;
 	}
-	
-	private int findAdvance(String zz_Credit_Card_No) throws Exception{
+
+	private int findAdvance(String zz_Credit_Card_No,BigDecimal claimAmt) throws Exception{
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID from ZZ_Petty_Cash_Advance_Hdr ca "
-				+ " where ca.ZZ_DocStatus = 'CO' and ca.ZZ_Credit_Card_No = ? and"
-				+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID)"
-				+ " order by ca.created"; 
+		String selectQuery = "SELECT ca.ZZ_Petty_Cash_Advance_Hdr_ID,"
+				+ " (select ZZ_Petty_Cash_Claim_Hdr_ID from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID) as Claim_ID"
+				+ " from ZZ_Petty_Cash_Advance_Hdr ca "
+				+ " where ca.ZZ_DocStatus = 'CO' and ca.ZZ_Credit_Card_No = ? "
+				//	+ " not exists (select 'x' from ZZ_Petty_Cash_Claim_Hdr ch where ch.ZZ_Petty_Cash_Advance_Hdr_ID = ca.ZZ_Petty_Cash_Advance_Hdr_ID)"
+				+ " order by ca.ZZ_Date_Completed Desc limit 1"; 
 		try {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setString(1, zz_Credit_Card_No);
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				return rs.getInt(1);
+				if (rs.getInt(1) > 0) {
+					String SQL = "Select count(*) from ZZ_Petty_Cash_Recon_Claim rc where rc.ZZ_Petty_Cash_Claim_Hdr_ID = ?";
+					int cnt = DB.getSQLValue(get_TrxName(), SQL, rs.getInt(1));
+					if (cnt > 0) {
+						return -1;
+					} else {
+						BigDecimal advanceBalance = calcAdvanceBalance(rs.getInt(1),zz_Petty_Cash_claim_Hdr_ID);
+						if (advanceBalance.compareTo(claimAmt) >= 0) {
+							return rs.getInt(1);
+						}
+					}
+				} else {
+					rs.getInt(1);
+				}
 			}
 		} catch (Exception ex)	{
 			log.log(Level.SEVERE, selectQuery, ex);
@@ -161,6 +181,20 @@ public class PettyCashClaimRequest extends SvrProcess {
 			rs = null;pstmt = null;
 		}
 		return -1;
+	}
+	
+	private BigDecimal getClaimTotalForAdvance(int zz_Petty_Cash_Advance_Hdr_ID,int zz_Petty_Cash_Claim_Hdr_ID) {
+		BigDecimal claimBalance = BigDecimal.ZERO.setScale(2);
+		String SQL = "Select sum(cl.totalamt) from zz_Petty_Cash_Claim_Hdr_ID cl where cl.zz_Petty_Cash_Advance_Hdr_ID = ? and cl.z_Petty_Cash_Claim_Hdr_ID <> ?";
+		claimBalance = DB.getSQLValueBD(get_TrxName(), SQL, zz_Petty_Cash_Advance_Hdr_ID,zz_Petty_Cash_Claim_Hdr_ID);
+		return claimBalance;
+	}
+	
+	private BigDecimal calcAdvanceBalance(int zz_Petty_Cash_Advance_Hdr_ID,int zz_Petty_Cash_Claim_Hdr_ID) {
+		MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), zz_Petty_Cash_Advance_Hdr_ID, get_TrxName());
+		BigDecimal advanceTot = (mZZPettyCashAdvanceHdr != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO.setScale(2);
+		BigDecimal advanceBalance = advanceTot.subtract(getClaimTotalForAdvance(zz_Petty_Cash_Advance_Hdr_ID,zz_Petty_Cash_Claim_Hdr_ID));		
+		return advanceBalance;
 	}
 
 

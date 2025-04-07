@@ -83,12 +83,14 @@ public class PettyCashReconCreateLines extends SvrProcess {
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
+				int lineNo = 0;
 				X_ZZ_Petty_Cash_Recon_Claim x_ZZ_Petty_Cash_Recon_Claim = new X_ZZ_Petty_Cash_Recon_Claim(getCtx(), 0, get_TrxName());
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Hdr_ID(rs.getInt(3));
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Line_ID(rs.getInt(1));
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
 				x_ZZ_Petty_Cash_Recon_Claim.setAmount(rs.getBigDecimal(2));
-				x_ZZ_Petty_Cash_Recon_Claim.setLine(rs.getInt(4));
+				lineNo = lineNo + 10;
+				x_ZZ_Petty_Cash_Recon_Claim.setLine(lineNo);
 				x_ZZ_Petty_Cash_Recon_Claim.setAD_Org_ID(rs.getInt(5));
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Motivation(rs.getString(6));
 				x_ZZ_Petty_Cash_Recon_Claim.setC_Charge_ID(rs.getInt(7));
@@ -123,12 +125,14 @@ public class PettyCashReconCreateLines extends SvrProcess {
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
+				int lineNo = 0;
 				X_ZZ_Petty_Cash_Recon_Advance x_ZZ_Petty_Cash_Recon_Advance = new X_ZZ_Petty_Cash_Recon_Advance(getCtx(), 0, get_TrxName());
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Advance_Line_ID(rs.getInt(1));
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Advance_Hdr_ID(rs.getInt(3));
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Recon_Hdr_ID(zz_Petty_Cash_Recon_Hdr_ID);
 				x_ZZ_Petty_Cash_Recon_Advance.setAmount(rs.getBigDecimal(2));
-				x_ZZ_Petty_Cash_Recon_Advance.setLine(rs.getInt(4));
+				lineNo = lineNo + 10;
+				x_ZZ_Petty_Cash_Recon_Advance.setLine(lineNo);
 				x_ZZ_Petty_Cash_Recon_Advance.saveEx();
 			}
 		} catch (Exception ex)	{
