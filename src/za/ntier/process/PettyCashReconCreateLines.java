@@ -81,9 +81,10 @@ public class PettyCashReconCreateLines extends SvrProcess {
 			pstmt.setInt(1, zz_Petty_Cash_Recon_Hdr_ID);
 			pstmt.setInt(2, zz_Petty_Cash_Recon_Hdr_ID);
 			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				int lineNo = 0;
+			String SQL = "Select max(Line) from ZZ_Petty_Cash_Recon_Claim where ZZ_Petty_Cash_Recon_Hdr_ID = ?";			
+			int lineNo = DB.getSQLValue(get_TrxName(), SQL, zz_Petty_Cash_Recon_Hdr_ID);
+			lineNo = (lineNo < 0) ? 0 : lineNo;
+			while (rs.next()) {				
 				X_ZZ_Petty_Cash_Recon_Claim x_ZZ_Petty_Cash_Recon_Claim = new X_ZZ_Petty_Cash_Recon_Claim(getCtx(), 0, get_TrxName());
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Hdr_ID(rs.getInt(3));
 				x_ZZ_Petty_Cash_Recon_Claim.setZZ_Petty_Cash_Claim_Line_ID(rs.getInt(1));
@@ -123,9 +124,10 @@ public class PettyCashReconCreateLines extends SvrProcess {
 			pstmt = DB.prepareStatement(selectQuery, get_TrxName());
 			pstmt.setInt(1, zz_Petty_Cash_Recon_Hdr_ID);
 			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				int lineNo = 0;
+			String SQL = "Select max(Line) from ZZ_Petty_Cash_Recon_Advance where ZZ_Petty_Cash_Recon_Hdr_ID = ?";			
+			int lineNo = DB.getSQLValue(get_TrxName(), SQL, zz_Petty_Cash_Recon_Hdr_ID);
+			lineNo = (lineNo < 0) ? 0 : lineNo;
+			while (rs.next()) {				
 				X_ZZ_Petty_Cash_Recon_Advance x_ZZ_Petty_Cash_Recon_Advance = new X_ZZ_Petty_Cash_Recon_Advance(getCtx(), 0, get_TrxName());
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Advance_Line_ID(rs.getInt(1));
 				x_ZZ_Petty_Cash_Recon_Advance.setZZ_Petty_Cash_Advance_Hdr_ID(rs.getInt(3));
