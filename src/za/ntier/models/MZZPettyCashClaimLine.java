@@ -41,25 +41,44 @@ public class MZZPettyCashClaimLine extends X_ZZ_Petty_Cash_Claim_Line {
 	protected boolean afterSave(boolean newRecord, boolean success) {
 		if (success)
 		{			
-			StringBuilder sql = new StringBuilder("UPDATE ZZ_Petty_Cash_Claim_Hdr h ")
-				.append("SET TotalAmt = NVL((SELECT SUM(Amount) FROM ZZ_Petty_Cash_Claim_Line l ")
-					.append("WHERE h.ZZ_Petty_Cash_Claim_Hdr_ID=l.ZZ_Petty_Cash_Claim_Hdr_ID AND l.IsActive='Y'),0) ")
-				.append("WHERE ZZ_Petty_Cash_Claim_Hdr_ID=").append(getZZ_Petty_Cash_Claim_Hdr_ID());
-			DB.executeUpdate(sql.toString(), get_TrxName());
-			MZZPettyCashClaimHdr mZZPettyCashClaimHdr = new MZZPettyCashClaimHdr(getCtx(), getZZ_Petty_Cash_Claim_Hdr_ID(), get_TrxName());
-			if (mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID() > 0) {
-				MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
-				BigDecimal totalAmtAdvance = (mZZPettyCashAdvanceHdr.getTotalAmt() != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO;
-				BigDecimal totalAmtClaim = (mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO;
-				BigDecimal zz_Advance_Balance = totalAmtAdvance.subtract(totalAmtClaim);
-				if (zz_Advance_Balance.compareTo(BigDecimal.ZERO) < 0) {
-					zz_Advance_Balance = BigDecimal.ZERO;
-				}
-				mZZPettyCashClaimHdr.setZZ_Advance_Balance(zz_Advance_Balance);
-				mZZPettyCashClaimHdr.saveEx();
-			}
+			updateTotals();
 		}
 		return super.afterSave(newRecord, success);
 	}
+	
+
+	
+	@Override
+	protected boolean afterDelete(boolean success) {
+		if (success)
+		{			
+			updateTotals();
+		}
+		return super.afterDelete(success);
+	}
+	
+	
+	private void updateTotals() {
+		StringBuilder sql = new StringBuilder("UPDATE ZZ_Petty_Cash_Claim_Hdr h ")
+			.append("SET TotalAmt = NVL((SELECT SUM(Amount) FROM ZZ_Petty_Cash_Claim_Line l ")
+				.append("WHERE h.ZZ_Petty_Cash_Claim_Hdr_ID=l.ZZ_Petty_Cash_Claim_Hdr_ID AND l.IsActive='Y'),0) ")
+			.append("WHERE ZZ_Petty_Cash_Claim_Hdr_ID=").append(getZZ_Petty_Cash_Claim_Hdr_ID());
+		DB.executeUpdate(sql.toString(), get_TrxName());
+		MZZPettyCashClaimHdr mZZPettyCashClaimHdr = new MZZPettyCashClaimHdr(getCtx(), getZZ_Petty_Cash_Claim_Hdr_ID(), get_TrxName());
+		if (mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID() > 0) {
+			MZZPettyCashAdvanceHdr mZZPettyCashAdvanceHdr = new MZZPettyCashAdvanceHdr(getCtx(), mZZPettyCashClaimHdr.getZZ_Petty_Cash_Advance_Hdr_ID(), get_TrxName());
+			BigDecimal totalAmtAdvance = (mZZPettyCashAdvanceHdr.getTotalAmt() != null) ? mZZPettyCashAdvanceHdr.getTotalAmt() : BigDecimal.ZERO;
+			BigDecimal totalAmtClaim = (mZZPettyCashClaimHdr.getTotalAmt() != null) ? mZZPettyCashClaimHdr.getTotalAmt() : BigDecimal.ZERO;
+			BigDecimal zz_Advance_Balance = totalAmtAdvance.subtract(totalAmtClaim);
+			if (zz_Advance_Balance.compareTo(BigDecimal.ZERO) < 0) {
+				zz_Advance_Balance = BigDecimal.ZERO;
+			}
+			mZZPettyCashClaimHdr.setZZ_Advance_Balance(zz_Advance_Balance);
+			mZZPettyCashClaimHdr.saveEx();
+		}
+	}
+
+	
+	
 	
 }

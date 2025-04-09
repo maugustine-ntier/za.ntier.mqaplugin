@@ -40,14 +40,31 @@ public class MZZPettyCashAdvanceLine extends X_ZZ_Petty_Cash_Advance_Line {
 	protected boolean afterSave(boolean newRecord, boolean success) {
 		if (success)
 		{			
-			StringBuilder sql = new StringBuilder("UPDATE ZZ_Petty_Cash_Advance_Hdr h ")
-				.append("SET TotalAmt = NVL((SELECT SUM(Amount) FROM ZZ_Petty_Cash_Advance_Line l ")
-					.append("WHERE h.ZZ_Petty_Cash_Advance_Hdr_ID=l.ZZ_Petty_Cash_Advance_Hdr_ID AND l.IsActive='Y'),0) ")
-				.append("WHERE ZZ_Petty_Cash_Advance_Hdr_ID=").append(getZZ_Petty_Cash_Advance_Hdr_ID());
-			DB.executeUpdate(sql.toString(), get_TrxName());
+			updateTotals();
 		}
 		return super.afterSave(newRecord, success);
+	}	
+
+	@Override
+	protected boolean afterDelete(boolean success) {
+		if (success)
+		{			
+			updateTotals();
+		}
+		return super.afterDelete(success);
 	}
+	
+
+	private void updateTotals() {
+		StringBuilder sql = new StringBuilder("UPDATE ZZ_Petty_Cash_Advance_Hdr h ")
+			.append("SET TotalAmt = NVL((SELECT SUM(Amount) FROM ZZ_Petty_Cash_Advance_Line l ")
+				.append("WHERE h.ZZ_Petty_Cash_Advance_Hdr_ID=l.ZZ_Petty_Cash_Advance_Hdr_ID AND l.IsActive='Y'),0) ")
+			.append("WHERE ZZ_Petty_Cash_Advance_Hdr_ID=").append(getZZ_Petty_Cash_Advance_Hdr_ID());
+		DB.executeUpdate(sql.toString(), get_TrxName());
+	}
+
+	
+	
 	
 	
 
