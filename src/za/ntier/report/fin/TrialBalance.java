@@ -48,7 +48,54 @@ import org.compiere.util.Msg;
 @org.adempiere.base.annotation.Process
 public class TrialBalance extends SvrProcess
 {
+	/** AcctSchame Parameter			*/
+	private int					p_C_AcctSchema_ID = 0;
+	/**	Period Parameter				*/
 	private int					p_C_Period_ID = 0;
+	private Timestamp			p_DateAcct_From = null;
+	private Timestamp			p_DateAcct_To = null;
+	/**	Org Parameter					*/
+	private int					p_AD_Org_ID = 0;
+	/**	Account Parameter				*/
+	private int					p_Account_ID = 0;
+	private String				p_AccountValue_From = null;
+	private String				p_AccountValue_To = null;
+	/**	BPartner Parameter				*/
+	private int					p_C_BPartner_ID = 0;
+	/**	Product Parameter				*/
+	private int					p_M_Product_ID = 0;
+	/**	Project Parameter				*/
+	private int					p_C_Project_ID = 0;
+	/**	Activity Parameter				*/
+	private int					p_C_Activity_ID = 0;
+	/**	SalesRegion Parameter			*/
+	private int					p_C_SalesRegion_ID = 0;
+	/**	Campaign Parameter				*/
+	private int					p_C_Campaign_ID = 0;
+	/** Posting Type					*/
+	private String				p_PostingType = "A";
+	/** Hierarchy						*/
+	private int					p_PA_Hierarchy_ID = 0;
+	
+	private int					p_AD_OrgTrx_ID = 0;
+	private int					p_C_LocFrom_ID = 0;
+	private int					p_C_LocTo_ID = 0;
+	private int					p_User1_ID = 0;
+	private int					p_User2_ID = 0;
+	private boolean				p_IsGroupByOrg = false;
+	
+	private static String		s_insert = "INSERT INTO T_TrialBalance_Ntier "
+			+ "(AD_PInstance_ID, Fact_Acct_ID,"
+			+ " AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,"
+			+ " C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,"
+			+ " AD_Table_ID, Record_ID, Line_ID,"
+			+ " GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,"
+			+ " C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,"
+			+ " AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,"
+			+ " M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,"
+			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
+			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Ntier_UU"
+			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget)";
 	
 	/**
 	 *  Prepare - e.g., get Parameters.
@@ -67,6 +114,8 @@ public class TrialBalance extends SvrProcess
 				;		
 			else if (name.equals("C_Period_ID"))
 				p_C_Period_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("AD_Org_ID"))
+				p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
 			else
 				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
 		}
@@ -92,12 +141,19 @@ public class TrialBalance extends SvrProcess
 		prevYear--;
 		String SQL2 = "Select y.C_Year_ID from C_Year y where y.fiscalYear = ?";
 		int prev_C_Year_ID = DB.getSQLValue(get_TrxName(), SQL2, prevYear + "");
+		int priorStartID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,1);
+		MPeriod priorStartPeriod = new MPeriod(getCtx(), priorStartID, get_TrxName());
+		int priorEndID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,mPeriodSelected.getPeriodNo());
+		MPeriod priorEndPeriod = new MPeriod(getCtx(), priorEndID, get_TrxName());
+		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
+		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
+		
 		
 		return "";
 	}	//	doIt
 	
 	
-	private void createBalanceLine()
+	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate)
 	{
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
@@ -197,23 +253,29 @@ public class TrialBalance extends SvrProcess
 			sql.append (p_User2_ID);
 		sql.append(", null, '");
 		sql.append(Msg.getMsg(getCtx(), "opening.balance") + "', 0, generate_uuid() ");
+		
+		sql.append(",");
+		sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
+		
+		sql.append(",");
+		sql.append("COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0)");
+		
+		sql.append(",");
+		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where )")
+		   .append(" fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+	       .append(" + 1)");
+		
+		;
+		
 		//
 		sql.append(" FROM Fact_Acct WHERE AD_Client_ID=").append(getAD_Client_ID())
-			.append (" AND ").append(m_parameterWhere)
-			.append(" AND DateAcct < ").append(DB.TO_DATE(p_DateAcct_From, true));
+	//		.append (" AND ").append(m_parameterWhere)
+			.append(" AND DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+		    .append(" AND DateAcct < (").append(DB.TO_DATE(toDate, true))
+		    .append(" + 1)");;
 		//	Start Beginning of Year
-		if (p_Account_ID > 0)
-		{
-			m_acct = new MElementValue (getCtx(), p_Account_ID, get_TrxName());
-			if (!m_acct.isBalanceSheet())
-			{
-				MPeriod first = MPeriod.getFirstInYear (getCtx(), p_DateAcct_From, p_AD_Org_ID);
-				if (first != null)
-					sql.append(" AND DateAcct >= ").append(DB.TO_DATE(first.getStartDate(), true));
-				else
-					log.log(Level.SEVERE, "first period not found");
-			}
-		}
+		
 		sql.append(" GROUP BY Account_ID ");
 		if (p_IsGroupByOrg)
 			sql.append(", AD_Org_ID ");
