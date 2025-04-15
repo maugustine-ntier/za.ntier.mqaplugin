@@ -147,7 +147,7 @@ public class TrialBalance extends SvrProcess
 		MPeriod priorEndPeriod = new MPeriod(getCtx(), priorEndID, get_TrxName());
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
-		
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate())
 		
 		return "";
 	}	//	doIt
@@ -262,9 +262,21 @@ public class TrialBalance extends SvrProcess
 		
 		sql.append(",");
 		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where )")
-		   .append(" fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+
+		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
 	       .append(" + 1)");
+		
+		sql.append(",");
+		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where )")
+		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
+	       .append(" + 1)");
+		
+		sql.append(",");
+		sql.append("0,0");
 		
 		;
 		
