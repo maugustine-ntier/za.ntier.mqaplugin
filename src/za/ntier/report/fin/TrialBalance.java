@@ -31,6 +31,7 @@ import org.compiere.model.MProcessPara;
 import org.compiere.model.MYear;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
+import org.compiere.report.MReportTree;
 import org.compiere.util.DB;
 import org.compiere.util.Language;
 import org.compiere.util.Msg;
@@ -83,6 +84,7 @@ public class TrialBalance extends SvrProcess
 	private int					p_User1_ID = 0;
 	private int					p_User2_ID = 0;
 	private boolean				p_IsGroupByOrg = false;
+	private StringBuffer		m_parameterWhere = new StringBuffer();
 	
 	private static String		s_insert = "INSERT INTO T_TrialBalance_Ntier "
 			+ "(AD_PInstance_ID, Fact_Acct_ID,"
@@ -94,7 +96,7 @@ public class TrialBalance extends SvrProcess
 			+ " AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,"
 			+ " M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,"
 			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
-			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Ntier_UU"
+			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Ntier_UU,"
 			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget)";
 	
 	/**
@@ -104,24 +106,112 @@ public class TrialBalance extends SvrProcess
 	protected void prepare()
 	{
 		StringBuilder sb = new StringBuilder ("AD_PInstance_ID=")
-			.append(getAD_PInstance_ID());
-		//	Parameter
-		ProcessInfoParameter[] para = getParameter();
-		for (int i = 0; i < para.length; i++)
-		{
-			String name = para[i].getParameterName();
-			if (para[i].getParameter() == null && para[i].getParameter_To() == null)
-				;		
-			else if (name.equals("C_Period_ID"))
-				p_C_Period_ID = ((BigDecimal)para[i].getParameter()).intValue();
-			else if (name.equals("AD_Org_ID"))
-				p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
-			else
-				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
-		}
-		//	Mandatory C_AcctSchema_ID
-		
-		if (log.isLoggable(Level.FINE)) log.fine(p_C_Period_ID + "");
+				.append(getAD_PInstance_ID());
+			//	Parameter
+			ProcessInfoParameter[] para = getParameter();
+			for (int i = 0; i < para.length; i++)
+			{
+				String name = para[i].getParameterName();
+				if (para[i].getParameter() == null && para[i].getParameter_To() == null)
+					;
+				else if (name.equals("C_AcctSchema_ID"))
+					p_C_AcctSchema_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("C_Period_ID"))
+					p_C_Period_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("DateAcct"))
+				{
+					p_DateAcct_From = (Timestamp)para[i].getParameter();
+					p_DateAcct_To = (Timestamp)para[i].getParameter_To();
+				}
+				else if (name.equals("PA_Hierarchy_ID"))
+					p_PA_Hierarchy_ID = para[i].getParameterAsInt();
+				else if (name.equals("AD_Org_ID"))
+					p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("Account_ID"))
+					p_Account_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("AccountValue"))
+				{
+					p_AccountValue_From = (String)para[i].getParameter();
+					p_AccountValue_To = (String)para[i].getParameter_To();
+				}
+				else if (name.equals("C_BPartner_ID"))
+					p_C_BPartner_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("M_Product_ID"))
+					p_M_Product_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("C_Project_ID"))
+					p_C_Project_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("C_Activity_ID"))
+					p_C_Activity_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("C_SalesRegion_ID"))
+					p_C_SalesRegion_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("C_Campaign_ID"))
+					p_C_Campaign_ID = ((BigDecimal)para[i].getParameter()).intValue();
+				else if (name.equals("PostingType"))
+					p_PostingType = (String)para[i].getParameter();
+				else if (name.equals("IsGroupByOrg"))
+					p_IsGroupByOrg = para[i].getParameterAsBoolean();
+				else
+					MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
+			}
+			//	Mandatory C_AcctSchema_ID
+			m_parameterWhere.append("C_AcctSchema_ID=").append(p_C_AcctSchema_ID);
+			//	Optional Account_ID
+			if (p_Account_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID,MAcctSchemaElement.ELEMENTTYPE_Account, p_Account_ID));
+			if (p_AccountValue_From != null && p_AccountValue_From.length() == 0)
+				p_AccountValue_From = null;
+			if (p_AccountValue_To != null && p_AccountValue_To.length() == 0)
+				p_AccountValue_To = null;
+			if (p_AccountValue_From != null && p_AccountValue_To != null)
+				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+					.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+					.append(DB.TO_STRING(p_AccountValue_From)).append(" AND ev.Value <= ")
+					.append(DB.TO_STRING(p_AccountValue_To)).append("))");
+			else if (p_AccountValue_From != null && p_AccountValue_To == null)
+				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+				.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+				.append(DB.TO_STRING(p_AccountValue_From)).append("))");
+			else if (p_AccountValue_From == null && p_AccountValue_To != null)
+				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+				.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value <= ")
+				.append(DB.TO_STRING(p_AccountValue_To)).append("))");
+			//	Optional Org
+			if (p_AD_Org_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Organization, p_AD_Org_ID));
+			//	Optional BPartner
+			if (p_C_BPartner_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_BPartner, p_C_BPartner_ID));
+			//	Optional Product
+			if (p_M_Product_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Product, p_M_Product_ID));
+			//	Optional Project
+			if (p_C_Project_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Project, p_C_Project_ID));
+			//	Optional Activity
+			if (p_C_Activity_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Activity, p_C_Activity_ID));
+			//	Optional Campaign
+			if (p_C_Campaign_ID != 0)
+				m_parameterWhere.append(" AND C_Campaign_ID=").append(p_C_Campaign_ID);
+			//	m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+			//		MAcctSchemaElement.ELEMENTTYPE_Campaign, p_C_Campaign_ID));
+			//	Optional Sales Region
+			if (p_C_SalesRegion_ID != 0)
+				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_SalesRegion, p_C_SalesRegion_ID));
+			//	Mandatory Posting Type
+			m_parameterWhere.append(" AND PostingType='").append(p_PostingType).append("'");
+			//
+		//	setDateAcct();
+		//	sb.append(" - DateAcct ").append(p_DateAcct_From).append("-").append(p_DateAcct_To);
+			sb.append(" - Where=").append(m_parameterWhere);
+			if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 	}	//	prepare
 
 	
@@ -139,15 +229,15 @@ public class TrialBalance extends SvrProcess
 		MYear currYear = new MYear(getCtx(), startPeriod.getC_Year_ID(), get_TrxName());
 		int prevYear = Integer.parseInt(currYear.getFiscalYear());
 		prevYear--;
-		String SQL2 = "Select y.C_Year_ID from C_Year y where y.fiscalYear = ?";
-		int prev_C_Year_ID = DB.getSQLValue(get_TrxName(), SQL2, prevYear + "");
+		String SQL2 = "Select y.C_Year_ID from C_Year y where y.ad_client_id = ? and y.fiscalYear = ?";
+		int prev_C_Year_ID = DB.getSQLValue(get_TrxName(), SQL2, getAD_Client_ID(),prevYear + "");
 		int priorStartID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,1);
 		MPeriod priorStartPeriod = new MPeriod(getCtx(), priorStartID, get_TrxName());
 		int priorEndID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,mPeriodSelected.getPeriodNo());
 		MPeriod priorEndPeriod = new MPeriod(getCtx(), priorEndID, get_TrxName());
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate())
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate());
 		
 		return "";
 	}	//	doIt
@@ -261,19 +351,19 @@ public class TrialBalance extends SvrProcess
 		sql.append("COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0)");
 		
 		sql.append(",");
-		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where )")
+		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
 
 		   .append(" fp.ad_client_id = ad_client_id")
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
-	       .append(" + 1)");
+	       .append(" + 1))");
 		
 		sql.append(",");
-		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where )")
+		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
 		   .append(" fp.ad_client_id = ad_client_id")
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
-	       .append(" + 1)");
+	       .append(" + 1))");
 		
 		sql.append(",");
 		sql.append("0,0");
