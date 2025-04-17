@@ -87,6 +87,7 @@ public class TrialBalance extends SvrProcess
 	private boolean				p_IsGroupByOrg = false;
 	private StringBuffer		m_parameterWhere = new StringBuffer();
 	private StringBuffer		m_parameterWhereBudget = new StringBuffer();
+	private StringBuffer		m_parameterWhereActuals = new StringBuffer();
 	
 	private static String		s_insert = "INSERT INTO T_TrialBalance_Ntier "
 			+ "(AD_PInstance_ID, Fact_Acct_ID,"
@@ -156,61 +157,62 @@ public class TrialBalance extends SvrProcess
 					MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
 			}
 			//	Mandatory C_AcctSchema_ID
-			m_parameterWhere.append("C_AcctSchema_ID=").append(p_C_AcctSchema_ID);
+			m_parameterWhere.append("f.C_AcctSchema_ID=").append(p_C_AcctSchema_ID);
 			//	Optional Account_ID
 			if (p_Account_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID,MAcctSchemaElement.ELEMENTTYPE_Account, p_Account_ID));
 			if (p_AccountValue_From != null && p_AccountValue_From.length() == 0)
 				p_AccountValue_From = null;
 			if (p_AccountValue_To != null && p_AccountValue_To.length() == 0)
 				p_AccountValue_To = null;
 			if (p_AccountValue_From != null && p_AccountValue_To != null)
-				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-					.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+					.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
 					.append(DB.TO_STRING(p_AccountValue_From)).append(" AND ev.Value <= ")
 					.append(DB.TO_STRING(p_AccountValue_To)).append("))");
 			else if (p_AccountValue_From != null && p_AccountValue_To == null)
-				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-				.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+				.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
 				.append(DB.TO_STRING(p_AccountValue_From)).append("))");
 			else if (p_AccountValue_From == null && p_AccountValue_To != null)
-				m_parameterWhere.append(" AND (Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-				.append("WHERE Account_ID=ev.C_ElementValue_ID AND ev.Value <= ")
+				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+				.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value <= ")
 				.append(DB.TO_STRING(p_AccountValue_To)).append("))");
 			//	Optional Org
 			if (p_AD_Org_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Organization, p_AD_Org_ID));
 			//	Optional BPartner
 			if (p_C_BPartner_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_BPartner, p_C_BPartner_ID));
 			//	Optional Product
 			if (p_M_Product_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Product, p_M_Product_ID));
 			//	Optional Project
 			if (p_C_Project_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Project, p_C_Project_ID));
 			//	Optional Activity
 			if (p_C_Activity_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Activity, p_C_Activity_ID));
 			//	Optional Campaign
 			if (p_C_Campaign_ID != 0)
-				m_parameterWhere.append(" AND C_Campaign_ID=").append(p_C_Campaign_ID);
+				m_parameterWhere.append(" AND f.C_Campaign_ID=").append(p_C_Campaign_ID);
 			//	m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
 			//		MAcctSchemaElement.ELEMENTTYPE_Campaign, p_C_Campaign_ID));
 			//	Optional Sales Region
 			if (p_C_SalesRegion_ID != 0)
-				m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_SalesRegion, p_C_SalesRegion_ID));
-			m_parameterWhereBudget.append(m_parameterWhere);
+			m_parameterWhereBudget.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
+			m_parameterWhereActuals.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
 			//	Mandatory Posting Type
 		//	m_parameterWhere.append(" AND PostingType='").append(p_PostingType).append("'");
-			m_parameterWhereBudget.append(" AND PostingType='").append(X_Fact_Acct.POSTINGTYPE_Budget).append("'");
+			m_parameterWhereBudget.append(" AND fp.PostingType='").append(X_Fact_Acct.POSTINGTYPE_Budget).append("'");
 			//
 		//	setDateAcct();
 		//	sb.append(" - DateAcct ").append(p_DateAcct_From).append("-").append(p_DateAcct_To);
@@ -360,7 +362,7 @@ public class TrialBalance extends SvrProcess
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
 	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhere)
+	       .append(" AND ").append(m_parameterWhereActuals)
 		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		sql.append(")");
 		
@@ -372,7 +374,7 @@ public class TrialBalance extends SvrProcess
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
 	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhere)
+	       .append(" AND ").append(m_parameterWhereActuals)
 		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		sql.append(")");
 		
@@ -383,7 +385,7 @@ public class TrialBalance extends SvrProcess
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
 	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhere)
+	       .append(" AND ").append(m_parameterWhereActuals)
 	       .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		sql.append(")");
 		
@@ -417,7 +419,7 @@ public class TrialBalance extends SvrProcess
 		    .append(" + 1)");;
 		//	Start Beginning of Year
 		
-		sql.append(" GROUP BY Account_ID ");
+		sql.append(" GROUP BY Ad_Client_ID,Account_ID ");
 		if (p_IsGroupByOrg)
 			sql.append(", AD_Org_ID ");
 
