@@ -209,7 +209,7 @@ public class TrialBalance extends SvrProcess
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_SalesRegion, p_C_SalesRegion_ID));
 			m_parameterWhereBudget.append(m_parameterWhere);
 			//	Mandatory Posting Type
-			m_parameterWhere.append(" AND PostingType='").append(p_PostingType).append("'");
+		//	m_parameterWhere.append(" AND PostingType='").append(p_PostingType).append("'");
 			m_parameterWhereBudget.append(" AND PostingType='").append(X_Fact_Acct.POSTINGTYPE_Budget).append("'");
 			//
 		//	setDateAcct();
@@ -354,30 +354,43 @@ public class TrialBalance extends SvrProcess
 		sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
 		
 		sql.append(",");
-		sql.append("COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0)");
+		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+		   .append(" fp.ad_client_id = f.ad_client_id")
+		   .append(" AND fp.Account_ID = f.Account_ID" )
+		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+	       .append(" + 1)")
+	       .append(" AND ").append(m_parameterWhere)
+		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		sql.append(")");
 		
 		sql.append(",");
 		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
 
-		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" fp.ad_client_id = f.ad_client_id")
+		   .append(" AND fp.Account_ID = f.Account_ID" )
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
 	       .append(" + 1)")
-	       .append (" AND ").append(m_parameterWhere);
+	       .append(" AND ").append(m_parameterWhere)
+		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		sql.append(")");
 		
 		sql.append(",");
 		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" fp.ad_client_id = f.ad_client_id")
+		   .append(" AND fp.Account_ID = f.Account_ID" )
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
 	       .append(" + 1)")
-	       .append (" AND ").append(m_parameterWhere);
+	       .append(" AND ").append(m_parameterWhere)
+	       .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		sql.append(")");
 		
 		sql.append(",");
 		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" fp.ad_client_id = f.ad_client_id")
+		   .append(" AND fp.Account_ID = f.Account_ID" )
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
 	       .append(" + 1)")
@@ -386,7 +399,8 @@ public class TrialBalance extends SvrProcess
 		
 		sql.append(",");
 		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = ad_client_id")
+		   .append(" fp.ad_client_id = f.ad_client_id")
+		   .append(" AND fp.Account_ID = f.Account_ID" )
 		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
 	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
 	       .append(" + 1)")
@@ -396,9 +410,9 @@ public class TrialBalance extends SvrProcess
 		;
 		
 		//
-		sql.append(" FROM Fact_Acct WHERE AD_Client_ID=").append(getAD_Client_ID())
+		sql.append(" FROM Fact_Acct f WHERE AD_Client_ID=").append(getAD_Client_ID())
 			.append (" AND ").append(m_parameterWhere)
-			.append(" AND DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+			.append(" AND DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 		    .append(" AND DateAcct < (").append(DB.TO_DATE(toDate, true))
 		    .append(" + 1)");;
 		//	Start Beginning of Year
