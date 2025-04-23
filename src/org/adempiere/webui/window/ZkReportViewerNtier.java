@@ -1987,8 +1987,8 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 		if (renderer.isSameContentForExportAndPreview() && media != null 
 				&& media.getContentType().equals(contentType) && media.getFormat().equals(fileExtension))
 			return media;
-		//return null;  // Martin	
-		return renderer != null ? renderer.renderMedia(this, true) : null;
+		return null;  // Martin	
+	//	return renderer != null ? renderer.renderMedia(this, true) : null;
 	}
 
 	public AMedia getMedia(String rendererId) {
@@ -1996,8 +1996,8 @@ public class ZkReportViewerNtier extends Window implements EventListener<Event>,
 			return jasperPrintRenderer.getMedia(JasperPrintRendererNtier.getMIMEType(rendererId), JasperPrintRendererNtier.getFileExtension(rendererId));
 		}
 		IReportViewerRenderer renderer = rendererMap.get(rendererId);
-	//	return null;  // Martin
-		return renderer != null ? renderer.renderMedia(this, false) : null;
+		return null;  // Martin
+		//return renderer != null ? renderer.renderMedia(this, false) : null;
 	}
 	
 	@Override
