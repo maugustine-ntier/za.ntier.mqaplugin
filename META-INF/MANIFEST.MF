@@ -43,5 +43,5 @@ Service-Component: OSGI-INF/org.adempiere.webui.factory.NtierEditorFactory.xml,
 Automatic-Module-Name: za.ntier.rgnplugin
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/mssql-jdbc-12.6.3.jre11.jar
+ libx/mssql-jdbc-12.6.3.jre11.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-17
