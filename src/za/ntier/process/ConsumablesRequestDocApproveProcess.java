@@ -22,7 +22,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 	}
 	
 	private void requestConsumables() {
-		MInventory_New mInventory_New = new MInventory_New(getCtx(), 0, get_TrxName());
+		MInventory_New mInventory_New = new MInventory_New(getCtx(), getRecord_ID(), get_TrxName());
 		ProcessInfo pi = MWorkflow.runDocumentActionWorkflow(mInventory_New, DocAction.ACTION_Complete);
 		if (pi.isError()) {
 			throw new AdempiereException(pi.getSummary()); 
