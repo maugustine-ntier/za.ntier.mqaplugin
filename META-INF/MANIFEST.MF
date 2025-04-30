@@ -29,8 +29,7 @@ Require-Bundle: org.osgi.service.component.annotations;bundle-version="1.5.1",
  org.atmosphere.runtime,
  org.eclipse.osgi,
  za.co.ntier.fa
-Service-Component: OSGI-INF/jrviewrproviderntier.xml,
- OSGI-INF/org.adempiere.webui.factory.NtierEditorFactory.xml,
+Service-Component: OSGI-INF/org.adempiere.webui.factory.NtierEditorFactory.xml,
  OSGI-INF/org.adempiere.webui.window.ZkJRViewerProviderNtier.xml,
  OSGI-INF/za.ntier.callouts.CalloutFactory.xml,
  OSGI-INF/za.ntier.editors.MyDisplayTypeFactory.xml,
@@ -44,5 +43,5 @@ Service-Component: OSGI-INF/jrviewrproviderntier.xml,
 Automatic-Module-Name: za.ntier.rgnplugin
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/mssql-jdbc-12.6.3.jre11.jar
+ libx/mssql-jdbc-12.6.3.jre11.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-17
