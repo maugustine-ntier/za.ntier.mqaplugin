@@ -507,6 +507,15 @@ public interface I_M_Inventory
 	  */
 	public boolean isZZ_AllowLineManageApproved();
 
+    /** Column name ZZ_AllowMgrFinConsumablesApproval */
+    public static final String COLUMNNAME_ZZ_AllowMgrFinConsumablesApproval = "ZZ_AllowMgrFinConsumablesApproval";
+
+	/** Set Allow Mgr Finance Consumables Approval	  */
+	public void setZZ_AllowMgrFinConsumablesApproval (boolean ZZ_AllowMgrFinConsumablesApproval);
+
+	/** Get Allow Mgr Finance Consumables Approval	  */
+	public boolean isZZ_AllowMgrFinConsumablesApproval();
+
     /** Column name ZZ_AllowSnrAdminFinanceApproved */
     public static final String COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved = "ZZ_AllowSnrAdminFinanceApproved";
 
@@ -519,6 +528,15 @@ public interface I_M_Inventory
 	  * Choose to allow Snr Admin Finance join to approved workfllow
 	  */
 	public boolean isZZ_AllowSnrAdminFinanceApproved();
+
+    /** Column name ZZ_Consumables_Signed_Uploaded */
+    public static final String COLUMNNAME_ZZ_Consumables_Signed_Uploaded = "ZZ_Consumables_Signed_Uploaded";
+
+	/** Set Consumables Document Signed and Uploaded	  */
+	public void setZZ_Consumables_Signed_Uploaded (boolean ZZ_Consumables_Signed_Uploaded);
+
+	/** Get Consumables Document Signed and Uploaded	  */
+	public boolean isZZ_Consumables_Signed_Uploaded();
 
     /** Column name ZZ_Date_Approved */
     public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
@@ -546,6 +564,24 @@ public interface I_M_Inventory
 
 	/** Get Date LM Approved	  */
 	public Timestamp getZZ_Date_LM_Approved();
+
+    /** Column name ZZ_Date_MFC_Approved */
+    public static final String COLUMNNAME_ZZ_Date_MFC_Approved = "ZZ_Date_MFC_Approved";
+
+	/** Set Date Manager Finance Consumables	  */
+	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved);
+
+	/** Get Date Manager Finance Consumables	  */
+	public Timestamp getZZ_Date_MFC_Approved();
+
+    /** Column name ZZ_Date_MFC_Not_Approved */
+    public static final String COLUMNNAME_ZZ_Date_MFC_Not_Approved = "ZZ_Date_MFC_Not_Approved";
+
+	/** Set Date Manager Finance Not Approved	  */
+	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved);
+
+	/** Get Date Manager Finance Not Approved	  */
+	public Timestamp getZZ_Date_MFC_Not_Approved();
 
     /** Column name ZZ_Date_Not_Approved_by_LM */
     public static final String COLUMNNAME_ZZ_Date_Not_Approved_by_LM = "ZZ_Date_Not_Approved_by_LM";
@@ -604,6 +640,17 @@ public interface I_M_Inventory
 	  * Value set to ZZ_DocStatus when reach to end of approve workflow
 	  */
 	public String getZZ_FinalWorkflowStateValue();
+
+    /** Column name ZZ_Mgr_Fin_Consumables_ID */
+    public static final String COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID = "ZZ_Mgr_Fin_Consumables_ID";
+
+	/** Set Manager Finance Consumables	  */
+	public void setZZ_Mgr_Fin_Consumables_ID (int ZZ_Mgr_Fin_Consumables_ID);
+
+	/** Get Manager Finance Consumables	  */
+	public int getZZ_Mgr_Fin_Consumables_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException;
 
     /** Column name ZZ_Snr_Admin_Fin_ID */
     public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";

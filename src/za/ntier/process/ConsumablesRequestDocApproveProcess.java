@@ -1,5 +1,6 @@
 package za.ntier.process;
 
+import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfo;
@@ -11,8 +12,10 @@ import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 import za.co.ntier.fa.process.api.IDocApprove;
 import za.ntier.models.MInventory_New;
 
-@org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.ConsumablesRequestDocApproveProcess")
+@org.adempiere.base.annotation.Process(name="za.ntier.process.ConsumablesRequestDocApproveProcess")
 public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProcess<MInventory_New> {
+	@Parameter(name="ZZ_Approve_Rej_MFC")
+	protected String pApproveRejMFC;
 	
 	@Override
 	protected void initDocApproveObj() {
@@ -71,6 +74,42 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 			doLogic();
 		}
 		return null;
+	}
+	protected void doManagerFinConApprove() {
+		if("Y".equals(pApproveRejMFC)){
+			if (docApprove.isZZ_AllowSnrAdminFinanceApproved()) {
+				doSubmitDocForSnrAdminFinanceManage(false);
+			}else {
+				docApprove.setZZ_Date_Approved(now);
+				docApprove.setZZ_Date_LM_Approved(now);
+				docApprove.setZZ_Date_Completed(now);
+				AbstractDocApproveProcess.sendNotification(
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+			}
+		}else{
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
+			docApprove.setZZ_Date_Not_Approved_by_LM(now);
+			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
+		}
+	}
+
+	@Override
+	protected void doLineManageApprove() {
+		if("Y".equals(pApproveRejLM)){
+			if (docApprove.isZZ_AllowSnrAdminFinanceApproved()) {
+				doSubmitDocForSnrAdminFinanceManage(false);
+			}else {
+				docApprove.setZZ_Date_Approved(now);
+				docApprove.setZZ_Date_LM_Approved(now);
+				docApprove.setZZ_Date_Completed(now);
+				AbstractDocApproveProcess.sendNotification(
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+			}
+		}else{
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
+			docApprove.setZZ_Date_Not_Approved_by_LM(now);
+			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
+		}
 	}
 	
 }

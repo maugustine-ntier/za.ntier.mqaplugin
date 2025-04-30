@@ -35,7 +35,7 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250423L;
+	private static final long serialVersionUID = 20250430L;
 
     /** Standard Constructor */
     public X_M_Inventory (Properties ctx, int M_Inventory_ID, String trxName)
@@ -57,8 +57,12 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 			setProcessed (false);
 			setZZ_AllowLineManageApproved (true);
 // Y
+			setZZ_AllowMgrFinConsumablesApproval (true);
+// Y
 			setZZ_AllowSnrAdminFinanceApproved (true);
 // Y
+			setZZ_Consumables_Signed_Uploaded (false);
+// N
         } */
     }
 
@@ -82,8 +86,12 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 			setProcessed (false);
 			setZZ_AllowLineManageApproved (true);
 // Y
+			setZZ_AllowMgrFinConsumablesApproval (true);
+// Y
 			setZZ_AllowSnrAdminFinanceApproved (true);
 // Y
+			setZZ_Consumables_Signed_Uploaded (false);
+// N
         } */
     }
 
@@ -107,8 +115,12 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 			setProcessed (false);
 			setZZ_AllowLineManageApproved (true);
 // Y
+			setZZ_AllowMgrFinConsumablesApproval (true);
+// Y
 			setZZ_AllowSnrAdminFinanceApproved (true);
 // Y
+			setZZ_Consumables_Signed_Uploaded (false);
+// N
         } */
     }
 
@@ -132,8 +144,12 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 			setProcessed (false);
 			setZZ_AllowLineManageApproved (true);
 // Y
+			setZZ_AllowMgrFinConsumablesApproval (true);
+// Y
 			setZZ_AllowSnrAdminFinanceApproved (true);
 // Y
+			setZZ_Consumables_Signed_Uploaded (false);
+// N
         } */
     }
 
@@ -925,6 +941,28 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 		return false;
 	}
 
+	/** Set Allow Mgr Finance Consumables Approval.
+		@param ZZ_AllowMgrFinConsumablesApproval Allow Mgr Finance Consumables Approval
+	*/
+	public void setZZ_AllowMgrFinConsumablesApproval (boolean ZZ_AllowMgrFinConsumablesApproval)
+	{
+		set_ValueNoCheck (COLUMNNAME_ZZ_AllowMgrFinConsumablesApproval, Boolean.valueOf(ZZ_AllowMgrFinConsumablesApproval));
+	}
+
+	/** Get Allow Mgr Finance Consumables Approval.
+		@return Allow Mgr Finance Consumables Approval	  */
+	public boolean isZZ_AllowMgrFinConsumablesApproval()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_AllowMgrFinConsumablesApproval);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Allow Snr Admin Finance Approved.
 		@param ZZ_AllowSnrAdminFinanceApproved Choose to allow Snr Admin Finance join to approved workfllow
 	*/
@@ -939,6 +977,28 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public boolean isZZ_AllowSnrAdminFinanceApproved()
 	{
 		Object oo = get_Value(COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Consumables Document Signed and Uploaded.
+		@param ZZ_Consumables_Signed_Uploaded Consumables Document Signed and Uploaded
+	*/
+	public void setZZ_Consumables_Signed_Uploaded (boolean ZZ_Consumables_Signed_Uploaded)
+	{
+		set_Value (COLUMNNAME_ZZ_Consumables_Signed_Uploaded, Boolean.valueOf(ZZ_Consumables_Signed_Uploaded));
+	}
+
+	/** Get Consumables Document Signed and Uploaded.
+		@return Consumables Document Signed and Uploaded	  */
+	public boolean isZZ_Consumables_Signed_Uploaded()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Consumables_Signed_Uploaded);
 		if (oo != null)
 		{
 			 if (oo instanceof Boolean)
@@ -993,6 +1053,36 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_LM_Approved);
 	}
 
+	/** Set Date Manager Finance Consumables.
+		@param ZZ_Date_MFC_Approved Date Manager Finance Consumables
+	*/
+	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Approved, ZZ_Date_MFC_Approved);
+	}
+
+	/** Get Date Manager Finance Consumables.
+		@return Date Manager Finance Consumables	  */
+	public Timestamp getZZ_Date_MFC_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Approved);
+	}
+
+	/** Set Date Manager Finance Not Approved.
+		@param ZZ_Date_MFC_Not_Approved Date Manager Finance Not Approved
+	*/
+	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Not_Approved, ZZ_Date_MFC_Not_Approved);
+	}
+
+	/** Get Date Manager Finance Not Approved.
+		@return Date Manager Finance Not Approved	  */
+	public Timestamp getZZ_Date_MFC_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Not_Approved);
+	}
+
 	/** Set Date Not Approved by LM.
 		@param ZZ_Date_Not_Approved_by_LM Date Not Approved by LM
 	*/
@@ -1044,6 +1134,8 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -1062,6 +1154,8 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
 	/** Completed = CO */
@@ -1070,10 +1164,14 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
@@ -1092,6 +1190,8 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Approved = "AP";
 	/** Completed = CO */
@@ -1100,10 +1200,14 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted = SU */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
 	/** Set Final Workflow State Value.
@@ -1121,6 +1225,33 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public String getZZ_FinalWorkflowStateValue()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_FinalWorkflowStateValue);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_Mgr_Fin_Consumables_ID(), get_TrxName());
+	}
+
+	/** Set Manager Finance Consumables.
+		@param ZZ_Mgr_Fin_Consumables_ID Manager Finance Consumables
+	*/
+	public void setZZ_Mgr_Fin_Consumables_ID (int ZZ_Mgr_Fin_Consumables_ID)
+	{
+		if (ZZ_Mgr_Fin_Consumables_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID, Integer.valueOf(ZZ_Mgr_Fin_Consumables_ID));
+	}
+
+	/** Get Manager Finance Consumables.
+		@return Manager Finance Consumables	  */
+	public int getZZ_Mgr_Fin_Consumables_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException

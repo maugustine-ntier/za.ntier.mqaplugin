@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-
 import org.compiere.model.MInventory;
 import org.compiere.model.MTable;
 import org.compiere.model.MWarehouse;
@@ -48,13 +47,44 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		super(ctx, copy, trxName);
 		// TODO Auto-generated constructor stub
 	}
+
+	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+				.getPO(getLine_Manager_ID(), get_TrxName());
+	}
+
+	/** Set Line Manager.
+		@param Line_Manager_ID Line Manager
+	 */
+	public void setLine_Manager_ID (int Line_Manager_ID)
+	{
+		if (Line_Manager_ID < 1)
+			set_Value (COLUMNNAME_Line_Manager_ID, null);
+		else
+			set_Value (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
+	}
+
+	/** Get Line Manager.
+		@return Line Manager	  */
+	public int getLine_Manager_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line_Manager_ID);
+		if (ii == null)
+			return 0;
+		return ii.intValue();
+	}
+
+	/** Set Allow Line Manage Approved.
+	@param ZZ_AllowLineManageApproved Choose to allow line manage join to approved workfllow
+	 */
 	public void setZZ_AllowLineManageApproved (boolean ZZ_AllowLineManageApproved)
 	{
 		set_ValueNoCheck (COLUMNNAME_ZZ_AllowLineManageApproved, Boolean.valueOf(ZZ_AllowLineManageApproved));
 	}
 
 	/** Get Allow Line Manage Approved.
-		@return Choose to allow line manage join to approved workfllow
+	@return Choose to allow line manage join to approved workfllow
 	 */
 	public boolean isZZ_AllowLineManageApproved()
 	{
@@ -68,8 +98,30 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return false;
 	}
 
+	/** Set Allow Mgr Finance Consumables Approval.
+	@param ZZ_AllowMgrFinConsumablesApproval Allow Mgr Finance Consumables Approval
+	 */
+	public void setZZ_AllowMgrFinConsumablesApproval (boolean ZZ_AllowMgrFinConsumablesApproval)
+	{
+		set_ValueNoCheck (COLUMNNAME_ZZ_AllowMgrFinConsumablesApproval, Boolean.valueOf(ZZ_AllowMgrFinConsumablesApproval));
+	}
+
+	/** Get Allow Mgr Finance Consumables Approval.
+	@return Allow Mgr Finance Consumables Approval	  */
+	public boolean isZZ_AllowMgrFinConsumablesApproval()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_AllowMgrFinConsumablesApproval);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Allow Snr Admin Finance Approved.
-		@param ZZ_AllowSnrAdminFinanceApproved Choose to allow Snr Admin Finance join to approved workfllow
+	@param ZZ_AllowSnrAdminFinanceApproved Choose to allow Snr Admin Finance join to approved workfllow
 	 */
 	public void setZZ_AllowSnrAdminFinanceApproved (boolean ZZ_AllowSnrAdminFinanceApproved)
 	{
@@ -77,7 +129,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Allow Snr Admin Finance Approved.
-		@return Choose to allow Snr Admin Finance join to approved workfllow
+	@return Choose to allow Snr Admin Finance join to approved workfllow
 	 */
 	public boolean isZZ_AllowSnrAdminFinanceApproved()
 	{
@@ -91,8 +143,30 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return false;
 	}
 
+	/** Set Consumables Document Signed and Uploaded.
+	@param ZZ_Consumables_Signed_Uploaded Consumables Document Signed and Uploaded
+	 */
+	public void setZZ_Consumables_Signed_Uploaded (boolean ZZ_Consumables_Signed_Uploaded)
+	{
+		set_Value (COLUMNNAME_ZZ_Consumables_Signed_Uploaded, Boolean.valueOf(ZZ_Consumables_Signed_Uploaded));
+	}
+
+	/** Get Consumables Document Signed and Uploaded.
+	@return Consumables Document Signed and Uploaded	  */
+	public boolean isZZ_Consumables_Signed_Uploaded()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Consumables_Signed_Uploaded);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Date Approved.
-		@param ZZ_Date_Approved Date Approved
+	@param ZZ_Date_Approved Date Approved
 	 */
 	public void setZZ_Date_Approved (Timestamp ZZ_Date_Approved)
 	{
@@ -100,14 +174,14 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date Approved.
-		@return Date Approved	  */
+	@return Date Approved	  */
 	public Timestamp getZZ_Date_Approved()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Approved);
 	}
 
 	/** Set Date Completed.
-		@param ZZ_Date_Completed Date Completed
+	@param ZZ_Date_Completed Date Completed
 	 */
 	public void setZZ_Date_Completed (Timestamp ZZ_Date_Completed)
 	{
@@ -115,14 +189,14 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date Completed.
-		@return Date Completed	  */
+	@return Date Completed	  */
 	public Timestamp getZZ_Date_Completed()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Completed);
 	}
 
 	/** Set Date LM Approved.
-		@param ZZ_Date_LM_Approved Date LM Approved
+	@param ZZ_Date_LM_Approved Date LM Approved
 	 */
 	public void setZZ_Date_LM_Approved (Timestamp ZZ_Date_LM_Approved)
 	{
@@ -130,14 +204,14 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date LM Approved.
-		@return Date LM Approved	  */
+	@return Date LM Approved	  */
 	public Timestamp getZZ_Date_LM_Approved()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_LM_Approved);
 	}
 
 	/** Set Date Not Approved by LM.
-		@param ZZ_Date_Not_Approved_by_LM Date Not Approved by LM
+	@param ZZ_Date_Not_Approved_by_LM Date Not Approved by LM
 	 */
 	public void setZZ_Date_Not_Approved_by_LM (Timestamp ZZ_Date_Not_Approved_by_LM)
 	{
@@ -145,14 +219,14 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date Not Approved by LM.
-		@return Date Not Approved by LM	  */
+	@return Date Not Approved by LM	  */
 	public Timestamp getZZ_Date_Not_Approved_by_LM()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved_by_LM);
 	}
 
 	/** Set Date Not Approved by Snr Admin Finance.
-		@param ZZ_Date_Not_Approved_by_Snr_Adm_Fin Date Not Approved by Snr Admin Finance
+	@param ZZ_Date_Not_Approved_by_Snr_Adm_Fin Date Not Approved by Snr Admin Finance
 	 */
 	public void setZZ_Date_Not_Approved_by_Snr_Adm_Fin (Timestamp ZZ_Date_Not_Approved_by_Snr_Adm_Fin)
 	{
@@ -160,14 +234,14 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date Not Approved by Snr Admin Finance.
-		@return Date Not Approved by Snr Admin Finance	  */
+	@return Date Not Approved by Snr Admin Finance	  */
 	public Timestamp getZZ_Date_Not_Approved_by_Snr_Adm_Fin()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
 	}
 
 	/** Set Date Submitted.
-		@param ZZ_Date_Submitted Date Submitted
+	@param ZZ_Date_Submitted Date Submitted
 	 */
 	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted)
 	{
@@ -175,7 +249,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Date Submitted.
-		@return Date Submitted	  */
+	@return Date Submitted	  */
 	public Timestamp getZZ_Date_Submitted()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Submitted);
@@ -190,7 +264,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
-		@param ZZ_DocAction Document Action
+	@param ZZ_DocAction Document Action
 	 */
 	public void setZZ_DocAction (String ZZ_DocAction)
 	{
@@ -199,7 +273,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Document Action.
-		@return Document Action	  */
+	@return Document Action	  */
 	public String getZZ_DocAction()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
@@ -220,7 +294,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
-		@param ZZ_DocStatus Document Status
+	@param ZZ_DocStatus Document Status
 	 */
 	public void setZZ_DocStatus (String ZZ_DocStatus)
 	{
@@ -229,7 +303,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Document Status.
-		@return Document Status	  */
+	@return Document Status	  */
 	public String getZZ_DocStatus()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
@@ -250,7 +324,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	/** Submitted = SU */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
 	/** Set Final Workflow State Value.
-		@param ZZ_FinalWorkflowStateValue Value set to ZZ_DocStatus when reach to end of approve workflow
+	@param ZZ_FinalWorkflowStateValue Value set to ZZ_DocStatus when reach to end of approve workflow
 	 */
 	public void setZZ_FinalWorkflowStateValue (String ZZ_FinalWorkflowStateValue)
 	{
@@ -259,11 +333,38 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Final Workflow State Value.
-		@return Value set to ZZ_DocStatus when reach to end of approve workflow
+	@return Value set to ZZ_DocStatus when reach to end of approve workflow
 	 */
 	public String getZZ_FinalWorkflowStateValue()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_FinalWorkflowStateValue);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+				.getPO(getZZ_Mgr_Fin_Consumables_ID(), get_TrxName());
+	}
+
+	/** Set Manager Finance Consumables.
+	@param ZZ_Mgr_Fin_Consumables_ID Manager Finance Consumables
+	 */
+	public void setZZ_Mgr_Fin_Consumables_ID (int ZZ_Mgr_Fin_Consumables_ID)
+	{
+		if (ZZ_Mgr_Fin_Consumables_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID, Integer.valueOf(ZZ_Mgr_Fin_Consumables_ID));
+	}
+
+	/** Get Manager Finance Consumables.
+	@return Manager Finance Consumables	  */
+	public int getZZ_Mgr_Fin_Consumables_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID);
+		if (ii == null)
+			return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException
@@ -273,7 +374,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Set Snr Admin Finance User.
-		@param ZZ_Snr_Admin_Fin_ID Snr Admin Finance User
+	@param ZZ_Snr_Admin_Fin_ID Snr Admin Finance User
 	 */
 	public void setZZ_Snr_Admin_Fin_ID (int ZZ_Snr_Admin_Fin_ID)
 	{
@@ -284,7 +385,7 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	}
 
 	/** Get Snr Admin Finance User.
-		@return Snr Admin Finance User	  */
+	@return Snr Admin Finance User	  */
 	public int getZZ_Snr_Admin_Fin_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Snr_Admin_Fin_ID);
@@ -293,35 +394,35 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return ii.intValue();
 	}
 
-	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException
-	{
-		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
-				.getPO(getLine_Manager_ID(), get_TrxName());
-	}
-
-	/** Set Line Manager.
-		@param Line_Manager_ID Line Manager
+	/** Set Date Manager Finance Consumables.
+	@param ZZ_Date_MFC_Approved Date Manager Finance Consumables
 	 */
-	public void setLine_Manager_ID (int Line_Manager_ID)
+	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved)
 	{
-		if (Line_Manager_ID < 1)
-			set_Value (COLUMNNAME_Line_Manager_ID, null);
-		else
-			set_Value (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Approved, ZZ_Date_MFC_Approved);
 	}
 
-	/** Get Line Manager.
-	@return Line Manager	  */
-	public int getLine_Manager_ID()
+	/** Get Date Manager Finance Consumables.
+	@return Date Manager Finance Consumables	  */
+	public Timestamp getZZ_Date_MFC_Approved()
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Line_Manager_ID);
-		if (ii == null)
-			return 0;
-		return ii.intValue();
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Approved);
 	}
 
+	/** Set Date Manager Finance Not Approved.
+	@param ZZ_Date_MFC_Not_Approved Date Manager Finance Not Approved
+	 */
+	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Not_Approved, ZZ_Date_MFC_Not_Approved);
+	}
 
-
+	/** Get Date Manager Finance Not Approved.
+	@return Date Manager Finance Not Approved	  */
+	public Timestamp getZZ_Date_MFC_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Not_Approved);
+	}
 
 
 }
