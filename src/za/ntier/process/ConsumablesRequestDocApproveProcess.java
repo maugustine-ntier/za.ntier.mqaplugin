@@ -47,8 +47,8 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
 				IDocApprove.ZZ_DOCSTATUS_Submitted.equals(currentDocStatus)) {	// Line Manager presses Action button		
 			doLineManageApprove();
-		}else if(!docApprove.isZZ_AllowMgrFinConsumablesApproval() &&
-				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
+		}else if(docApprove.isZZ_AllowMgrFinConsumablesApproval() &&
+				IDocApprove.ZZ_DOCACTION_SubmitToManagerFinanceConsumables.equals(currentDocAction) && 
 				IDocApprove.ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables.equals(currentDocStatus)) {  // consumables manager presses button
 			doManagerFinConsumablesApprove();
 		}else if(docApprove.isZZ_AllowSnrAdminFinanceApproved() &&  // fin admin presses button
@@ -94,6 +94,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
 		docApprove.setZZ_Date_MFC_Approved(now);
+		docApprove.setZZ_Mgr_Fin_Consumables_ID(getAD_User_ID());
 		if (isBypassLineManage && docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 		
@@ -127,7 +128,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 	
 	protected void doSubmitDocFinConsumeablesMgr() {
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables);
-		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
+		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_SubmitToManagerFinanceConsumables);
 		docApprove.setZZ_Date_LM_Approved(now);
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
