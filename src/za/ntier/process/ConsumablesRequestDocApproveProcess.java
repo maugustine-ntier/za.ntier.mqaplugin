@@ -3,6 +3,7 @@ package za.ntier.process;
 import java.util.Arrays;
 
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MInventoryLine;
 import org.compiere.model.MUserRoles;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfo;
@@ -17,18 +18,19 @@ import za.ntier.models.MInventory_New;
 @org.adempiere.base.annotation.Process(name="za.ntier.process.ConsumablesRequestDocApproveProcess")
 public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProcess<MInventory_New> {
 
+	private MInventory_New mInventory_New = null;
+	
 	@Override
 	protected void initDocApproveObj() {
 		docApprove = poObj;
 	}
-	
+
 	@Override
 	protected void doLogic(){
 		requestConsumables();
 	}
-	
+
 	private void requestConsumables() {
-		MInventory_New mInventory_New = new MInventory_New(getCtx(), getRecord_ID(), get_TrxName());
 		ProcessInfo pi = MWorkflow.runDocumentActionWorkflow(mInventory_New, DocAction.ACTION_Complete);
 		if (pi.isError()) {
 			throw new AdempiereException(pi.getSummary()); 
@@ -37,6 +39,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 
 	@Override
 	protected String doIt() throws Exception {
+		mInventory_New = new MInventory_New(getCtx(), getRecord_ID(), get_TrxName());
 		validateData();
 		String currentDocAction = docApprove.getZZ_DocAction();
 		String currentDocStatus = docApprove.getZZ_DocStatus();
@@ -58,9 +61,9 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		}else {
 			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_WrongWorkflowState", 
 					new Object [] {docApprove.isZZ_AllowLineManageApproved(),
-					docApprove.isZZ_AllowSnrAdminFinanceApproved(),
-					currentDocStatus,
-					currentDocAction}));
+							docApprove.isZZ_AllowSnrAdminFinanceApproved(),
+							currentDocStatus,
+							currentDocAction}));
 		}
 		doFinalDocState(currentDocAction);
 		poObj.saveEx();
@@ -70,7 +73,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		}
 		return null;
 	}
-	
+
 	//consumables manager presses button
 	protected void doManagerFinConsumablesApprove() {
 		if("Y".equals(pApprove_Rej_MFC)){
@@ -89,7 +92,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
 		}
 	}
-	
+
 	protected void doSubmitDocForSnrAdminFinanceManage(boolean isBypassLineManage) {
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
@@ -97,14 +100,14 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		docApprove.setZZ_Mgr_Fin_Consumables_ID(getAD_User_ID());
 		if (isBypassLineManage && docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
-		
+
 		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.SNR_ADMIN_FIN_ROLE_ID)).forEach(role -> {
 			if (role.isActive()) {
 				AbstractDocApproveProcess.sendNotification(role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr(), get_TrxName());
 			}
 		});
-		
-		
+
+
 	}
 
 	@Override
@@ -125,20 +128,27 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
 		}
 	}
-	
+
 	protected void doSubmitDocFinConsumeablesMgr() {
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
 		docApprove.setZZ_Date_LM_Approved(now);
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
-		
+
 		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID)).forEach(role -> {
 			if (role.isActive()) {
 				AbstractDocApproveProcess.sendNotification(role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr(), get_TrxName());
 			}
 		});	
-		
+
 	}
-	
+
+	protected void validateData() {
+		MInventoryLine[] lines = mInventory_New.getLines(false);
+		if (lines.length == 0)		{
+			throw new AdempiereException("@NoLines@");
+		}
+	}
+
 }
