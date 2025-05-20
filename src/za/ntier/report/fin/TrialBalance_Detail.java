@@ -88,10 +88,11 @@ public class TrialBalance_Detail extends SvrProcess
 	private StringBuffer		m_parameterWhere = new StringBuffer();
 	private StringBuffer		m_parameterWhereBudget = new StringBuffer();
 	private StringBuffer		m_parameterWhereActuals = new StringBuffer();
-//	private StringBuffer        m_YTD_Current = new StringBuffer();
-//	private StringBuffer        m_ZZ_YTD_Prior = new StringBuffer();
-//	private StringBuffer        m_YTD_Current = new StringBuffer();
-//	private StringBuffer        m_YTD_Current = new StringBuffer();
+	private StringBuffer        m_YTD_Current = new StringBuffer();
+	private StringBuffer        m_ZZ_YTD_Prior = new StringBuffer();
+	private StringBuffer        m_ZZ_Prior_Year_Full = new StringBuffer();
+	private StringBuffer        m_ZZ_Budget_YTD = new StringBuffer();
+	private StringBuffer        m_ZZ_Total_Budget = new StringBuffer();
 	
 	
 	private static String		s_insert = "INSERT INTO T_TrialBalance_Ntier "
@@ -254,6 +255,7 @@ public class TrialBalance_Detail extends SvrProcess
 		MPeriod priorEndPeriod = new MPeriod(getCtx(), priorEndID, get_TrxName());
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
+		setUpSumSQLs(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate());
 		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),"SDL");
 		
 		return "";
@@ -278,6 +280,31 @@ public class TrialBalance_Detail extends SvrProcess
 	       .append(" + 1)")
 	       .append(" AND ").append(m_parameterWhereActuals)
 		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		
+		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append(" COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+				   .append(" fp.ad_client_id = f.ad_client_id")
+				   .append(" AND fp.Account_ID = f.Account_ID" )
+				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
+			       .append(" + 1)")
+			       .append(" AND ").append(m_parameterWhereActuals)
+			       .append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		
+		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+				   .append(" fp.ad_client_id = f.ad_client_id")
+				   .append(" AND fp.Account_ID = f.Account_ID" )
+				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+			       .append(" + 1)")
+			       .append (" AND ").append(m_parameterWhereBudget);
+		
+		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+				   .append(" fp.ad_client_id = f.ad_client_id")
+				   .append(" AND fp.Account_ID = f.Account_ID" )
+				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
+			       .append(" + 1)")
+			       .append (" AND ").append(m_parameterWhereBudget);
 		
 		
 	}
@@ -396,49 +423,26 @@ public class TrialBalance_Detail extends SvrProcess
 		//ZZ_YTD_Prior
 		sql.append(",");
 		sql.append("(")
-		   .append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = f.ad_client_id")
-		   .append(" AND fp.Account_ID = f.Account_ID" )
-		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
-	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhereActuals)
-		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		   .append(m_ZZ_YTD_Prior);
 		sql.append(")");
 		
 		//ZZ_Prior_Year_Full
 		sql.append(",");
-		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = f.ad_client_id")
-		   .append(" AND fp.Account_ID = f.Account_ID" )
-		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
-	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhereActuals)
-	       .append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		sql.append("(")
+		   .append(m_ZZ_Prior_Year_Full);
 		sql.append(")");
 		
 		//ZZ_Budget_YTD
 		sql.append(",");
-		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = f.ad_client_id")
-		   .append(" AND fp.Account_ID = f.Account_ID" )
-		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
-	       .append(" + 1)")
-	       .append (" AND ").append(m_parameterWhereBudget);
+		sql.append("(")
+		   .append(m_ZZ_Budget_YTD);
 		sql.append(")");
 		
 		
 		// ZZ_Total_Budget
 		sql.append(",");
-		sql.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = f.ad_client_id")
-		   .append(" AND fp.Account_ID = f.Account_ID" )
-		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
-	       .append(" + 1)")
-	       .append (" AND ").append(m_parameterWhereBudget);
+		sql.append("(")
+		   .append(m_ZZ_Total_Budget);
 		sql.append(")");
 		
 		// ZZ_Variance_B_W
