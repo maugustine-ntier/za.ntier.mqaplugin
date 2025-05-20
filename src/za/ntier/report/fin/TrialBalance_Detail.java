@@ -107,7 +107,7 @@ public class TrialBalance_Detail extends SvrProcess
 			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
 			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Ntier_UU,"
 			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget"
-			+ " ZZ_Variance_B_W,ZZ_YTD_Current,ZZ_YTD_Prior)";
+			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining)";
 	
 	
 
@@ -445,9 +445,32 @@ public class TrialBalance_Detail extends SvrProcess
 		   .append(m_ZZ_Total_Budget);
 		sql.append(")");
 		
-		// ZZ_Variance_B_W
+		// ZZ_Variance_B_W   Actual YTD - Budget YTD
+		sql.append(",");
+		sql.append("(")
+		   .append("(").append(m_YTD_Current).append(")")
+		   .append("-")
+		   .append("(").append(m_ZZ_Budget_YTD).append(")");
+		sql.append(")");
 		
+		// ZZ_Variance_YTD_Percent
+		sql.append(",");
+		sql.append("(")
+		   .append("(").append(m_YTD_Current).append(")")
+		   .append("-")
+		   .append("(").append(m_ZZ_Budget_YTD).append(")")
+		   .append("/")
+		   .append("(").append(m_ZZ_Budget_YTD).append(")")
+		   .append(" * 100");
+		sql.append(")");
 		
+		// ZZ_Annual_Budget_Remaining
+		sql.append(",");
+		sql.append("(")
+		   .append("(").append(m_ZZ_Total_Budget).append(")")
+		   .append("-")
+		   .append("(").append(m_YTD_Current).append(")");
+		sql.append(")");
 		;
 		
 		//
@@ -458,7 +481,7 @@ public class TrialBalance_Detail extends SvrProcess
 			.append(" AND DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 		    .append(" AND DateAcct < (").append(DB.TO_DATE(toDate, true))
 		    .append(" + 1)")
-		    .append(" AND ev.ZZ_Det_Income_Group = 'ZZ_Det_Income_Group'");
+		    .append(" AND ev.ZZ_Det_Income_Group = '" + ZZ_Det_Income_Group + "'");
 		//	Start Beginning of Year
 		
 		sql.append(" GROUP BY Ad_Client_ID,Account_ID ");
