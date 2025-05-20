@@ -95,7 +95,7 @@ public class TrialBalance_Detail extends SvrProcess
 	private StringBuffer        m_ZZ_Total_Budget = new StringBuffer();
 	
 	
-	private static String		s_insert = "INSERT INTO T_TrialBalance_Ntier "
+	private static String		s_insert = "INSERT INTO T_TrialBalance_Detail_Ntier "
 			+ "(AD_PInstance_ID, Fact_Acct_ID,"
 			+ " AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,"
 			+ " C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,"
@@ -256,7 +256,16 @@ public class TrialBalance_Detail extends SvrProcess
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
 		setUpSumSQLs(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate());
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),"SDL");
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+				"='SDL'",null);
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+				"='SDL'","ev.ZZ_Det_Income_Group");
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+				"='OIN'",null);
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+				"='OIN'","ev.ZZ_Det_Income_Group");
+		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+				"in ('OIN','SDL')","ev.AccountType");
 		
 		return "";
 	}	//	doIt
@@ -281,7 +290,7 @@ public class TrialBalance_Detail extends SvrProcess
 	       .append(" AND ").append(m_parameterWhereActuals)
 		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
 		
-		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append(" COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
 				   .append(" fp.ad_client_id = f.ad_client_id")
 				   .append(" AND fp.Account_ID = f.Account_ID" )
 				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
@@ -310,7 +319,8 @@ public class TrialBalance_Detail extends SvrProcess
 	}
 	
 	
-	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String ZZ_Det_Income_Group)
+	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String ZZ_Det_Income_Group,
+			String groupBy)
 	{
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
@@ -481,13 +491,20 @@ public class TrialBalance_Detail extends SvrProcess
 			.append(" AND DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 		    .append(" AND DateAcct < (").append(DB.TO_DATE(toDate, true))
 		    .append(" + 1)")
-		    .append(" AND ev.ZZ_Det_Income_Group = '" + ZZ_Det_Income_Group + "'");
+		    .append(" AND ev.ZZ_Det_Income_Group " + ZZ_Det_Income_Group );
 		//	Start Beginning of Year
 		
-		sql.append(" GROUP BY Ad_Client_ID,Account_ID ");
+		sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
 		if (p_IsGroupByOrg)
-			sql.append(", AD_Org_ID ");
+			sql.append(", f.AD_Org_ID ");
 
+		if (groupBy != null) {
+			sql.append(" GROUP BY " + groupBy);
+		} else {
+			sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
+			if (p_IsGroupByOrg)
+				sql.append(", f.AD_Org_ID ");
+		}
 		//
 		int no = DB.executeUpdate(sql.toString(), get_TrxName());
 		if (no == 0)
