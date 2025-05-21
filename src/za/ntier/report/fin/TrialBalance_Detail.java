@@ -78,7 +78,7 @@ public class TrialBalance_Detail extends SvrProcess
 	private String				p_PostingType = "A";
 	/** Hierarchy						*/
 	private int					p_PA_Hierarchy_ID = 0;
-	
+
 	private int					p_AD_OrgTrx_ID = 0;
 	private int					p_C_LocFrom_ID = 0;
 	private int					p_C_LocTo_ID = 0;
@@ -93,8 +93,8 @@ public class TrialBalance_Detail extends SvrProcess
 	private StringBuffer        m_ZZ_Prior_Year_Full = new StringBuffer();
 	private StringBuffer        m_ZZ_Budget_YTD = new StringBuffer();
 	private StringBuffer        m_ZZ_Total_Budget = new StringBuffer();
-	
-	
+
+
 	private static String		s_insert = "INSERT INTO T_TrialBalance_Detail_Ntier "
 			+ "(AD_PInstance_ID, Fact_Acct_ID,"
 			+ " AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,"
@@ -105,13 +105,13 @@ public class TrialBalance_Detail extends SvrProcess
 			+ " AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,"
 			+ " M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,"
 			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
-			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Ntier_UU,"
-			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget"
+			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,"
+			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,"
 			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining)";
-	
-	
 
-	
+
+
+
 	/**
 	 *  Prepare - e.g., get Parameters.
 	 */
@@ -120,118 +120,118 @@ public class TrialBalance_Detail extends SvrProcess
 	{
 		StringBuilder sb = new StringBuilder ("AD_PInstance_ID=")
 				.append(getAD_PInstance_ID());
-			//	Parameter
-			ProcessInfoParameter[] para = getParameter();
-			for (int i = 0; i < para.length; i++)
+		//	Parameter
+		ProcessInfoParameter[] para = getParameter();
+		for (int i = 0; i < para.length; i++)
+		{
+			String name = para[i].getParameterName();
+			if (para[i].getParameter() == null && para[i].getParameter_To() == null)
+				;
+			else if (name.equals("C_AcctSchema_ID"))
+				p_C_AcctSchema_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("C_Period_ID"))
+				p_C_Period_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("DateAcct"))
 			{
-				String name = para[i].getParameterName();
-				if (para[i].getParameter() == null && para[i].getParameter_To() == null)
-					;
-				else if (name.equals("C_AcctSchema_ID"))
-					p_C_AcctSchema_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("C_Period_ID"))
-					p_C_Period_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("DateAcct"))
-				{
-					p_DateAcct_From = (Timestamp)para[i].getParameter();
-					p_DateAcct_To = (Timestamp)para[i].getParameter_To();
-				}
-				else if (name.equals("PA_Hierarchy_ID"))
-					p_PA_Hierarchy_ID = para[i].getParameterAsInt();
-				else if (name.equals("AD_Org_ID"))
-					p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("Account_ID"))
-					p_Account_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("AccountValue"))
-				{
-					p_AccountValue_From = (String)para[i].getParameter();
-					p_AccountValue_To = (String)para[i].getParameter_To();
-				}
-				else if (name.equals("C_BPartner_ID"))
-					p_C_BPartner_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("M_Product_ID"))
-					p_M_Product_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("C_Project_ID"))
-					p_C_Project_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("C_Activity_ID"))
-					p_C_Activity_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("C_SalesRegion_ID"))
-					p_C_SalesRegion_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("C_Campaign_ID"))
-					p_C_Campaign_ID = ((BigDecimal)para[i].getParameter()).intValue();
-				else if (name.equals("PostingType"))
-					p_PostingType = (String)para[i].getParameter();
-				else if (name.equals("IsGroupByOrg"))
-					p_IsGroupByOrg = para[i].getParameterAsBoolean();
-				else
-					MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
+				p_DateAcct_From = (Timestamp)para[i].getParameter();
+				p_DateAcct_To = (Timestamp)para[i].getParameter_To();
 			}
-			//	Mandatory C_AcctSchema_ID
-			m_parameterWhere.append("f.C_AcctSchema_ID=").append(p_C_AcctSchema_ID);
-			//	Optional Account_ID
-			if (p_Account_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+			else if (name.equals("PA_Hierarchy_ID"))
+				p_PA_Hierarchy_ID = para[i].getParameterAsInt();
+			else if (name.equals("AD_Org_ID"))
+				p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("Account_ID"))
+				p_Account_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("AccountValue"))
+			{
+				p_AccountValue_From = (String)para[i].getParameter();
+				p_AccountValue_To = (String)para[i].getParameter_To();
+			}
+			else if (name.equals("C_BPartner_ID"))
+				p_C_BPartner_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("M_Product_ID"))
+				p_M_Product_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("C_Project_ID"))
+				p_C_Project_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("C_Activity_ID"))
+				p_C_Activity_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("C_SalesRegion_ID"))
+				p_C_SalesRegion_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("C_Campaign_ID"))
+				p_C_Campaign_ID = ((BigDecimal)para[i].getParameter()).intValue();
+			else if (name.equals("PostingType"))
+				p_PostingType = (String)para[i].getParameter();
+			else if (name.equals("IsGroupByOrg"))
+				p_IsGroupByOrg = para[i].getParameterAsBoolean();
+			else
+				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
+		}
+		//	Mandatory C_AcctSchema_ID
+		m_parameterWhere.append("f.C_AcctSchema_ID=").append(p_C_AcctSchema_ID);
+		//	Optional Account_ID
+		if (p_Account_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID,MAcctSchemaElement.ELEMENTTYPE_Account, p_Account_ID));
-			if (p_AccountValue_From != null && p_AccountValue_From.length() == 0)
-				p_AccountValue_From = null;
-			if (p_AccountValue_To != null && p_AccountValue_To.length() == 0)
-				p_AccountValue_To = null;
-			if (p_AccountValue_From != null && p_AccountValue_To != null)
-				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-					.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
-					.append(DB.TO_STRING(p_AccountValue_From)).append(" AND ev.Value <= ")
-					.append(DB.TO_STRING(p_AccountValue_To)).append("))");
-			else if (p_AccountValue_From != null && p_AccountValue_To == null)
-				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-				.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
-				.append(DB.TO_STRING(p_AccountValue_From)).append("))");
-			else if (p_AccountValue_From == null && p_AccountValue_To != null)
-				m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
-				.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value <= ")
-				.append(DB.TO_STRING(p_AccountValue_To)).append("))");
-			//	Optional Org
-			if (p_AD_Org_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		if (p_AccountValue_From != null && p_AccountValue_From.length() == 0)
+			p_AccountValue_From = null;
+		if (p_AccountValue_To != null && p_AccountValue_To.length() == 0)
+			p_AccountValue_To = null;
+		if (p_AccountValue_From != null && p_AccountValue_To != null)
+			m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+			.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+			.append(DB.TO_STRING(p_AccountValue_From)).append(" AND ev.Value <= ")
+			.append(DB.TO_STRING(p_AccountValue_To)).append("))");
+		else if (p_AccountValue_From != null && p_AccountValue_To == null)
+			m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+			.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value >= ")
+			.append(DB.TO_STRING(p_AccountValue_From)).append("))");
+		else if (p_AccountValue_From == null && p_AccountValue_To != null)
+			m_parameterWhere.append(" AND (f.Account_ID IS NULL OR EXISTS (SELECT * FROM C_ElementValue ev ")
+			.append("WHERE f.Account_ID=ev.C_ElementValue_ID AND ev.Value <= ")
+			.append(DB.TO_STRING(p_AccountValue_To)).append("))");
+		//	Optional Org
+		if (p_AD_Org_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Organization, p_AD_Org_ID));
-			//	Optional BPartner
-			if (p_C_BPartner_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		//	Optional BPartner
+		if (p_C_BPartner_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_BPartner, p_C_BPartner_ID));
-			//	Optional Product
-			if (p_M_Product_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		//	Optional Product
+		if (p_M_Product_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Product, p_M_Product_ID));
-			//	Optional Project
-			if (p_C_Project_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		//	Optional Project
+		if (p_C_Project_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Project, p_C_Project_ID));
-			//	Optional Activity
-			if (p_C_Activity_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		//	Optional Activity
+		if (p_C_Activity_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_Activity, p_C_Activity_ID));
-			//	Optional Campaign
-			if (p_C_Campaign_ID != 0)
-				m_parameterWhere.append(" AND f.C_Campaign_ID=").append(p_C_Campaign_ID);
-			//	m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
-			//		MAcctSchemaElement.ELEMENTTYPE_Campaign, p_C_Campaign_ID));
-			//	Optional Sales Region
-			if (p_C_SalesRegion_ID != 0)
-				m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
+		//	Optional Campaign
+		if (p_C_Campaign_ID != 0)
+			m_parameterWhere.append(" AND f.C_Campaign_ID=").append(p_C_Campaign_ID);
+		//	m_parameterWhere.append(" AND ").append(MReportTree.getWhereClause(getCtx(), 
+		//		MAcctSchemaElement.ELEMENTTYPE_Campaign, p_C_Campaign_ID));
+		//	Optional Sales Region
+		if (p_C_SalesRegion_ID != 0)
+			m_parameterWhere.append(" AND f.").append(MReportTree.getWhereClause(getCtx(), 
 					p_PA_Hierarchy_ID, MAcctSchemaElement.ELEMENTTYPE_SalesRegion, p_C_SalesRegion_ID));
-			m_parameterWhereBudget.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
-			m_parameterWhereActuals.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
-			//	Mandatory Posting Type
+		m_parameterWhereBudget.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
+		m_parameterWhereActuals.append(m_parameterWhere.toString().replaceAll("f.", "fp."));
+		//	Mandatory Posting Type
 		//	m_parameterWhere.append(" AND PostingType='").append(p_PostingType).append("'");
-			m_parameterWhereBudget.append(" AND fp.PostingType='").append(X_Fact_Acct.POSTINGTYPE_Budget).append("'");
-			//
+		m_parameterWhereBudget.append(" AND fp.PostingType='").append(X_Fact_Acct.POSTINGTYPE_Budget).append("'");
+		//
 		//	setDateAcct();
 		//	sb.append(" - DateAcct ").append(p_DateAcct_From).append("-").append(p_DateAcct_To);
-			sb.append(" - Where=").append(m_parameterWhere);
-			if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+		sb.append(" - Where=").append(m_parameterWhere);
+		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 	}	//	prepare
 
-	
-	
+
+
 	/**
 	 *  Insert reporting data to T_TrialBalance
 	 *  @return empty string
@@ -256,71 +256,78 @@ public class TrialBalance_Detail extends SvrProcess
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
 		setUpSumSQLs(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate());
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-				"='SDL'",null);
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-				"='SDL'","ev.ZZ_Det_Income_Group");
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-				"='OIN'",null);
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-				"='OIN'","ev.ZZ_Det_Income_Group");
-		createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-				"in ('OIN','SDL')","ev.AccountType");
-		
+		try {
+			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+					"='SDL'",null,null);
+
+			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+					"='SDL'","ev.ZZ_Det_Income_Group","'Subtotal for skills development levies'");
+			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+					"='OIN'",null,null);
+			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+					"='OIN'","ev.ZZ_Det_Income_Group","'Total other Income'");
+			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
+					"in ('OIN','SDL')","ev.AccountType","'Total Revenue'");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "Database Error";
+		}  
+
 		return "";
 	}	//	doIt
-	
-	
+
+
 	private void setUpSumSQLs (Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate) {
-		m_YTD_Current =   m_YTD_Current.append("(Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				   .append(" fp.ad_client_id = f.ad_client_id")
-				   .append(" AND fp.Account_ID = f.Account_ID" )
-				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-			    .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
-			    .append(" + 1)")
-			    .append(" AND ").append(m_parameterWhereActuals)
-				   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
-		
+		m_YTD_Current =   m_YTD_Current.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
+				.append(" fp.ad_client_id = f.ad_client_id")
+				.append(" AND fp.Account_ID = f.Account_ID" )
+				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+				.append(" + 1)")
+				.append(" AND ").append(m_parameterWhereActuals)
+				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+
 		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-		   .append(" fp.ad_client_id = f.ad_client_id")
-		   .append(" AND fp.Account_ID = f.Account_ID" )
-		   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-	       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
-	       .append(" + 1)")
-	       .append(" AND ").append(m_parameterWhereActuals)
-		   .append(" AND fp.PostingType='").append(p_PostingType).append("'");
-		
+				.append(" fp.ad_client_id = f.ad_client_id")
+				.append(" AND fp.Account_ID = f.Account_ID" )
+				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
+				.append(" + 1)")
+				.append(" AND ").append(m_parameterWhereActuals)
+				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+
 		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				   .append(" fp.ad_client_id = f.ad_client_id")
-				   .append(" AND fp.Account_ID = f.Account_ID" )
-				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
-			       .append(" + 1)")
-			       .append(" AND ").append(m_parameterWhereActuals)
-			       .append(" AND fp.PostingType='").append(p_PostingType).append("'");
-		
+				.append(" fp.ad_client_id = f.ad_client_id")
+				.append(" AND fp.Account_ID = f.Account_ID" )
+				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
+				.append(" + 1)")
+				.append(" AND ").append(m_parameterWhereActuals)
+				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+
 		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				   .append(" fp.ad_client_id = f.ad_client_id")
-				   .append(" AND fp.Account_ID = f.Account_ID" )
-				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
-			       .append(" + 1)")
-			       .append (" AND ").append(m_parameterWhereBudget);
-		
+				.append(" fp.ad_client_id = f.ad_client_id")
+				.append(" AND fp.Account_ID = f.Account_ID" )
+				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+				.append(" + 1)")
+				.append (" AND ").append(m_parameterWhereBudget);
+
 		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				   .append(" fp.ad_client_id = f.ad_client_id")
-				   .append(" AND fp.Account_ID = f.Account_ID" )
-				   .append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-			       .append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
-			       .append(" + 1)")
-			       .append (" AND ").append(m_parameterWhereBudget);
-		
-		
+				.append(" fp.ad_client_id = f.ad_client_id")
+				.append(" AND fp.Account_ID = f.Account_ID" )
+				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
+				.append(" + 1)")
+				.append (" AND ").append(m_parameterWhereBudget);
+
+
 	}
-	
-	
-	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String ZZ_Det_Income_Group,
-			String groupBy)
+
+
+	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String zz_Det_Income_Group,
+			String groupBy,String description) throws Exception
 	{
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
@@ -334,10 +341,14 @@ public class TrialBalance_Detail extends SvrProcess
 		else
 			sql.append(p_AD_Org_ID);
 		sql.append(", getDate(),").append(getAD_User_ID())
-			.append(",getDate(),").append(getAD_User_ID()).append(",");
+		.append(",getDate(),").append(getAD_User_ID()).append(",");
 		//	C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,
 		sql.append(p_C_AcctSchema_ID).append(",");
-		sql.append("Account_ID");
+		if (groupBy == null) {
+			sql.append("Account_ID");
+		} else {
+			sql.append("''");
+		}
 		if (p_AccountValue_From != null)
 			sql.append(",").append(DB.TO_STRING(p_AccountValue_From));
 		else if (p_AccountValue_To != null)
@@ -359,8 +370,8 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append("null,null,null,null,");
 		//	AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,
 		sql.append(" COALESCE(SUM(AmtAcctDr),0),COALESCE(SUM(AmtAcctCr),0),"
-				  + "COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0),"
-			+ " null,COALESCE(SUM(Qty),0),");
+				+ "COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0),"
+				+ " null,COALESCE(SUM(Qty),0),");
 		//	M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,
 		if (p_M_Product_ID == 0)
 			sql.append ("null");
@@ -420,99 +431,101 @@ public class TrialBalance_Detail extends SvrProcess
 			sql.append (p_User2_ID);
 		sql.append(", null, '");
 		sql.append(Msg.getMsg(getCtx(), "opening.balance") + "', 0, generate_uuid() ");
-		
+
 		sql.append(",");
-		sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
-		
+		if (description == null) {
+			sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
+		} else {
+			sql.append(description);
+		}
+
 		// ZZ_YTD_Current
 		sql.append(",");
 		sql.append("(")
-		   .append(m_YTD_Current);
+		.append(m_YTD_Current);
 		sql.append(")");
-		
+
 		//ZZ_YTD_Prior
 		sql.append(",");
 		sql.append("(")
-		   .append(m_ZZ_YTD_Prior);
+		.append(m_ZZ_YTD_Prior);
 		sql.append(")");
-		
+
 		//ZZ_Prior_Year_Full
 		sql.append(",");
 		sql.append("(")
-		   .append(m_ZZ_Prior_Year_Full);
+		.append(m_ZZ_Prior_Year_Full);
 		sql.append(")");
-		
+
 		//ZZ_Budget_YTD
 		sql.append(",");
 		sql.append("(")
-		   .append(m_ZZ_Budget_YTD);
+		.append(m_ZZ_Budget_YTD);
 		sql.append(")");
-		
-		
+
+
 		// ZZ_Total_Budget
 		sql.append(",");
 		sql.append("(")
-		   .append(m_ZZ_Total_Budget);
+		.append(m_ZZ_Total_Budget);
 		sql.append(")");
-		
+
 		// ZZ_Variance_B_W   Actual YTD - Budget YTD
 		sql.append(",");
 		sql.append("(")
-		   .append("(").append(m_YTD_Current).append(")")
-		   .append("-")
-		   .append("(").append(m_ZZ_Budget_YTD).append(")");
+		.append("(").append(m_YTD_Current).append(")")
+		.append("-")
+		.append("(").append(m_ZZ_Budget_YTD).append(")");
 		sql.append(")");
-		
+
 		// ZZ_Variance_YTD_Percent
 		sql.append(",");
 		sql.append("(")
-		   .append("(").append(m_YTD_Current).append(")")
-		   .append("-")
-		   .append("(").append(m_ZZ_Budget_YTD).append(")")
-		   .append("/")
-		   .append("(").append(m_ZZ_Budget_YTD).append(")")
-		   .append(" * 100");
+		.append("(").append(m_YTD_Current).append(")")
+		.append("-")
+		.append("(").append(m_ZZ_Budget_YTD).append(")")
+		.append("/")
+		.append("(").append(m_ZZ_Budget_YTD).append(")")
+		.append(" * 100");
 		sql.append(")");
-		
+
 		// ZZ_Annual_Budget_Remaining
 		sql.append(",");
 		sql.append("(")
-		   .append("(").append(m_ZZ_Total_Budget).append(")")
-		   .append("-")
-		   .append("(").append(m_YTD_Current).append(")");
+		.append("(").append(m_ZZ_Total_Budget).append(")")
+		.append("-")
+		.append("(").append(m_YTD_Current).append(")");
 		sql.append(")");
 		;
-		
+
 		//
 		sql.append(" FROM Fact_Acct f ")
-		    .append(" join C_ElementValue ev on f.C_ElementValue_ID = ev.Account_ID")
-			.append(" WHERE AD_Client_ID=").append(getAD_Client_ID())
-			.append (" AND ").append(m_parameterWhere)
-			.append(" AND DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-		    .append(" AND DateAcct < (").append(DB.TO_DATE(toDate, true))
-		    .append(" + 1)")
-		    .append(" AND ev.ZZ_Det_Income_Group " + ZZ_Det_Income_Group );
+		.append(" join C_ElementValue ev on ev.C_ElementValue_ID = f.Account_ID")
+		.append(" WHERE f.AD_Client_ID=").append(getAD_Client_ID())
+		.append (" AND ").append(m_parameterWhere)
+		.append(" AND f.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+		.append(" AND f.DateAcct < (").append(DB.TO_DATE(toDate, true))
+		.append(" + 1)")
+		.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		//	Start Beginning of Year
-		
-		sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
-		if (p_IsGroupByOrg)
-			sql.append(", f.AD_Org_ID ");
+
+
 
 		if (groupBy != null) {
-			sql.append(" GROUP BY " + groupBy);
+			sql.append(" GROUP BY f.Ad_Client_ID," + groupBy);
 		} else {
 			sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
 			if (p_IsGroupByOrg)
 				sql.append(", f.AD_Org_ID ");
 		}
 		//
-		int no = DB.executeUpdate(sql.toString(), get_TrxName());
+		int no = DB.executeUpdateEx(sql.toString(), get_TrxName());
 		if (no == 0)
 			if (log.isLoggable(Level.FINE)) log.fine(sql.toString());
 		if (log.isLoggable(Level.FINE)) log.fine("#" + no + " (Account_ID=" + p_Account_ID + ")");
 	}	//	createBalanceLine
 
 
-	
+
 
 }	//	TrialBalance
