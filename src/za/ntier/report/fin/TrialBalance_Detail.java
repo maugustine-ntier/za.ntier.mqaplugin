@@ -28,12 +28,14 @@ import org.compiere.model.MAcctSchemaElement;
 import org.compiere.model.MElementValue;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MProcessPara;
+import org.compiere.model.MSequence;
 import org.compiere.model.MYear;
 import org.compiere.model.X_Fact_Acct;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.report.MReportTree;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.compiere.util.Language;
 import org.compiere.util.Msg;
 
@@ -93,6 +95,7 @@ public class TrialBalance_Detail extends SvrProcess
 	private StringBuffer        m_ZZ_Prior_Year_Full = new StringBuffer();
 	private StringBuffer        m_ZZ_Budget_YTD = new StringBuffer();
 	private StringBuffer        m_ZZ_Total_Budget = new StringBuffer();
+	private MSequence           sequence = null; 
 
 
 	private static String		s_insert = "INSERT INTO T_TrialBalance_Detail_Ntier "
@@ -107,7 +110,7 @@ public class TrialBalance_Detail extends SvrProcess
 			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
 			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,"
 			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,"
-			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining)";
+			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,T_TrialBalance_Detail_Ntier_ID)";
 
 
 
@@ -238,6 +241,7 @@ public class TrialBalance_Detail extends SvrProcess
 	 */
 	protected String doIt()
 	{
+		MSequence.get(Env.getCtx(), "T_TrialBalance_Detail_Ntier", get_TrxName(), true);
 		MPeriod mPeriodSelected = new MPeriod(getCtx(), p_C_Period_ID, get_TrxName());
 		String SQL = "Select C_Period_ID from C_Period p where p.C_Year_ID = ? and p.periodNo = ?";
 		int startID = DB.getSQLValue(get_TrxName(), SQL, mPeriodSelected.getC_Year_ID(),1);
@@ -285,7 +289,7 @@ public class TrialBalance_Detail extends SvrProcess
 		m_ZZ_Total_Budget.setLength(0);
 
 		m_YTD_Current =   m_YTD_Current.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
 				.append(" fp.ad_client_id = f.ad_client_id");
 		if (groupBy == null) {
@@ -301,7 +305,7 @@ public class TrialBalance_Detail extends SvrProcess
 		}
 
 		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
 				.append(" fp.ad_client_id = f.ad_client_id");
 		if (groupBy == null) {
@@ -312,13 +316,13 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" + 1)")
 		.append(" AND ").append(m_parameterWhereActuals)
 		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
-		if (groupBy == null) {
-			m_ZZ_YTD_Prior.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		if (groupBy != null) {
+			m_ZZ_YTD_Prior.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
 
 		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
-				.append("where ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
+				.append(" where ")
 				.append(" fp.ad_client_id = f.ad_client_id");
 		if (groupBy == null) {
 			m_ZZ_Prior_Year_Full.append(" AND fp.Account_ID = f.Account_ID" );
@@ -328,12 +332,12 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" + 1)")
 		.append(" AND ").append(m_parameterWhereActuals)
 		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
-		if (groupBy == null) {
-			m_ZZ_Prior_Year_Full.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		if (groupBy != null) {
+			m_ZZ_Prior_Year_Full.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
 
 		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
 				.append(" fp.ad_client_id = f.ad_client_id");
 		if (groupBy == null) {
@@ -343,13 +347,13 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
 		.append(" + 1)")
 		.append (" AND ").append(m_parameterWhereBudget);
-		if (groupBy == null) {
-			m_ZZ_Budget_YTD.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		if (groupBy != null) {
+			m_ZZ_Budget_YTD.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
 
 		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
-				.append("where ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
+				.append(" where ")
 				.append(" fp.ad_client_id = f.ad_client_id");
 		if (groupBy == null) {
 			m_ZZ_Total_Budget.append(" AND fp.Account_ID = f.Account_ID" );
@@ -358,8 +362,8 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
 		.append(" + 1)")
 		.append (" AND ").append(m_parameterWhereBudget);
-		if (groupBy == null) {
-			m_ZZ_Total_Budget.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		if (groupBy != null) {
+			m_ZZ_Total_Budget.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
 
 
@@ -388,7 +392,7 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy == null) {
 			sql.append("Account_ID");
 		} else {
-			sql.append("''");
+			sql.append("null");
 		}
 		if (p_AccountValue_From != null)
 			sql.append(",").append(DB.TO_STRING(p_AccountValue_From));
@@ -524,9 +528,9 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append("(")
 		.append("(").append(m_YTD_Current).append(")")
 		.append("-")
-		.append("(").append(m_ZZ_Budget_YTD).append(")")
+		.append("Nullif((").append(m_ZZ_Budget_YTD).append(")")
 		.append("/")
-		.append("(").append(m_ZZ_Budget_YTD).append(")")
+		.append("(").append(m_ZZ_Budget_YTD).append("),0)")
 		.append(" * 100");
 		sql.append(")");
 
@@ -537,7 +541,9 @@ public class TrialBalance_Detail extends SvrProcess
 		.append("-")
 		.append("(").append(m_YTD_Current).append(")");
 		sql.append(")");
-		;
+		
+		// Key
+		sql.append("nextidfunc(" + sequence.getAD_Sequence_ID() + ",'N')");
 
 		//
 		sql.append(" FROM Fact_Acct f ")
