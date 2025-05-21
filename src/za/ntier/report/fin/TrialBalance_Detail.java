@@ -255,11 +255,9 @@ public class TrialBalance_Detail extends SvrProcess
 		MPeriod priorEndPeriod = new MPeriod(getCtx(), priorEndID, get_TrxName());
 		int priorLastID = DB.getSQLValue(get_TrxName(), SQL, prev_C_Year_ID,12);
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
-		setUpSumSQLs(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate());
-		try {
+		try {			
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"='SDL'",null,null);
-
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"='SDL'","ev.ZZ_Det_Income_Group","'Subtotal for skills development levies'");
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
@@ -278,49 +276,91 @@ public class TrialBalance_Detail extends SvrProcess
 	}	//	doIt
 
 
-	private void setUpSumSQLs (Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate) {
-		m_YTD_Current =   m_YTD_Current.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				.append(" fp.ad_client_id = f.ad_client_id")
-				.append(" AND fp.Account_ID = f.Account_ID" )
-				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
-				.append(" + 1)")
-				.append(" AND ").append(m_parameterWhereActuals)
-				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+	private void setUpSumSQLs (Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,
+			String zz_Det_Income_Group,String groupBy) {
+		m_YTD_Current.setLength(0);
+		m_ZZ_YTD_Prior.setLength(0);
+		m_ZZ_Prior_Year_Full.setLength(0);
+		m_ZZ_Budget_YTD.setLength(0);
+		m_ZZ_Total_Budget.setLength(0);
 
-		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				.append(" fp.ad_client_id = f.ad_client_id")
-				.append(" AND fp.Account_ID = f.Account_ID" )
-				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
-				.append(" + 1)")
-				.append(" AND ").append(m_parameterWhereActuals)
-				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		m_YTD_Current =   m_YTD_Current.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			m_YTD_Current.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		m_YTD_Current.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+		.append(" + 1)")
+		.append(" AND ").append(m_parameterWhereActuals)
+		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		if (groupBy != null) {
+			m_YTD_Current.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
 
-		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				.append(" fp.ad_client_id = f.ad_client_id")
-				.append(" AND fp.Account_ID = f.Account_ID" )
-				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
-				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
-				.append(" + 1)")
-				.append(" AND ").append(m_parameterWhereActuals)
-				.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			m_ZZ_YTD_Prior.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		m_ZZ_YTD_Prior.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorEndDate, true))
+		.append(" + 1)")
+		.append(" AND ").append(m_parameterWhereActuals)
+		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		if (groupBy == null) {
+			m_ZZ_YTD_Prior.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
 
-		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				.append(" fp.ad_client_id = f.ad_client_id")
-				.append(" AND fp.Account_ID = f.Account_ID" )
-				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
-				.append(" + 1)")
-				.append (" AND ").append(m_parameterWhereBudget);
+		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append("where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			m_ZZ_Prior_Year_Full.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		m_ZZ_Prior_Year_Full.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(priorLastDate, true))
+		.append(" + 1)")
+		.append(" AND ").append(m_parameterWhereActuals)
+		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		if (groupBy == null) {
+			m_ZZ_Prior_Year_Full.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
 
-		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp where ")
-				.append(" fp.ad_client_id = f.ad_client_id")
-				.append(" AND fp.Account_ID = f.Account_ID" )
-				.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
-				.append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
-				.append(" + 1)")
-				.append (" AND ").append(m_parameterWhereBudget);
+		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append(" where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			m_ZZ_Budget_YTD.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		m_ZZ_Budget_YTD.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+		.append(" + 1)")
+		.append (" AND ").append(m_parameterWhereBudget);
+		if (groupBy == null) {
+			m_ZZ_Budget_YTD.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
+
+		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = f.Account_ID")
+				.append("where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			m_ZZ_Total_Budget.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		m_ZZ_Total_Budget.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(lastDate, true))
+		.append(" + 1)")
+		.append (" AND ").append(m_parameterWhereBudget);
+		if (groupBy == null) {
+			m_ZZ_Total_Budget.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
 
 
 	}
@@ -329,6 +369,7 @@ public class TrialBalance_Detail extends SvrProcess
 	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String zz_Det_Income_Group,
 			String groupBy,String description) throws Exception
 	{
+		setUpSumSQLs(fromDate,toDate,lastDate,priorStartDate,priorEndDate,priorLastDate,zz_Det_Income_Group,groupBy);
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
 		sql.append("SELECT ").append(getAD_PInstance_ID()).append(",0,");
