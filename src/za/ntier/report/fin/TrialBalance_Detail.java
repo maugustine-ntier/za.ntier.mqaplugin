@@ -296,6 +296,7 @@ public class TrialBalance_Detail extends SvrProcess
 
 	private void setUpSumSQLs (Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,
 			String zz_Det_Income_Group,String groupBy) {
+		/*
 		m_YTD_Current.setLength(0);
 		m_ZZ_YTD_Prior.setLength(0);
 		m_ZZ_Prior_Year_Full.setLength(0);
@@ -317,7 +318,9 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_YTD_Current.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
+		*/
 
+		/*
 		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
 				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
@@ -333,7 +336,9 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_YTD_Prior.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
+		*/
 
+		/*
 		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
 				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
@@ -349,7 +354,9 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Prior_Year_Full.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
+		*/
 
+		/*
 		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
 				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
@@ -364,7 +371,8 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Budget_YTD.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-
+		*/
+		/* 
 		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
 				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
 				.append(" where ")
@@ -379,8 +387,34 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Total_Budget.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-
-
+		*/
+		
+		m_YTD_Current = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereActuals);
+		m_ZZ_YTD_Prior = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorEndDate, groupBy,m_parameterWhereActuals);
+		m_ZZ_Prior_Year_Full = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorLastDate, groupBy,m_parameterWhereActuals);
+		m_ZZ_Budget_YTD = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereBudget);
+		m_ZZ_Total_Budget = setUpSumSQL(zz_Det_Income_Group,fromDate, lastDate, groupBy,m_parameterWhereBudget);
+	}
+	
+	
+	private StringBuffer setUpSumSQL(String zz_Det_Income_Group,Timestamp fromDate, Timestamp toDate, String groupBy,StringBuffer paraWhere) {
+		StringBuffer sumSQL = new StringBuffer();
+		sumSQL =   sumSQL.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
+				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
+				.append(" where ")
+				.append(" fp.ad_client_id = f.ad_client_id");
+		if (groupBy == null) {
+			sumSQL.append(" AND fp.Account_ID = f.Account_ID" );
+		}
+		sumSQL.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
+		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
+		.append(" + 1)")
+		.append(" AND ").append(paraWhere)
+		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		if (groupBy != null) {
+			sumSQL.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
+		return sumSQL;
 	}
 
 
