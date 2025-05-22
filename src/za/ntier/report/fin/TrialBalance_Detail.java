@@ -401,8 +401,8 @@ public class TrialBalance_Detail extends SvrProcess
 		StringBuffer sumSQL = new StringBuffer();
 		sumSQL =   sumSQL.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ");
 		if (useParent) {
-			sumSQL.append(" join ad_treenode tn1 on pev.C_ElementValue_ID = tn1.parent_ID")
-			.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = tn1.node_ID");
+			sumSQL.append(" join ad_treenode tn1 on fp.account_ID = tn1.node_ID")
+			.append(" join C_ElementValue ev1 on 	ev1.C_ElementValue_ID = tn1.parent_ID");
 		} else {
 			sumSQL.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID");
 		}
@@ -537,7 +537,7 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append(",");
 		if (description == null) {
 			if (useParent) {
-				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = pev.C_ElementValue_ID)");
+				sql.append("(Select e.Name from C_ElementValue e where e.C_ElementValue_ID = pev.C_ElementValue_ID)");
 			} else {
 				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
 			}
