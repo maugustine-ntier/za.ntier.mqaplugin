@@ -77,7 +77,7 @@ public class TrialBalance_Detail extends SvrProcess
 	/**	Campaign Parameter				*/
 	private int					p_C_Campaign_ID = 0;
 	/** Posting Type					*/
-	private String				p_PostingType = "A";
+	//private String				p_PostingType = "A";
 	/** Hierarchy						*/
 	private int					p_PA_Hierarchy_ID = 0;
 
@@ -162,8 +162,8 @@ public class TrialBalance_Detail extends SvrProcess
 				p_C_SalesRegion_ID = ((BigDecimal)para[i].getParameter()).intValue();
 			else if (name.equals("C_Campaign_ID"))
 				p_C_Campaign_ID = ((BigDecimal)para[i].getParameter()).intValue();
-			else if (name.equals("PostingType"))
-				p_PostingType = (String)para[i].getParameter();
+			// else if (name.equals("PostingType"))
+			// p_PostingType = (String)para[i].getParameter();
 			else if (name.equals("IsGroupByOrg"))
 				p_IsGroupByOrg = para[i].getParameterAsBoolean();
 			else
@@ -261,29 +261,29 @@ public class TrialBalance_Detail extends SvrProcess
 		MPeriod priorLastPeriod = new MPeriod(getCtx(), priorLastID, get_TrxName());
 		try {			
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='SDL'",null,null);
+					"='SDL'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='SDL'","ev.ZZ_Det_Income_Group","'Subtotal - skills development levies'");
+					"='SDL'","ev.ZZ_Det_Income_Group","'Subtotal - skills development levies'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='OIN'",null,null);
+					"='OIN'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='OIN'","ev.ZZ_Det_Income_Group","'Total other Income'");
+					"='OIN'","ev.ZZ_Det_Income_Group","'Total other Income'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"in ('OIN','SDL')","ev.AccountType","'Total Revenue'");
+					"in ('OIN','SDL')","ev.AccountType","'Total Revenue'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='ADM'",null,null);
+					"='ADM'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='ADM'","ev.ZZ_Det_Income_Group","'Subtotal - ADMINISTRATION EXPENSES'");
+					"='ADM'","ev.ZZ_Det_Income_Group","'Subtotal - ADMINISTRATION EXPENSES'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='TQO'",null,null);
+					"='TQO'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='TQO'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - QCTO'");
+					"='TQO'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - QCTO'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='GRN'",null,null);
+					"='GRN'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='GRN'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - GRANTS EXPENDITURE'");
+					"='GRN'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - GRANTS EXPENDITURE'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'");
+					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'",false);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -295,7 +295,7 @@ public class TrialBalance_Detail extends SvrProcess
 
 
 	private void setUpSumSQLs (Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,
-			String zz_Det_Income_Group,String groupBy) {
+			String zz_Det_Income_Group,String groupBy,boolean useParent) {
 		/*
 		m_YTD_Current.setLength(0);
 		m_ZZ_YTD_Prior.setLength(0);
@@ -318,7 +318,7 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_YTD_Current.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-		*/
+		 */
 
 		/*
 		m_ZZ_YTD_Prior = m_ZZ_YTD_Prior.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
@@ -336,7 +336,7 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_YTD_Prior.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-		*/
+		 */
 
 		/*
 		m_ZZ_Prior_Year_Full = m_ZZ_Prior_Year_Full.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
@@ -354,7 +354,7 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Prior_Year_Full.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-		*/
+		 */
 
 		/*
 		m_ZZ_Budget_YTD = m_ZZ_Budget_YTD.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
@@ -371,7 +371,7 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Budget_YTD.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-		*/
+		 */
 		/* 
 		m_ZZ_Total_Budget = m_ZZ_Total_Budget.append(" Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
 				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
@@ -387,30 +387,39 @@ public class TrialBalance_Detail extends SvrProcess
 		if (groupBy != null) {
 			m_ZZ_Total_Budget.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
-		*/
-		
-		m_YTD_Current = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereActuals);
-		m_ZZ_YTD_Prior = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorEndDate, groupBy,m_parameterWhereActuals);
-		m_ZZ_Prior_Year_Full = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorLastDate, groupBy,m_parameterWhereActuals);
-		m_ZZ_Budget_YTD = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereBudget);
-		m_ZZ_Total_Budget = setUpSumSQL(zz_Det_Income_Group,fromDate, lastDate, groupBy,m_parameterWhereBudget);
+		 */
+
+		m_YTD_Current = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereActuals,"A",useParent);
+		m_ZZ_YTD_Prior = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorEndDate, groupBy,m_parameterWhereActuals,"A",useParent);
+		m_ZZ_Prior_Year_Full = setUpSumSQL(zz_Det_Income_Group,priorStartDate, priorLastDate, groupBy,m_parameterWhereActuals,"A",useParent);
+		m_ZZ_Budget_YTD = setUpSumSQL(zz_Det_Income_Group,fromDate, toDate, groupBy,m_parameterWhereBudget,"B",useParent);
+		m_ZZ_Total_Budget = setUpSumSQL(zz_Det_Income_Group,fromDate, lastDate, groupBy,m_parameterWhereBudget,"B",useParent);
 	}
-	
-	
-	private StringBuffer setUpSumSQL(String zz_Det_Income_Group,Timestamp fromDate, Timestamp toDate, String groupBy,StringBuffer paraWhere) {
+
+
+	private StringBuffer setUpSumSQL(String zz_Det_Income_Group,Timestamp fromDate, Timestamp toDate, String groupBy,StringBuffer paraWhere,String postingType,boolean useParent) {
 		StringBuffer sumSQL = new StringBuffer();
-		sumSQL =   sumSQL.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ")
-				.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID")
-				.append(" where ")
-				.append(" fp.ad_client_id = f.ad_client_id");
-		if (groupBy == null) {
-			sumSQL.append(" AND fp.Account_ID = f.Account_ID" );
+		sumSQL =   sumSQL.append("Select COALESCE(SUM(AmtAcctDr),0)-COALESCE(SUM(AmtAcctCr),0) from Fact_Acct fp ");
+		if (useParent) {
+			sumSQL.append(" join ad_treenode tn1 on pev.C_ElementValue_ID = tn1.parent_ID")
+			.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = tn1.node_ID");
+		} else {
+			sumSQL.append(" join C_ElementValue ev1 on ev1.C_ElementValue_ID = fp.Account_ID");
+		}
+		sumSQL.append(" where ")
+		.append(" fp.ad_client_id = f.ad_client_id");
+		if (useParent) {
+			sumSQL.append(" AND fp.Account_ID = ev1.C_ElementValue_ID" );
+		} else {
+			if (groupBy == null) {
+				sumSQL.append(" AND fp.Account_ID = f.Account_ID" );
+			}
 		}
 		sumSQL.append(" AND fp.DateAcct >= ").append(DB.TO_DATE(fromDate, true))
 		.append(" AND fp.DateAcct < (").append(DB.TO_DATE(toDate, true))
 		.append(" + 1)")
 		.append(" AND ").append(paraWhere)
-		.append(" AND fp.PostingType='").append(p_PostingType).append("'");
+		.append(" AND fp.PostingType='").append(postingType).append("'");
 		if (groupBy != null) {
 			sumSQL.append(" AND ev1.ZZ_Det_Income_Group " + zz_Det_Income_Group );
 		}
@@ -419,9 +428,9 @@ public class TrialBalance_Detail extends SvrProcess
 
 
 	private void createBalanceLine(Timestamp fromDate, Timestamp toDate, Timestamp lastDate,Timestamp priorStartDate,Timestamp priorEndDate, Timestamp priorLastDate,String zz_Det_Income_Group,
-			String groupBy,String description) throws Exception
+			String groupBy,String description,boolean useParent) throws Exception
 	{
-		setUpSumSQLs(fromDate,toDate,lastDate,priorStartDate,priorEndDate,priorLastDate,zz_Det_Income_Group,groupBy);
+		setUpSumSQLs(fromDate,toDate,lastDate,priorStartDate,priorEndDate,priorLastDate,zz_Det_Income_Group,groupBy,useParent);
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
 		sql.append("SELECT ").append(getAD_PInstance_ID()).append(",0,");
@@ -458,7 +467,7 @@ public class TrialBalance_Detail extends SvrProcess
 		//	AD_Table_ID, Record_ID, Line_ID,
 		sql.append("null,null,null,");
 		//	GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,
-		sql.append("null,null,null,null,'").append(p_PostingType).append("',");
+		sql.append("null,null,null,null,'").append("").append("',");
 		//	C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,
 		sql.append("null,null,null,null,");
 		//	AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,
@@ -527,7 +536,11 @@ public class TrialBalance_Detail extends SvrProcess
 
 		sql.append(",");
 		if (description == null) {
-			sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
+			if (useParent) {
+				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
+			} else {
+				sql.append("(Select pev.description from C_ElementValue pev where pev.C_ElementValue_ID = Account_ID)");
+			}
 		} else {
 			sql.append(description);
 		}
@@ -576,9 +589,11 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append("(")
 		.append("(").append(m_YTD_Current).append(")")
 		.append("-")
-		.append("Nullif((").append(m_ZZ_Budget_YTD).append(")")
+		.append("(").append(m_ZZ_Budget_YTD).append(")")
 		.append("/")
-		.append("(").append(m_ZZ_Budget_YTD).append("),0)")
+		.append("nullif(")
+		.append("(").append(m_ZZ_Budget_YTD).append(")")
+		.append(",0)")
 		.append(" * 100");
 		sql.append(")");
 
@@ -589,15 +604,19 @@ public class TrialBalance_Detail extends SvrProcess
 		.append("-")
 		.append("(").append(m_YTD_Current).append(")");
 		sql.append(")");
-		
+
 		// Key
 		sql.append(",");
 		sql.append("nextidfunc(" + sequence.getAD_Sequence_ID() + ",'N')");
 
 		//
 		sql.append(" FROM Fact_Acct f ")
-		.append(" join C_ElementValue ev on ev.C_ElementValue_ID = f.Account_ID")
-		.append(" WHERE f.AD_Client_ID=").append(getAD_Client_ID())
+		.append(" join C_ElementValue ev on ev.C_ElementValue_ID = f.Account_ID");
+		if (useParent) {
+			sql.append(" join ad_treenode tn on ev.C_ElementValue_ID = tn.node_ID")
+			.append(" join C_ElementValue pev on pev.C_ElementValue_ID = tn.parent_ID");  // parent element value
+		}
+		sql.append(" WHERE f.AD_Client_ID=").append(getAD_Client_ID())
 		.append (" AND ").append(m_parameterWhere)
 		.append(" AND f.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 		.append(" AND f.DateAcct < (").append(DB.TO_DATE(toDate, true))
@@ -606,14 +625,24 @@ public class TrialBalance_Detail extends SvrProcess
 		//	Start Beginning of Year
 
 
-
-		if (groupBy != null) {
-			sql.append(" GROUP BY f.Ad_Client_ID," + groupBy);
-		} else {
-			sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
-			if (p_IsGroupByOrg)
-				sql.append(", f.AD_Org_ID ");
+		if (useParent) {
+			if (groupBy != null) {
+				sql.append(" GROUP BY f.Ad_Client_ID," + groupBy);
+			} else {
+				sql.append(" GROUP BY f.Ad_Client_ID,pev.C_ElementValue_ID");
+				if (p_IsGroupByOrg)
+					sql.append(", f.AD_Org_ID ");
+			}
+		} else {		
+			if (groupBy != null) {
+				sql.append(" GROUP BY f.Ad_Client_ID," + groupBy);
+			} else {
+				sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
+				if (p_IsGroupByOrg)
+					sql.append(", f.AD_Org_ID ");
+			}
 		}
+
 		//
 		int no = DB.executeUpdateEx(sql.toString(), get_TrxName());
 		if (no == 0)
