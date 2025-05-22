@@ -275,15 +275,15 @@ public class TrialBalance_Detail extends SvrProcess
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"='ADM'","ev.ZZ_Det_Income_Group","'Subtotal - ADMINISTRATION EXPENSES'",true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='TQO'",null,null,false);
+					"='TQO'",null,null,true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='TQO'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - QCTO'",false);
+					"='TQO'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - QCTO'",true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='GRN'",null,null,false);
+					"='GRN'",null,null,true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='GRN'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - GRANTS EXPENDITURE'",false);
+					"='GRN'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - GRANTS EXPENDITURE'",true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'",false);
+					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'",true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
