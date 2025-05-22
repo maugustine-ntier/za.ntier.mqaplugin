@@ -271,9 +271,9 @@ public class TrialBalance_Detail extends SvrProcess
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"in ('OIN','SDL')","ev.AccountType","'Total Revenue'",false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='ADM'",null,null,false);
+					"='ADM'",null,null,true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
-					"='ADM'","ev.ZZ_Det_Income_Group","'Subtotal - ADMINISTRATION EXPENSES'",false);
+					"='ADM'","ev.ZZ_Det_Income_Group","'Subtotal - ADMINISTRATION EXPENSES'",true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"='TQO'",null,null,false);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
@@ -446,7 +446,7 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(",getDate(),").append(getAD_User_ID()).append(",");
 		//	C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,
 		sql.append(p_C_AcctSchema_ID).append(",");
-		if (groupBy == null) {
+		if (groupBy == null && !useParent) {
 			sql.append("Account_ID");
 		} else {
 			sql.append("null");
@@ -537,9 +537,9 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append(",");
 		if (description == null) {
 			if (useParent) {
-				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
+				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = pev.C_ElementValue_ID)");
 			} else {
-				sql.append("(Select pev.description from C_ElementValue pev where pev.C_ElementValue_ID = Account_ID)");
+				sql.append("(Select e.description from C_ElementValue e where e.C_ElementValue_ID = Account_ID)");
 			}
 		} else {
 			sql.append(description);
@@ -620,8 +620,12 @@ public class TrialBalance_Detail extends SvrProcess
 		.append (" AND ").append(m_parameterWhere)
 		.append(" AND f.DateAcct >= ").append(DB.TO_DATE(priorStartDate, true))
 		.append(" AND f.DateAcct < (").append(DB.TO_DATE(toDate, true))
-		.append(" + 1)")
-		.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		.append(" + 1)");
+		if (useParent) {
+			sql.append(" AND pev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		} else {
+			sql.append(" AND ev.ZZ_Det_Income_Group " + zz_Det_Income_Group );
+		}
 		//	Start Beginning of Year
 
 
