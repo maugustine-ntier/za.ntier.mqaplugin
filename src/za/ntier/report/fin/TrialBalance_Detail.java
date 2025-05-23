@@ -285,6 +285,7 @@ public class TrialBalance_Detail extends SvrProcess
 					"='GRN'","ev.ZZ_Det_Income_Group","'Subtotal Transfer - GRANTS EXPENDITURE'",true);
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'",true);
+			createSurplusDeficit_Catergory(" = 'ASD'","Administration Surplus/(Deficit)");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -665,30 +666,37 @@ public class TrialBalance_Detail extends SvrProcess
 
 
 
-	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group) {
+	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group_where,String description) {
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
 		sql.append("SELECT ").append(getAD_PInstance_ID());
 		sql.append(",");
-		sql.append("Fact_Acct_ID,")
-		.append(" AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,")
-		.append(" C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,")
-		.append(" AD_Table_ID, Record_ID, Line_ID,")
-		.append(" GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,")
-		.append(" C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,")
-		.append(" AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,")
-		.append(" M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,")
-		.append(" C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,")
-		.append(" User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,")
-		.append(" ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,")
-		.append(" ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,")
+		sql.append("0,")
+		.append(" AD_Client_ID, AD_Org_ID, max(Created),max(CreatedBy), max(Updated),max(UpdatedBy),")
+		.append(" 0, 0, '', null, null, 0,")
+		.append(" 0, 0, 0,")
+		.append(" 0, 0, 0, 0, '',")
+		.append(" 0, sum(AmtSourceDr), sum(AmtSourceCr), sum(AmtSourceBalance),")
+		.append(" sum(AmtAcctDr), sum(AmtAcctCr), sum(AmtAcctBalance), 0, sum(Qty),")
+		.append(" 0, 0, 0, 0,0,")
+		.append(" 0, 0, 0, 0,")
+		.append(" 0, 0, 0, '', '', generate_uuid(),")
+		.append(description)
+		.append(",")
+		.append(" sum(ZZ_YTD_Current),sum(ZZ_YTD_Prior),sum(ZZ_Prior_Year_Full),sum(ZZ_Budget_YTD),sum(ZZ_Total_Budget),")
+		.append(" sum(ZZ_Variance_B_W),0.00,sum(ZZ_Annual_Budget_Remaining),")
 		.append("nextidfunc(" + sequence.getAD_Sequence_ID() + ",'N'),")
-		.append("XXX");
+		.append("'XXX'");
 
 
 
 
-		sql.append(" From T_TrialBalance_Detail_Ntier tr where tr.ZZ_Sur_Def_Group = '" + zz_Sur_Def_Group + "'" );
+		sql.append(" From T_TrialBalance_Detail_Ntier tr where tr.ZZ_Sur_Def_Group " + zz_Sur_Def_Group_where  );
+		sql.append(" Group By ");
+		sql.append(getAD_PInstance_ID());
+		sql.append(",")
+		.append(" AD_Client_ID, AD_Org_ID");
+		
 
 
 
