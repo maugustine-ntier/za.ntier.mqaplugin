@@ -668,23 +668,37 @@ public class TrialBalance_Detail extends SvrProcess
 	}	//	createBalanceLine
 
 
+	private static String		s_insert = "INSERT INTO T_TrialBalance_Detail_Ntier "
+			+ "(AD_PInstance_ID, Fact_Acct_ID,"
+			+ " AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,"
+			+ " C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,"
+			+ " AD_Table_ID, Record_ID, Line_ID,"
+			+ " GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,"
+			+ " C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,"
+			+ " AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,"
+			+ " M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,"
+			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
+			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,"
+			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,"
+			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,T_TrialBalance_Detail_Ntier_ID,"
+			+ " ZZ_Sur_Def_Group)";
 
 
 	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group_where,String description) throws Exception {
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
-		sql.append("SELECT ").append(getAD_PInstance_ID());
+		sql.append(" SELECT ").append(getAD_PInstance_ID());
 		sql.append(",");
-		sql.append("0,")
+		sql.append("max(Fact_Acct_ID),")
 		.append(" AD_Client_ID, AD_Org_ID, max(Created),max(CreatedBy), max(Updated),max(UpdatedBy),")
-		.append(" 0, 0, '', null, null, 0,")
-		.append(" 0, 0, 0,")
-		.append(" 0, 0, 0, 0, '',")
+		.append(" max(C_AcctSchema_ID), max(account_ID), '', max(tr.DateTrx), max(tr.dateacct), max(C_Period_ID),")
+		.append(" max(AD_Table_ID), max(Record_ID), max(Line_ID),")
+		.append(" max(GL_Category_ID), max(GL_Budget_ID), max(C_Tax_ID), max(M_Locator_ID), max(PostingType),")
 		.append(" 0, sum(AmtSourceDr), sum(AmtSourceCr), sum(AmtSourceBalance),")
 		.append(" sum(AmtAcctDr), sum(AmtAcctCr), sum(AmtAcctBalance), 0, sum(Qty),")
-		.append(" 0, 0, 0, 0,0,")
-		.append(" 0, 0, 0, 0,")
-		.append(" 0, 0, 0, '', '', generate_uuid(),")
+		.append(" null, null, null, null,null,")
+		.append(" null, null, null, null,")
+		.append(" null, null, null, '', 0, generate_uuid(),")
 		.append("'").append(description).append("'")
 		.append(",")
 		.append(" sum(ZZ_YTD_Current),sum(ZZ_YTD_Prior),sum(ZZ_Prior_Year_Full),sum(ZZ_Budget_YTD),sum(ZZ_Total_Budget),")
@@ -697,7 +711,7 @@ public class TrialBalance_Detail extends SvrProcess
 
 		sql.append(" From T_TrialBalance_Detail_Ntier tr where tr.ZZ_Sur_Def_Group " + zz_Sur_Def_Group_where  );
 		sql.append(" Group By ");
-		sql.append(" PInstance_ID");
+		sql.append(" AD_PInstance_ID");
 		sql.append(",")
 		.append(" AD_Client_ID, AD_Org_ID");
 		
