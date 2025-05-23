@@ -646,6 +646,8 @@ public class TrialBalance_Detail extends SvrProcess
 				if (p_IsGroupByOrg)
 					sql.append(", f.AD_Org_ID ");
 			}
+			sql.append(",")
+			   .append("pev.ZZ_Sur_Def_Group");
 		} else {		
 			if (groupBy != null) {
 				sql.append(" GROUP BY f.Ad_Client_ID," + groupBy);
@@ -654,6 +656,8 @@ public class TrialBalance_Detail extends SvrProcess
 				if (p_IsGroupByOrg)
 					sql.append(", f.AD_Org_ID ");
 			}	
+			sql.append(",")
+			   .append("ev.ZZ_Sur_Def_Group");
 		}
 
 		//
@@ -666,7 +670,7 @@ public class TrialBalance_Detail extends SvrProcess
 
 
 
-	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group_where,String description) {
+	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group_where,String description) throws Exception {
 		StringBuilder sql = new StringBuilder (s_insert);
 		//	(AD_PInstance_ID, Fact_Acct_ID,
 		sql.append("SELECT ").append(getAD_PInstance_ID());
@@ -681,7 +685,7 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" 0, 0, 0, 0,0,")
 		.append(" 0, 0, 0, 0,")
 		.append(" 0, 0, 0, '', '', generate_uuid(),")
-		.append(description)
+		.append("'").append(description).append("'")
 		.append(",")
 		.append(" sum(ZZ_YTD_Current),sum(ZZ_YTD_Prior),sum(ZZ_Prior_Year_Full),sum(ZZ_Budget_YTD),sum(ZZ_Total_Budget),")
 		.append(" sum(ZZ_Variance_B_W),0.00,sum(ZZ_Annual_Budget_Remaining),")
@@ -693,11 +697,14 @@ public class TrialBalance_Detail extends SvrProcess
 
 		sql.append(" From T_TrialBalance_Detail_Ntier tr where tr.ZZ_Sur_Def_Group " + zz_Sur_Def_Group_where  );
 		sql.append(" Group By ");
-		sql.append(getAD_PInstance_ID());
+		sql.append(" PInstance_ID");
 		sql.append(",")
 		.append(" AD_Client_ID, AD_Org_ID");
 		
-
+		int no = DB.executeUpdateEx(sql.toString(), get_TrxName());
+		if (no == 0)
+			if (log.isLoggable(Level.FINE)) log.fine(sql.toString());
+		if (log.isLoggable(Level.FINE)) log.fine("#" + no + " (Account_ID=" + p_Account_ID + ")");
 
 
 
