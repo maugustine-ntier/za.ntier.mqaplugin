@@ -110,7 +110,8 @@ public class TrialBalance_Detail extends SvrProcess
 			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
 			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,"
 			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,"
-			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,T_TrialBalance_Detail_Ntier_ID)";
+			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,T_TrialBalance_Detail_Ntier_ID,"
+			+ " ZZ_Sur_Def_Group)";
 
 
 
@@ -609,6 +610,13 @@ public class TrialBalance_Detail extends SvrProcess
 		sql.append(",");
 		sql.append("nextidfunc(" + sequence.getAD_Sequence_ID() + ",'N')");
 
+		sql.append(",");
+		if (useParent) {
+			sql.append("pev.ZZ_Sur_Def_Group");
+		} else {
+			sql.append("ev.ZZ_Sur_Def_Group");
+		}
+
 		//
 		sql.append(" FROM Fact_Acct f ")
 		.append(" join C_ElementValue ev on ev.C_ElementValue_ID = f.Account_ID");
@@ -644,7 +652,7 @@ public class TrialBalance_Detail extends SvrProcess
 				sql.append(" GROUP BY f.Ad_Client_ID,f.Account_ID ");
 				if (p_IsGroupByOrg)
 					sql.append(", f.AD_Org_ID ");
-			}
+			}	
 		}
 
 		//
@@ -655,6 +663,37 @@ public class TrialBalance_Detail extends SvrProcess
 	}	//	createBalanceLine
 
 
+
+
+	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group) {
+		StringBuilder sql = new StringBuilder (s_insert);
+		//	(AD_PInstance_ID, Fact_Acct_ID,
+		sql.append("SELECT ").append(getAD_PInstance_ID());
+		sql.append(",");
+		sql.append("Fact_Acct_ID,")
+		.append(" AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,")
+		.append(" C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,")
+		.append(" AD_Table_ID, Record_ID, Line_ID,")
+		.append(" GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,")
+		.append(" C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,")
+		.append(" AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,")
+		.append(" M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,")
+		.append(" C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,")
+		.append(" User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,")
+		.append(" ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,")
+		.append(" ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,")
+		.append("nextidfunc(" + sequence.getAD_Sequence_ID() + ",'N'),")
+		.append("XXX");
+
+
+
+
+		sql.append(" From T_TrialBalance_Detail_Ntier tr where tr.ZZ_Sur_Def_Group = '" + zz_Sur_Def_Group + "'" );
+
+
+
+
+	}
 
 
 }	//	TrialBalance
