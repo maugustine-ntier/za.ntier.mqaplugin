@@ -286,6 +286,9 @@ public class TrialBalance_Detail extends SvrProcess
 			createBalanceLine(startPeriod.getStartDate(), mPeriodSelected.getEndDate(), lastPeriod.getEndDate(),priorStartPeriod.getStartDate(),priorEndPeriod.getEndDate(),priorLastPeriod.getEndDate(),
 					"in ('ADM','TQO','GRN')","ev.AccountType","'Total Expenses'",true);
 			createSurplusDeficit_Catergory(" = 'ASD'","Administration Surplus/(Deficit)");
+			createSurplusDeficit_Catergory(" = 'MGS'","Mandatory Grants Surplus/(Deficit)");
+			createSurplusDeficit_Catergory(" = 'DGS'","Discretionary Grants Surplus/(Deficit)");
+			createSurplusDeficit_Catergory(" in ('ASD','DGS','MGS')","Total Surplus/(Deficit)");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -668,20 +671,6 @@ public class TrialBalance_Detail extends SvrProcess
 	}	//	createBalanceLine
 
 
-	private static String		s_insert = "INSERT INTO T_TrialBalance_Detail_Ntier "
-			+ "(AD_PInstance_ID, Fact_Acct_ID,"
-			+ " AD_Client_ID, AD_Org_ID, Created,CreatedBy, Updated,UpdatedBy,"
-			+ " C_AcctSchema_ID, Account_ID, AccountValue, DateTrx, DateAcct, C_Period_ID,"
-			+ " AD_Table_ID, Record_ID, Line_ID,"
-			+ " GL_Category_ID, GL_Budget_ID, C_Tax_ID, M_Locator_ID, PostingType,"
-			+ " C_Currency_ID, AmtSourceDr, AmtSourceCr, AmtSourceBalance,"
-			+ " AmtAcctDr, AmtAcctCr, AmtAcctBalance, C_UOM_ID, Qty,"
-			+ " M_Product_ID, C_BPartner_ID, AD_OrgTrx_ID, C_LocFrom_ID,C_LocTo_ID,"
-			+ " C_SalesRegion_ID, C_Project_ID, C_Campaign_ID, C_Activity_ID,"
-			+ " User1_ID, User2_ID, A_Asset_ID, Description, LevelNo, T_TrialBalance_Detail_Ntier_UU,"
-			+ " ZZ_Account_Description,ZZ_YTD_Current,ZZ_YTD_Prior,ZZ_Prior_Year_Full,ZZ_Budget_YTD,ZZ_Total_Budget,"
-			+ " ZZ_Variance_B_W,ZZ_Variance_YTD_Percent,ZZ_Annual_Budget_Remaining,T_TrialBalance_Detail_Ntier_ID,"
-			+ " ZZ_Sur_Def_Group)";
 
 
 	private void createSurplusDeficit_Catergory(String zz_Sur_Def_Group_where,String description) throws Exception {
@@ -694,8 +683,8 @@ public class TrialBalance_Detail extends SvrProcess
 		.append(" max(C_AcctSchema_ID), max(account_ID), '', max(tr.DateTrx), max(tr.dateacct), max(C_Period_ID),")
 		.append(" max(AD_Table_ID), max(Record_ID), max(Line_ID),")
 		.append(" max(GL_Category_ID), max(GL_Budget_ID), max(C_Tax_ID), max(M_Locator_ID), max(PostingType),")
-		.append(" 0, sum(AmtSourceDr), sum(AmtSourceCr), sum(AmtSourceBalance),")
-		.append(" sum(AmtAcctDr), sum(AmtAcctCr), sum(AmtAcctBalance), 0, sum(Qty),")
+		.append(" null, sum(AmtSourceDr), sum(AmtSourceCr), sum(AmtSourceBalance),")
+		.append(" sum(AmtAcctDr), sum(AmtAcctCr), sum(AmtAcctBalance), null, sum(Qty),")
 		.append(" null, null, null, null,null,")
 		.append(" null, null, null, null,")
 		.append(" null, null, null, '', 0, generate_uuid(),")
