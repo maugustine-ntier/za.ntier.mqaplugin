@@ -1,10 +1,7 @@
 package za.ntier.process;
 
-import java.util.Arrays;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MInventoryLine;
-import org.compiere.model.MUserRoles;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfo;
 import org.compiere.util.Msg;
@@ -71,6 +68,8 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		if (!Util.isEmpty(docApprove.getZZ_FinalWorkflowStateValue(), true) && docApprove.getZZ_FinalWorkflowStateValue().equals(docApprove.getZZ_DocStatus())) {
 			doLogic();
 		}
+		
+		sentNotify(queueNotifis, get_TrxName());
 		return null;
 	}
 
@@ -83,13 +82,13 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 				docApprove.setZZ_Date_Approved(now);
 				docApprove.setZZ_Date_MFC_Approved(now);
 				docApprove.setZZ_Date_Completed(now);
-				AbstractDocApproveProcess.sendNotification(
-						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+				AbstractDocApproveProcess.queueNotify(queueNotifis, 
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
 			}
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables);
 			docApprove.setZZ_Date_MFC_Not_Approved(now);
-			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
 
@@ -101,13 +100,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		if (isBypassLineManage && docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.SNR_ADMIN_FIN_ROLE_ID)).forEach(role -> {
-			if (role.isActive()) {
-				AbstractDocApproveProcess.sendNotification(role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr(), get_TrxName());
-			}
-		});
-
-
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.SNR_ADMIN_FIN_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 	}
 
 	@Override
@@ -119,13 +112,13 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 				docApprove.setZZ_Date_Approved(now);
 				docApprove.setZZ_Date_LM_Approved(now);
 				docApprove.setZZ_Date_Completed(now);
-				AbstractDocApproveProcess.sendNotification(
-						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+				AbstractDocApproveProcess.queueNotify(queueNotifis,
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
 			}
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
 			docApprove.setZZ_Date_Not_Approved_by_LM(now);
-			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
 
@@ -136,12 +129,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID)).forEach(role -> {
-			if (role.isActive()) {
-				AbstractDocApproveProcess.sendNotification(role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr(), get_TrxName());
-			}
-		});	
-
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 	}
 
 	protected void validateData() {
