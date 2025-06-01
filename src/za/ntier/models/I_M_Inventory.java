@@ -516,6 +516,15 @@ public interface I_M_Inventory
 	/** Get Allow Mgr Finance Consumables Approval	  */
 	public boolean isZZ_AllowMgrFinConsumablesApproval();
 
+    /** Column name ZZ_AllowSdlLineMgrApproved */
+    public static final String COLUMNNAME_ZZ_AllowSdlLineMgrApproved = "ZZ_AllowSdlLineMgrApproved";
+
+	/** Set Allow SDL Finance Manager Approval	  */
+	public void setZZ_AllowSdlLineMgrApproved (boolean ZZ_AllowSdlLineMgrApproved);
+
+	/** Get Allow SDL Finance Manager Approval	  */
+	public boolean isZZ_AllowSdlLineMgrApproved();
+
     /** Column name ZZ_AllowSnrAdminFinanceApproved */
     public static final String COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved = "ZZ_AllowSnrAdminFinanceApproved";
 
@@ -601,6 +610,24 @@ public interface I_M_Inventory
 	/** Get Date Not Approved by Snr Admin Finance	  */
 	public Timestamp getZZ_Date_Not_Approved_by_Snr_Adm_Fin();
 
+    /** Column name ZZ_Date_SDL_Approved */
+    public static final String COLUMNNAME_ZZ_Date_SDL_Approved = "ZZ_Date_SDL_Approved";
+
+	/** Set Date Approved By SDL Finance Manager	  */
+	public void setZZ_Date_SDL_Approved (Timestamp ZZ_Date_SDL_Approved);
+
+	/** Get Date Approved By SDL Finance Manager	  */
+	public Timestamp getZZ_Date_SDL_Approved();
+
+    /** Column name ZZ_Date_SDL_Not_Approved */
+    public static final String COLUMNNAME_ZZ_Date_SDL_Not_Approved = "ZZ_Date_SDL_Not_Approved";
+
+	/** Set Date Not Approved By the SDL Finance Mgr	  */
+	public void setZZ_Date_SDL_Not_Approved (Timestamp ZZ_Date_SDL_Not_Approved);
+
+	/** Get Date Not Approved By the SDL Finance Mgr	  */
+	public Timestamp getZZ_Date_SDL_Not_Approved();
+
     /** Column name ZZ_Date_Submitted */
     public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
 
@@ -651,6 +678,17 @@ public interface I_M_Inventory
 	public int getZZ_Mgr_Fin_Consumables_ID();
 
 	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException;
+
+    /** Column name ZZ_SDL_Fin_Mgr_ID */
+    public static final String COLUMNNAME_ZZ_SDL_Fin_Mgr_ID = "ZZ_SDL_Fin_Mgr_ID";
+
+	/** Set SDL Finance Mgr	  */
+	public void setZZ_SDL_Fin_Mgr_ID (int ZZ_SDL_Fin_Mgr_ID);
+
+	/** Get SDL Finance Mgr	  */
+	public int getZZ_SDL_Fin_Mgr_ID();
+
+	public org.compiere.model.I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException;
 
     /** Column name ZZ_Snr_Admin_Fin_ID */
     public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";
