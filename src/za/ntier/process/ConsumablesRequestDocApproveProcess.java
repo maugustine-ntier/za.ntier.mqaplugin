@@ -48,7 +48,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
 				IDocApprove.ZZ_DOCSTATUS_Submitted.equals(currentDocStatus)) {		
 			doLineManageApprove();
-		}else if(IDocApprove.ZZ_DOCACTION_SubmitToSDLFinanceMgr.equals(currentDocAction) &&  // SDL FIn Mgr presses Action Button
+		}else if(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) &&  // SDL FIn Mgr presses Action Button
 				IDocApprove.ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr.equals(currentDocStatus)) {			
 			doSDLFinManageApprove();
 		}else if(docApprove.isZZ_AllowMgrFinConsumablesApproval() &&
@@ -92,7 +92,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 	
 	protected void doSubmitDocForSDLFinanceManage(boolean isBypassLineManage) {
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr);
-		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_SubmitToSDLFinanceMgr);
+		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
 		docApprove.setZZ_Date_LM_Approved(now);
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
