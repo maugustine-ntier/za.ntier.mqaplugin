@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.compiere.model.I_AD_User;
 import org.compiere.model.MInventory;
 import org.compiere.model.MTable;
 import org.compiere.model.MWarehouse;
@@ -422,6 +423,60 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	public Timestamp getZZ_Date_MFC_Not_Approved()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Not_Approved);
+	}
+
+	@Override
+	public void setZZ_AllowSdlLineMgrApproved(boolean ZZ_AllowSdlLineMgrApproved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isZZ_AllowSdlLineMgrApproved() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setZZ_Date_SDL_Approved(Timestamp ZZ_Date_SDL_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_SDL_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_SDL_Not_Approved(Timestamp ZZ_Date_SDL_Not_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_SDL_Not_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_SDL_Fin_Mgr_ID(int ZZ_SDL_Fin_Mgr_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_SDL_Fin_Mgr_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
