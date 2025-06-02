@@ -79,7 +79,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 	protected void doManagerFinConsumablesApprove() {
 		docApprove.setZZ_Mgr_Fin_Consumables_ID(Env.getAD_User_ID(getCtx()));
 		if("Y".equals(pApprove_Rej_MFC)){
-			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Approved);
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
 			docApprove.setZZ_Date_Approved(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, 
 					IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrApproved());

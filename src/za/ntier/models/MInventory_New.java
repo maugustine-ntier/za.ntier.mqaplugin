@@ -121,6 +121,28 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return false;
 	}
 
+	/** Set Allow SDL Finance Manager Approval.
+	@param ZZ_AllowSdlLineMgrApproved Allow SDL Finance Manager Approval
+	 */
+	public void setZZ_AllowSdlLineMgrApproved (boolean ZZ_AllowSdlLineMgrApproved)
+	{
+		set_ValueNoCheck (COLUMNNAME_ZZ_AllowSdlLineMgrApproved, Boolean.valueOf(ZZ_AllowSdlLineMgrApproved));
+	}
+
+	/** Get Allow SDL Finance Manager Approval.
+	@return Allow SDL Finance Manager Approval	  */
+	public boolean isZZ_AllowSdlLineMgrApproved()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_AllowSdlLineMgrApproved);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Allow Snr Admin Finance Approved.
 	@param ZZ_AllowSnrAdminFinanceApproved Choose to allow Snr Admin Finance join to approved workfllow
 	 */
@@ -211,6 +233,36 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_LM_Approved);
 	}
 
+	/** Set Date Manager Finance Consumables.
+	@param ZZ_Date_MFC_Approved Date Manager Finance Consumables
+	 */
+	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Approved, ZZ_Date_MFC_Approved);
+	}
+
+	/** Get Date Manager Finance Consumables.
+	@return Date Manager Finance Consumables	  */
+	public Timestamp getZZ_Date_MFC_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Approved);
+	}
+
+	/** Set Date Manager Finance Not Approved.
+	@param ZZ_Date_MFC_Not_Approved Date Manager Finance Not Approved
+	 */
+	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_MFC_Not_Approved, ZZ_Date_MFC_Not_Approved);
+	}
+
+	/** Get Date Manager Finance Not Approved.
+	@return Date Manager Finance Not Approved	  */
+	public Timestamp getZZ_Date_MFC_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Not_Approved);
+	}
+
 	/** Set Date Not Approved by LM.
 	@param ZZ_Date_Not_Approved_by_LM Date Not Approved by LM
 	 */
@@ -241,6 +293,36 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
 	}
 
+	/** Set Date Approved By SDL Finance Manager.
+	@param ZZ_Date_SDL_Approved Date Approved By SDL Finance Manager
+	 */
+	public void setZZ_Date_SDL_Approved (Timestamp ZZ_Date_SDL_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_SDL_Approved, ZZ_Date_SDL_Approved);
+	}
+
+	/** Get Date Approved By SDL Finance Manager.
+	@return Date Approved By SDL Finance Manager	  */
+	public Timestamp getZZ_Date_SDL_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_SDL_Approved);
+	}
+
+	/** Set Date Not Approved By the SDL Finance Mgr.
+	@param ZZ_Date_SDL_Not_Approved Date Not Approved By the SDL Finance Mgr
+	 */
+	public void setZZ_Date_SDL_Not_Approved (Timestamp ZZ_Date_SDL_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_SDL_Not_Approved, ZZ_Date_SDL_Not_Approved);
+	}
+
+	/** Get Date Not Approved By the SDL Finance Mgr.
+	@return Date Not Approved By the SDL Finance Mgr	  */
+	public Timestamp getZZ_Date_SDL_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_SDL_Not_Approved);
+	}
+
 	/** Set Date Submitted.
 	@param ZZ_Date_Submitted Date Submitted
 	 */
@@ -262,6 +344,10 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
+	/** Submit to SDL Finance Mgr = SD */
+	public static final String ZZ_DOCACTION_SubmitToSDLFinanceMgr = "SD";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -280,6 +366,8 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
 	/** Completed = CO */
@@ -288,10 +376,18 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySDLFinanceMgr = "ND";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
@@ -310,6 +406,8 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Approved = "AP";
 	/** Completed = CO */
@@ -318,10 +416,18 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySDLFinanceMgr = "ND";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToSDLFinanceMgr = "SD";
 	/** Submitted = SU */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
 	/** Set Final Workflow State Value.
@@ -368,6 +474,33 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return ii.intValue();
 	}
 
+	public org.compiere.model.I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+				.getPO(getZZ_SDL_Fin_Mgr_ID(), get_TrxName());
+	}
+
+	/** Set SDL Finance Mgr.
+	@param ZZ_SDL_Fin_Mgr_ID SDL Finance Mgr
+	 */
+	public void setZZ_SDL_Fin_Mgr_ID (int ZZ_SDL_Fin_Mgr_ID)
+	{
+		if (ZZ_SDL_Fin_Mgr_ID < 1)
+			set_Value (COLUMNNAME_ZZ_SDL_Fin_Mgr_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_SDL_Fin_Mgr_ID, Integer.valueOf(ZZ_SDL_Fin_Mgr_ID));
+	}
+
+	/** Get SDL Finance Mgr.
+	@return SDL Finance Mgr	  */
+	public int getZZ_SDL_Fin_Mgr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_SDL_Fin_Mgr_ID);
+		if (ii == null)
+			return 0;
+		return ii.intValue();
+	}
+
 	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException
 	{
 		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
@@ -393,90 +526,6 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		if (ii == null)
 			return 0;
 		return ii.intValue();
-	}
-
-	/** Set Date Manager Finance Consumables.
-	@param ZZ_Date_MFC_Approved Date Manager Finance Consumables
-	 */
-	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved)
-	{
-		set_Value (COLUMNNAME_ZZ_Date_MFC_Approved, ZZ_Date_MFC_Approved);
-	}
-
-	/** Get Date Manager Finance Consumables.
-	@return Date Manager Finance Consumables	  */
-	public Timestamp getZZ_Date_MFC_Approved()
-	{
-		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Approved);
-	}
-
-	/** Set Date Manager Finance Not Approved.
-	@param ZZ_Date_MFC_Not_Approved Date Manager Finance Not Approved
-	 */
-	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved)
-	{
-		set_Value (COLUMNNAME_ZZ_Date_MFC_Not_Approved, ZZ_Date_MFC_Not_Approved);
-	}
-
-	/** Get Date Manager Finance Not Approved.
-	@return Date Manager Finance Not Approved	  */
-	public Timestamp getZZ_Date_MFC_Not_Approved()
-	{
-		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_MFC_Not_Approved);
-	}
-
-	@Override
-	public void setZZ_AllowSdlLineMgrApproved(boolean ZZ_AllowSdlLineMgrApproved) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isZZ_AllowSdlLineMgrApproved() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setZZ_Date_SDL_Approved(Timestamp ZZ_Date_SDL_Approved) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Timestamp getZZ_Date_SDL_Approved() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setZZ_Date_SDL_Not_Approved(Timestamp ZZ_Date_SDL_Not_Approved) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Timestamp getZZ_Date_SDL_Not_Approved() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setZZ_SDL_Fin_Mgr_ID(int ZZ_SDL_Fin_Mgr_ID) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getZZ_SDL_Fin_Mgr_ID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 
