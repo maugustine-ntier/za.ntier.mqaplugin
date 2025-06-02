@@ -679,6 +679,17 @@ public interface I_M_Inventory
 
 	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException;
 
+    /** Column name ZZ_RequestedBy_ID */
+    public static final String COLUMNNAME_ZZ_RequestedBy_ID = "ZZ_RequestedBy_ID";
+
+	/** Set Requested By	  */
+	public void setZZ_RequestedBy_ID (int ZZ_RequestedBy_ID);
+
+	/** Get Requested By	  */
+	public int getZZ_RequestedBy_ID();
+
+	public org.compiere.model.I_AD_User getZZ_RequestedBy() throws RuntimeException;
+
     /** Column name ZZ_SDL_Fin_Mgr_ID */
     public static final String COLUMNNAME_ZZ_SDL_Fin_Mgr_ID = "ZZ_SDL_Fin_Mgr_ID";
 
