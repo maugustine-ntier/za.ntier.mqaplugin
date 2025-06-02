@@ -82,7 +82,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Approved);
 			docApprove.setZZ_Date_Approved(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, 
-					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrApproved());
+					IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrApproved());
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables);
 			docApprove.setZZ_Date_MFC_Not_Approved(now);
@@ -97,7 +97,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.SNR_ADMIN_FIN_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.SDL_FIN_MGR_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 	}
 
 	// Line Manager presses Action button
