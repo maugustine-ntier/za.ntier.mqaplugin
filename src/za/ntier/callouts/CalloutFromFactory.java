@@ -9,6 +9,7 @@ import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MYear;
 import org.compiere.model.PO;
+import org.compiere.model.X_M_InventoryLine;
 import org.compiere.util.DB;
 
 import za.ntier.models.X_ZZ_Driver;
@@ -30,6 +31,23 @@ public class CalloutFromFactory implements IColumnCallout {
 				mTab.setValue(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, ids[0]);
 			}
 		}	*/	
+		if (mTab.getTableName().equals(X_M_InventoryLine.Table_Name) && 
+				mField.getColumnName().equals(X_M_InventoryLine.COLUMNNAME_M_Product_ID)) {
+			if (value != null) {
+				String SQL = "SELECT ca.c_charge_id "
+						+ "FROM M_Product_Acct pa "
+						+ "join C_ValidCombination vc on pa.p_expense_acct = c_validcombination_id "
+						+ "join c_charge_acct ca on vc.c_validcombination_id = ca.ch_expense_acct "
+						+ "WHERE pa.C_AcctSchema_ID=1000000 AND pa.M_Product_ID=?";
+				int chargeID = DB.getSQLValue(null, SQL, value);
+				if (chargeID > 0) {
+					mTab.setValue(X_M_InventoryLine.COLUMNNAME_C_Charge_ID, chargeID);
+				}
+				
+			} else {
+				mTab.setValue(X_M_InventoryLine.COLUMNNAME_C_Charge_ID, null);
+			}
+		}
 		return null;
 	}
 

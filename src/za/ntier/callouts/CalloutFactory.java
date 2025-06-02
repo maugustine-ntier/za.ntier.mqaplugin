@@ -6,6 +6,7 @@ import java.util.List;
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
 import org.compiere.model.MProduct;
+import org.compiere.model.X_M_InventoryLine;
 import org.osgi.service.component.annotations.Component;
 
 import za.ntier.models.X_ZZ_Driver;
@@ -25,7 +26,7 @@ public class CalloutFactory implements IColumnCalloutFactory {
 	@Override
 	public IColumnCallout[] getColumnCallouts(String tableName, String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-		if (tableName.equals(X_ZZ_Petty_Cash_Claim_Hdr.Table_Name))
+		if (tableName.equals(X_M_InventoryLine.Table_Name))
 		{
 			list.add(new CalloutFromFactory());
 		}
