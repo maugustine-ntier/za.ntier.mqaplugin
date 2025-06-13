@@ -31,6 +31,7 @@ public class TransactionBalanceReport extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
+		int lineNo = 0;
 
 		String sql = """
 				    WITH open_balance AS (
@@ -94,7 +95,7 @@ public class TransactionBalanceReport extends SvrProcess {
 				             NULL::numeric AS m_movementline_id,
 				             NULL::numeric AS m_inoutline_id
 				      FROM adempiere.m_transaction t
-				      WHERE t.movementdate > ? AND t.m_product_id = ? AND t.AD_Client_ID = ?
+				      WHERE t.movementdate <= ? AND t.m_product_id = ? AND t.AD_Client_ID = ?
 				    )
 				    SELECT * FROM open_balance
 				    UNION ALL
@@ -106,8 +107,8 @@ public class TransactionBalanceReport extends SvrProcess {
 		try (PreparedStatement pstmt = DB.prepareStatement(sql, get_TrxName())) {
 			pstmt.setInt(1, mProductId);   // open balance
 			pstmt.setTimestamp(2, startDate);
-			pstmt.setInt(3, getAD_Client_ID());
-			pstmt.setInt(4, mProductId);
+			pstmt.setInt(3, mProductId);
+			pstmt.setInt(4, getAD_Client_ID());
 			pstmt.setTimestamp(5, startDate); // transactions
 			pstmt.setTimestamp(6, endDate);
 			pstmt.setInt(7, mProductId);
@@ -123,8 +124,9 @@ public class TransactionBalanceReport extends SvrProcess {
 							    INSERT INTO adempiere.t_transactions_report (
 							      ad_pinstance_id, row_type, m_transaction_id, ad_client_id, ad_org_id, isactive, created,
 							      createdby, updated, updatedby, movementtype, m_locator_id, m_product_id, movementdate,
-							      movementqty, m_inventoryline_id, m_movementline_id, m_inoutline_id,t_transactions_report_uu
-							    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+							      movementqty, m_inventoryline_id, m_movementline_id, m_inoutline_id,t_transactions_report_uu,
+							      LineNo
+							    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
 							""";
 
 					try (PreparedStatement insertPstmt = DB.prepareStatement(insertSql, get_TrxName())) {
@@ -142,11 +144,12 @@ public class TransactionBalanceReport extends SvrProcess {
 						insertPstmt.setObject(12, rs.getObject("m_locator_id"));
 						insertPstmt.setObject(13, rs.getObject("m_product_id"));
 						insertPstmt.setObject(14, rs.getObject("movementdate"));
-						insertPstmt.setObject(15, rs.getObject("movementqty"));
+						insertPstmt.setObject(15, rs.getInt("movementqty"));
 						insertPstmt.setObject(16, rs.getObject("m_inventoryline_id"));
 						insertPstmt.setObject(17, rs.getObject("m_movementline_id"));
 						insertPstmt.setObject(18, rs.getObject("m_inoutline_id"));
 						insertPstmt.setObject(19, DB.getSQLValueStringEx(null, "SELECT Generate_UUID() FROM Dual"));
+						insertPstmt.setObject(20, ++lineNo);
 						insertPstmt.executeUpdate();
 					}
 				}
