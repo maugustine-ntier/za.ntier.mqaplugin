@@ -36,12 +36,12 @@ public class TransactionBalanceReport extends SvrProcess {
 				    WITH open_balance AS (
 				      SELECT 'O' AS row_type,
 				             NULL::numeric AS m_transaction_id,
-				             max(t.ad_client_id)::numeric AS ad_client_id,
-				             max(t.ad_org_id)::numeric AS ad_org_id,
+				             1000000::numeric AS ad_client_id,
+				             0::numeric AS ad_org_id,
 				             NULL::char AS isactive,
-				             NULL::timestamp AS created,
+				             now()::timestamp AS created,
 				             NULL::numeric AS createdby,
-				             NULL::timestamp AS updated,
+				             now()::timestamp AS updated,
 				             NULL::numeric AS updatedby,
 				             NULL::char AS movementtype,
 				             NULL::numeric AS m_locator_id,
@@ -52,7 +52,7 @@ public class TransactionBalanceReport extends SvrProcess {
 				             NULL::numeric AS m_movementline_id,
 				             NULL::numeric AS m_inoutline_id
 				      FROM adempiere.m_transaction t
-				      WHERE t.movementdate < ? AND t.m_product_id = ?
+				      WHERE t.movementdate < ? AND t.m_product_id = ? AND t.AD_Client_ID = ?
 				    ),
 				    transactions AS (
 				      SELECT 'T' AS row_type,
@@ -73,17 +73,17 @@ public class TransactionBalanceReport extends SvrProcess {
 				             t.m_movementline_id,
 				             t.m_inoutline_id
 				      FROM adempiere.m_transaction t
-				      WHERE t.movementdate BETWEEN ? AND ? AND t.m_product_id = ?
+				      WHERE t.movementdate BETWEEN ? AND ? AND t.m_product_id = ? AND t.ad_client_ID = ?
 				    ),
 				    closing_balance AS (
 				      SELECT 'C' AS row_type,
 				             NULL::numeric AS m_transaction_id,
-				             max(t.ad_client_id)::numeric AS ad_client_id,
-				             max(t.ad_org_id)::numeric AS ad_org_id,
+				             1000000::numeric AS ad_client_id,
+				             0::numeric AS ad_org_id,
 				             NULL::char AS isactive,
-				             NULL::timestamp AS created,
+				             now()::timestamp AS created,
 				             NULL::numeric AS createdby,
-				             NULL::timestamp AS updated,
+				             now()::timestamp AS updated,
 				             NULL::numeric AS updatedby,
 				             NULL::char AS movementtype,
 				             NULL::numeric AS m_locator_id,
@@ -94,7 +94,7 @@ public class TransactionBalanceReport extends SvrProcess {
 				             NULL::numeric AS m_movementline_id,
 				             NULL::numeric AS m_inoutline_id
 				      FROM adempiere.m_transaction t
-				      WHERE t.movementdate > ? AND t.m_product_id = ?
+				      WHERE t.movementdate > ? AND t.m_product_id = ? AND t.AD_Client_ID = ?
 				    )
 				    SELECT * FROM open_balance
 				    UNION ALL
@@ -106,13 +106,16 @@ public class TransactionBalanceReport extends SvrProcess {
 		try (PreparedStatement pstmt = DB.prepareStatement(sql, get_TrxName())) {
 			pstmt.setInt(1, mProductId);   // open balance
 			pstmt.setTimestamp(2, startDate);
-			pstmt.setInt(3, mProductId);
-			pstmt.setTimestamp(4, startDate); // transactions
-			pstmt.setTimestamp(5, endDate);
-			pstmt.setInt(6, mProductId);
-			pstmt.setInt(7, mProductId);   // closing balance
-			pstmt.setTimestamp(8, endDate);
-			pstmt.setInt(9, mProductId);
+			pstmt.setInt(3, getAD_Client_ID());
+			pstmt.setInt(4, mProductId);
+			pstmt.setTimestamp(5, startDate); // transactions
+			pstmt.setTimestamp(6, endDate);
+			pstmt.setInt(7, mProductId);
+			pstmt.setInt(8, getAD_Client_ID());
+			pstmt.setInt(9, mProductId);   // closing balance
+			pstmt.setTimestamp(10, endDate);
+			pstmt.setInt(11, mProductId);
+			pstmt.setInt(12, getAD_Client_ID());
 
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while (rs.next()) {
@@ -120,8 +123,8 @@ public class TransactionBalanceReport extends SvrProcess {
 							    INSERT INTO adempiere.t_transactions_report (
 							      ad_pinstance_id, row_type, m_transaction_id, ad_client_id, ad_org_id, isactive, created,
 							      createdby, updated, updatedby, movementtype, m_locator_id, m_product_id, movementdate,
-							      movementqty, m_inventoryline_id, m_movementline_id, m_inoutline_id
-							    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+							      movementqty, m_inventoryline_id, m_movementline_id, m_inoutline_id,t_transactions_report_uu
+							    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
 							""";
 
 					try (PreparedStatement insertPstmt = DB.prepareStatement(insertSql, get_TrxName())) {
@@ -130,11 +133,11 @@ public class TransactionBalanceReport extends SvrProcess {
 						insertPstmt.setObject(3, rs.getObject("m_transaction_id"));
 						insertPstmt.setObject(4, rs.getObject("ad_client_id"));
 						insertPstmt.setObject(5, rs.getObject("ad_org_id"));
-						insertPstmt.setObject(6, rs.getObject("isactive"));
+						insertPstmt.setObject(6, "Y");  // isactive
 						insertPstmt.setObject(7, rs.getObject("created"));
-						insertPstmt.setObject(8, rs.getObject("createdby"));
+						insertPstmt.setObject(8, getAD_User_ID());
 						insertPstmt.setObject(9, rs.getObject("updated"));
-						insertPstmt.setObject(10, rs.getObject("updatedby"));
+						insertPstmt.setObject(10, getAD_User_ID());
 						insertPstmt.setObject(11, rs.getObject("movementtype"));
 						insertPstmt.setObject(12, rs.getObject("m_locator_id"));
 						insertPstmt.setObject(13, rs.getObject("m_product_id"));
@@ -143,6 +146,7 @@ public class TransactionBalanceReport extends SvrProcess {
 						insertPstmt.setObject(16, rs.getObject("m_inventoryline_id"));
 						insertPstmt.setObject(17, rs.getObject("m_movementline_id"));
 						insertPstmt.setObject(18, rs.getObject("m_inoutline_id"));
+						insertPstmt.setObject(19, DB.getSQLValueStringEx(null, "SELECT Generate_UUID() FROM Dual"));
 						insertPstmt.executeUpdate();
 					}
 				}
