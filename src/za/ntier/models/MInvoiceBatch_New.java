@@ -15,6 +15,7 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 
 	private static final String MANAGER_OPS_SDL_ROLES = "MANAGER_OPS_SDL_ROLES";
 	private static final String FINACE_ROLES = "FINACE_ROLES";
+	private static final String FINANCE_ROLES_FOR_CREATE = "FINANCE_ROLES_FOR_CREATE";
 	private static final long serialVersionUID = 1L;
 
 	public MInvoiceBatch_New(Properties ctx, int C_InvoiceBatch_ID, String trxName) {
@@ -39,8 +40,8 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 
 	@Override
 	protected boolean beforeSave(boolean newRecord) {
-		String roles = MSysConfig.getValue(FINACE_ROLES); 
-		if (!checkRoleSetup(roles,FINACE_ROLES)) {
+		String roles = MSysConfig.getValue(FINANCE_ROLES_FOR_CREATE);  
+		if (!checkRoleSetup(roles,FINANCE_ROLES_FOR_CREATE)) {
 			return false;
 		}
 
@@ -57,6 +58,10 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 			}
 		} else {
 			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
+				roles = MSysConfig.getValue(FINACE_ROLES); 
+				if (!checkRoleSetup(roles,FINACE_ROLES)) {
+					return false;
+				}
 				if (!Roles.checkRole(roles,role_ID)) {
 					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
 					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHINPROG")); //"Only Finance Roles can change to In Progress");
