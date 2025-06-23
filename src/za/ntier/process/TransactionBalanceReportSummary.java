@@ -73,7 +73,7 @@ public class TransactionBalanceReportSummary extends SvrProcess {
                           created, createdby, updated, updatedby, movementtype, m_locator_id, m_product_id,
                           movementdate, movementqty, m_inventoryline_id, m_movementline_id, m_inoutline_id,
                           opening_balance, receipts, issues, closing_balance,
-                          t_transactions_report_uu, lineno
+                          t_transactions_report_summary_uu, lineno
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """;
 
