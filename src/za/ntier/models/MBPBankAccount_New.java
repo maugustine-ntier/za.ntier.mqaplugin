@@ -7,6 +7,7 @@ import org.compiere.model.MBPBankAccount;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MLocation;
 import org.compiere.model.MUser;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 public class MBPBankAccount_New extends MBPBankAccount implements za.ntier.models.I_C_BP_BankAccount{
@@ -55,14 +56,29 @@ public class MBPBankAccount_New extends MBPBankAccount implements za.ntier.model
 		if (getComments() != null && getComments().trim().equals("Initial Import")) {
 			return super.beforeSave(newRecord);
 		}
-		if (newRecord && (Env.getAD_Role_ID(getCtx()) != 1000003 && Env.getAD_Role_ID(getCtx()) != 1000002)) {
-			log.saveError("Error", "Only Snr Admin Finance or Admin Finance can create new Bank Accounts ");
+		if (newRecord && (Env.getAD_Role_ID(getCtx()) != 1000003 && Env.getAD_Role_ID(getCtx()) != 1000002
+				&& Env.getAD_Role_ID(getCtx()) != 1000007)) {
+			log.saveError("Error", "Only Snr Admin Finance,Admin Finance or the SDL Officer can create new Bank Accounts ");
+			return false;
+		}
+		if (newRecord && isZZ_Approve()) {
+			log.saveError("Error", "Cannot create a approved bank account. ");
 			return false;
 		}
 		if ((!newRecord || (newRecord && isZZ_Approve())) && is_ValueChanged(COLUMNNAME_ZZ_Approve) && Env.getAD_Role_ID(getCtx()) != 1000004 && Env.getAD_Role_ID(getCtx()) != 1000005) {
 			log.saveError("Error", "Only SDL/Ops Finance Manager can approve/unapprove a Bank Account Record ");
 			return false;
 		}
+		
+		if (isZZ_Approve()) {
+			int cnt = DB.getSQLValue(get_TrxName(), "Select count(*) from C_BP_BankAccount a where a.zz_approve = 'Y' and a.C_Bpartner_ID = ?"
+					+ " and a.C_BP_BankAccount_ID <> ?",getC_BPartner_ID(),getC_BP_BankAccount_ID());
+			if (cnt >= 1) {
+				log.saveError("Error", "Cannot have 2 approved bank accounts for a Business Partner.");
+				return false;
+			}
+		}
+		
 		return super.beforeSave(newRecord);
 	}
 
