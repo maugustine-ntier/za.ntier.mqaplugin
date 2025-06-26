@@ -2,6 +2,7 @@ package za.ntier.process;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MInventoryLine;
+import org.compiere.model.MMailText;
 import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfo;
 import org.compiere.util.Env;
@@ -133,7 +134,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000003, get_TrxName()));
 	}
 
 	protected void validateData() {
