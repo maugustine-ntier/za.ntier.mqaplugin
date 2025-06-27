@@ -58,10 +58,6 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 			}
 		} else {
 			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
-				roles = MSysConfig.getValue(FINACE_ROLES); 
-				if (!checkRoleSetup(roles,FINACE_ROLES)) {
-					return false;
-				}
 				if (!Roles.checkRole(roles,role_ID)) {
 					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
 					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHINPROG")); //"Only Finance Roles can change to In Progress");
