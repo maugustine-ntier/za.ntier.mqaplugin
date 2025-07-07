@@ -1,22 +1,18 @@
 package za.ntier.process;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.MInventoryLine;
 import org.compiere.model.MMailText;
-import org.compiere.process.DocAction;
-import org.compiere.process.ProcessInfo;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
-import org.compiere.wf.MWorkflow;
 
 import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 import za.co.ntier.fa.process.api.IDocApprove;
-import za.ntier.models.MInventory_New;
+import za.ntier.models.MZZSystemAccessApplication;
 import za.ntier.models.X_ZZ_System_Access_Application;
 
 @org.adempiere.base.annotation.Process(name="za.ntier.process.ITSystemAccessApplicationDocApproveProcess")
-public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocApproveProcess<MInventory_New> {
+public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocApproveProcess<MZZSystemAccessApplication> {
 
 	
 	
