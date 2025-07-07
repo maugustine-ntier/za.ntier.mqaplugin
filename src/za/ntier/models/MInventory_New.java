@@ -555,5 +555,113 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 			.getPO(getZZ_RequestedBy_ID(), get_TrxName());
 	}
 
+	@Override
+	public void setZZ_Date_Account_Created(Timestamp ZZ_Date_Account_Created) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Account_Created() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_IT_Manager_Approved(Timestamp ZZ_Date_IT_Manager_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_IT_Manager_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_IT_Manager_Rejected(Timestamp ZZ_Date_IT_Manager_Rejected) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_IT_Manager_Rejected() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Manager_Approved(Timestamp ZZ_Date_Manager_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Manager_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Manager_Rejected(Timestamp ZZ_Date_Manager_Rejected) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Manager_Rejected() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_IT_Admin_ID(int ZZ_IT_Admin_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_IT_Admin_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_IT_Admin() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_IT_Manager_ID(int ZZ_IT_Manager_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_IT_Manager_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_IT_Manager() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Manager_ID(int ZZ_Manager_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Manager_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 
 }
