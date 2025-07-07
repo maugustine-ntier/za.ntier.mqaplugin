@@ -8,7 +8,7 @@ import org.compiere.model.I_AD_User;
 
 import za.co.ntier.fa.process.api.IDocApprove;
 
-public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application implements I_ZZ_System_Access_Application,IDocApprove {
+public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application implements IDocApprove {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,23 +45,7 @@ public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application i
 		return null;
 	}
 
-	@Override
-	public int getLine_Manager_ID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-	@Override
-	public void setZZ_Date_LM_Approved(Timestamp approveDate) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setZZ_Date_Not_Approved_by_LM(Timestamp notApproveDate) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public int getZZ_Snr_Admin_Fin_ID() {
@@ -175,6 +159,18 @@ public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application i
 	public I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setZZ_Date_LM_Approved(Timestamp approveDate) {
+		
+		
+	}
+
+	@Override
+	public void setZZ_Date_Not_Approved_by_LM(Timestamp notApproveDate) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

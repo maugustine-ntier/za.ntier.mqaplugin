@@ -42,8 +42,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 		}else if(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) &&  // IT manager presses Action Button
 				X_ZZ_System_Access_Application.ZZ_DOCSTATUS_SubmittedToITManager.equals(currentDocStatus)) {			
 			doITAdminActions();  // 
-		}else if(docApprove.isZZ_AllowMgrFinConsumablesApproval() &&
-				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
+		}else if(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
 				X_ZZ_System_Access_Application.ZZ_DOCSTATUS_SubmittedToITAdmin.equals(currentDocStatus)) {  // IT Admin presses Action Button
 			doITADminApprove();
 		}
@@ -82,7 +81,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 	protected void doSubmitDocForITManager(boolean isBypassLineManage) {
 		docApprove.setZZ_DocStatus(X_ZZ_System_Access_Application.ZZ_DOCSTATUS_SubmittedToITManager);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
-		docApprove.setZZ_Date_LM_Approved(now);
+		docApprove.setZZ_Date_Manager_Approved(now);
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
@@ -97,7 +96,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 			
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
-			docApprove.setZZ_Date_Not_Approved_by_LM(now);
+			docApprove.setZZ_Date_Manager_Rejected(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
