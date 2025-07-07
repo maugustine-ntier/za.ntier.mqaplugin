@@ -77,7 +77,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
 			docApprove.setZZ_Date_Account_Created(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, 
-					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
+					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000018, get_TrxName()));
 		}else{
 			// IT Admin does not reject, just creates accounts
 		}
@@ -90,7 +90,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.SDL_FIN_MGR_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.IT_MGR_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 	}
 
 	// Line Manager presses Action button
@@ -113,7 +113,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 			doSubmitDocITAdmin();
 			
 		}else{
-			docApprove.setZZ_DocStatus(X_ZZ_System_Access_Application.ZZ_DOCSTATUS_SubmittedToITManager);
+			docApprove.setZZ_DocStatus(X_ZZ_System_Access_Application.ZZ_DOCSTATUS_NotApprovedByITManager);
 			docApprove.setZZ_Date_IT_Manager_Rejected(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
@@ -126,7 +126,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.MANAGER_FIN_CONSUMABLES_ROLE_ID, getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000003, get_TrxName()));
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.IT_ADMIN_ROLE_ID, getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000017, get_TrxName()));
 	}
 
 	protected void validateData() {
