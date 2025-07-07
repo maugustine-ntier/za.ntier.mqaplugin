@@ -8,7 +8,9 @@ import org.compiere.model.I_AD_User;
 
 import za.co.ntier.fa.process.api.IDocApprove;
 
-public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application implements IDocApprove {
+public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application implements I_ZZ_System_Access_Application,IDocApprove {
+
+	private static final long serialVersionUID = 1L;
 
 	public MZZSystemAccessApplication(Properties ctx, int ZZ_System_Access_Application_ID, String trxName) {
 		super(ctx, ZZ_System_Access_Application_ID, trxName);
@@ -174,5 +176,7 @@ public class MZZSystemAccessApplication extends X_ZZ_System_Access_Application i
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

@@ -93,6 +93,17 @@ public interface I_ZZ_System_Access_Application
 	  */
 	public boolean isActive();
 
+    /** Column name Line_Manager_ID */
+    public static final String COLUMNNAME_Line_Manager_ID = "Line_Manager_ID";
+
+	/** Set Line Manager	  */
+	public void setLine_Manager_ID (int Line_Manager_ID);
+
+	/** Get Line Manager	  */
+	public int getLine_Manager_ID();
+
+	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException;
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 

@@ -102,6 +102,33 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
       return sb.toString();
     }
 
+	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getLine_Manager_ID(), get_TrxName());
+	}
+
+	/** Set Line Manager.
+		@param Line_Manager_ID Line Manager
+	*/
+	public void setLine_Manager_ID (int Line_Manager_ID)
+	{
+		if (Line_Manager_ID < 1)
+			set_Value (COLUMNNAME_Line_Manager_ID, null);
+		else
+			set_Value (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
+	}
+
+	/** Get Line Manager.
+		@return Line Manager	  */
+	public int getLine_Manager_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line_Manager_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Date Account Created By IT Admin.
 		@param ZZ_Date_Account_Created Date Account Created By IT Admin
 	*/
