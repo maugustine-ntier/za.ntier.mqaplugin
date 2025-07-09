@@ -32,7 +32,7 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250707L;
+	private static final long serialVersionUID = 20250708L;
 
     /** Standard Constructor */
     public X_ZZ_System_Access_Application (Properties ctx, int ZZ_System_Access_Application_ID, String trxName)
@@ -127,6 +127,28 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** New User = N */
+	public static final String ZZ_APPLICATION_TYPE_NewUser = "N";
+	/** Remove User = R */
+	public static final String ZZ_APPLICATION_TYPE_RemoveUser = "R";
+	/** Update User = U */
+	public static final String ZZ_APPLICATION_TYPE_UpdateUser = "U";
+	/** Set Application Type.
+		@param ZZ_Application_Type Application Type
+	*/
+	public void setZZ_Application_Type (String ZZ_Application_Type)
+	{
+
+		set_Value (COLUMNNAME_ZZ_Application_Type, ZZ_Application_Type);
+	}
+
+	/** Get Application Type.
+		@return Application Type	  */
+	public String getZZ_Application_Type()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Application_Type);
 	}
 
 	/** Set Date Account Created By IT Admin.
@@ -293,6 +315,36 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
+	/** Set Effective Date.
+		@param ZZ_Effective_Date Effective Date
+	*/
+	public void setZZ_Effective_Date (Timestamp ZZ_Effective_Date)
+	{
+		set_Value (COLUMNNAME_ZZ_Effective_Date, ZZ_Effective_Date);
+	}
+
+	/** Get Effective Date.
+		@return Effective Date	  */
+	public Timestamp getZZ_Effective_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Effective_Date);
+	}
+
+	/** Set Expiry Date.
+		@param ZZ_Expiry_Date Expiry Date
+	*/
+	public void setZZ_Expiry_Date (Timestamp ZZ_Expiry_Date)
+	{
+		set_Value (COLUMNNAME_ZZ_Expiry_Date, ZZ_Expiry_Date);
+	}
+
+	/** Get Expiry Date.
+		@return Expiry Date	  */
+	public Timestamp getZZ_Expiry_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Expiry_Date);
+	}
+
 	public org.compiere.model.I_AD_User getZZ_IT_Admin() throws RuntimeException
 	{
 		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
@@ -374,28 +426,81 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		return ii.intValue();
 	}
 
-	public I_ZZ_System getZZ_Sys() throws RuntimeException
-	{
-		return (I_ZZ_System)MTable.get(getCtx(), I_ZZ_System.Table_ID)
-			.getPO(getZZ_System(), get_TrxName());
-	}
-
-	/** Set System.
-		@param ZZ_System System
+	/** Set Reason For Additional Access.
+		@param ZZ_Reason_For_Additional_Access Reason For Additional Access
 	*/
-	public void setZZ_System (int ZZ_System)
+	public void setZZ_Reason_For_Additional_Access (String ZZ_Reason_For_Additional_Access)
 	{
-		set_Value (COLUMNNAME_ZZ_System, Integer.valueOf(ZZ_System));
+		set_Value (COLUMNNAME_ZZ_Reason_For_Additional_Access, ZZ_Reason_For_Additional_Access);
 	}
 
-	/** Get System.
-		@return System	  */
-	public int getZZ_System()
+	/** Get Reason For Additional Access.
+		@return Reason For Additional Access	  */
+	public String getZZ_Reason_For_Additional_Access()
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_System);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
+		return (String)get_Value(COLUMNNAME_ZZ_Reason_For_Additional_Access);
+	}
+
+	/** Set Reason For Removal.
+		@param ZZ_Reason_For_Removal Reason For Removal
+	*/
+	public void setZZ_Reason_For_Removal (String ZZ_Reason_For_Removal)
+	{
+		set_Value (COLUMNNAME_ZZ_Reason_For_Removal, ZZ_Reason_For_Removal);
+	}
+
+	/** Get Reason For Removal.
+		@return Reason For Removal	  */
+	public String getZZ_Reason_For_Removal()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Reason_For_Removal);
+	}
+
+	/** Set Removal Date.
+		@param ZZ_Removal_Date Removal Date
+	*/
+	public void setZZ_Removal_Date (Timestamp ZZ_Removal_Date)
+	{
+		set_Value (COLUMNNAME_ZZ_Removal_Date, ZZ_Removal_Date);
+	}
+
+	/** Get Removal Date.
+		@return Removal Date	  */
+	public Timestamp getZZ_Removal_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Removal_Date);
+	}
+
+	/** Set Roles.
+		@param ZZ_Roles Roles
+	*/
+	public void setZZ_Roles (String ZZ_Roles)
+	{
+
+		set_Value (COLUMNNAME_ZZ_Roles, ZZ_Roles);
+	}
+
+	/** Get Roles.
+		@return Roles	  */
+	public String getZZ_Roles()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Roles);
+	}
+
+	/** Set Updated Roles.
+		@param ZZ_Roles_Updated Updated Roles
+	*/
+	public void setZZ_Roles_Updated (String ZZ_Roles_Updated)
+	{
+
+		set_Value (COLUMNNAME_ZZ_Roles_Updated, ZZ_Roles_Updated);
+	}
+
+	/** Get Updated Roles.
+		@return Updated Roles	  */
+	public String getZZ_Roles_Updated()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Roles_Updated);
 	}
 
 	/** Set System Access Application.
@@ -432,5 +537,47 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 	public String getZZ_System_Access_Application_UU()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_System_Access_Application_UU);
+	}
+
+	public I_ZZ_System getZZ_System() throws RuntimeException
+	{
+		return (I_ZZ_System)MTable.get(getCtx(), I_ZZ_System.Table_ID)
+			.getPO(getZZ_System_ID(), get_TrxName());
+	}
+
+	/** Set System.
+		@param ZZ_System_ID System
+	*/
+	public void setZZ_System_ID (int ZZ_System_ID)
+	{
+		if (ZZ_System_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_System_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_System_ID, Integer.valueOf(ZZ_System_ID));
+	}
+
+	/** Get System.
+		@return System	  */
+	public int getZZ_System_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_System_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set User ID.
+		@param ZZ_User User ID
+	*/
+	public void setZZ_User (String ZZ_User)
+	{
+		set_Value (COLUMNNAME_ZZ_User, ZZ_User);
+	}
+
+	/** Get User ID.
+		@return User ID	  */
+	public String getZZ_User()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_User);
 	}
 }

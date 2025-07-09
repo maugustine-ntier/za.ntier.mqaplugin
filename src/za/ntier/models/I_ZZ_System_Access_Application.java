@@ -120,6 +120,15 @@ public interface I_ZZ_System_Access_Application
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Application_Type */
+    public static final String COLUMNNAME_ZZ_Application_Type = "ZZ_Application_Type";
+
+	/** Set Application Type	  */
+	public void setZZ_Application_Type (String ZZ_Application_Type);
+
+	/** Get Application Type	  */
+	public String getZZ_Application_Type();
+
     /** Column name ZZ_Date_Account_Created */
     public static final String COLUMNNAME_ZZ_Date_Account_Created = "ZZ_Date_Account_Created";
 
@@ -192,6 +201,24 @@ public interface I_ZZ_System_Access_Application
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
 
+    /** Column name ZZ_Effective_Date */
+    public static final String COLUMNNAME_ZZ_Effective_Date = "ZZ_Effective_Date";
+
+	/** Set Effective Date	  */
+	public void setZZ_Effective_Date (Timestamp ZZ_Effective_Date);
+
+	/** Get Effective Date	  */
+	public Timestamp getZZ_Effective_Date();
+
+    /** Column name ZZ_Expiry_Date */
+    public static final String COLUMNNAME_ZZ_Expiry_Date = "ZZ_Expiry_Date";
+
+	/** Set Expiry Date	  */
+	public void setZZ_Expiry_Date (Timestamp ZZ_Expiry_Date);
+
+	/** Get Expiry Date	  */
+	public Timestamp getZZ_Expiry_Date();
+
     /** Column name ZZ_IT_Admin_ID */
     public static final String COLUMNNAME_ZZ_IT_Admin_ID = "ZZ_IT_Admin_ID";
 
@@ -225,16 +252,50 @@ public interface I_ZZ_System_Access_Application
 
 	public org.compiere.model.I_AD_User getZZ_Manager() throws RuntimeException;
 
-    /** Column name ZZ_System */
-    public static final String COLUMNNAME_ZZ_System = "ZZ_System";
+    /** Column name ZZ_Reason_For_Additional_Access */
+    public static final String COLUMNNAME_ZZ_Reason_For_Additional_Access = "ZZ_Reason_For_Additional_Access";
 
-	/** Set System	  */
-	public void setZZ_System (int ZZ_System);
+	/** Set Reason For Additional Access	  */
+	public void setZZ_Reason_For_Additional_Access (String ZZ_Reason_For_Additional_Access);
 
-	/** Get System	  */
-	public int getZZ_System();
+	/** Get Reason For Additional Access	  */
+	public String getZZ_Reason_For_Additional_Access();
 
-	public I_ZZ_System getZZ_Sys() throws RuntimeException;
+    /** Column name ZZ_Reason_For_Removal */
+    public static final String COLUMNNAME_ZZ_Reason_For_Removal = "ZZ_Reason_For_Removal";
+
+	/** Set Reason For Removal	  */
+	public void setZZ_Reason_For_Removal (String ZZ_Reason_For_Removal);
+
+	/** Get Reason For Removal	  */
+	public String getZZ_Reason_For_Removal();
+
+    /** Column name ZZ_Removal_Date */
+    public static final String COLUMNNAME_ZZ_Removal_Date = "ZZ_Removal_Date";
+
+	/** Set Removal Date	  */
+	public void setZZ_Removal_Date (Timestamp ZZ_Removal_Date);
+
+	/** Get Removal Date	  */
+	public Timestamp getZZ_Removal_Date();
+
+    /** Column name ZZ_Roles */
+    public static final String COLUMNNAME_ZZ_Roles = "ZZ_Roles";
+
+	/** Set Roles	  */
+	public void setZZ_Roles (String ZZ_Roles);
+
+	/** Get Roles	  */
+	public String getZZ_Roles();
+
+    /** Column name ZZ_Roles_Updated */
+    public static final String COLUMNNAME_ZZ_Roles_Updated = "ZZ_Roles_Updated";
+
+	/** Set Updated Roles	  */
+	public void setZZ_Roles_Updated (String ZZ_Roles_Updated);
+
+	/** Get Updated Roles	  */
+	public String getZZ_Roles_Updated();
 
     /** Column name ZZ_System_Access_Application_ID */
     public static final String COLUMNNAME_ZZ_System_Access_Application_ID = "ZZ_System_Access_Application_ID";
@@ -253,4 +314,24 @@ public interface I_ZZ_System_Access_Application
 
 	/** Get ZZ_System_Access_Application_UU	  */
 	public String getZZ_System_Access_Application_UU();
+
+    /** Column name ZZ_System_ID */
+    public static final String COLUMNNAME_ZZ_System_ID = "ZZ_System_ID";
+
+	/** Set System	  */
+	public void setZZ_System_ID (int ZZ_System_ID);
+
+	/** Get System	  */
+	public int getZZ_System_ID();
+
+	public I_ZZ_System getZZ_System() throws RuntimeException;
+
+    /** Column name ZZ_User */
+    public static final String COLUMNNAME_ZZ_User = "ZZ_User";
+
+	/** Set User ID	  */
+	public void setZZ_User (String ZZ_User);
+
+	/** Get User ID	  */
+	public String getZZ_User();
 }
