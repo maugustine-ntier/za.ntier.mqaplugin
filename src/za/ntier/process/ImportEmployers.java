@@ -26,7 +26,7 @@ public class ImportEmployers extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		File file = new File("/mnt/data/test.csv");  // Adjust path as needed
+		File file = new File(pFileName);  // Adjust path as needed
 	    return processCSV(file);
 	}
 	
