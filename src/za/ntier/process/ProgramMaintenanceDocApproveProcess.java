@@ -61,27 +61,13 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 	}
 
 	
-	//IT Admin presses button
-	protected void doITADminApprove() {
-		docApprove.setZZ_IT_Admin_ID(Env.getAD_User_ID(getCtx()));
-		if("Y".equals(pApprove_Rej_MFC)){
-			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
-			docApprove.setZZ_Date_Account_Created(now);
-			AbstractDocApproveProcess.queueNotify(queueNotifis, 
-					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000018, get_TrxName()));
-		}else{
-			// IT Admin does not reject, just creates accounts
-		}
-	}
-	
 	protected void doApproval(boolean isBypassLineManage) {
 		docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
 		docApprove.setZZ_DocAction(null);
 		docApprove.setZZ_Date_Manager_Approved(now);
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
-
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.IT_MGR_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
+		AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
 	}
 
 	// Line Manager presses Action button
