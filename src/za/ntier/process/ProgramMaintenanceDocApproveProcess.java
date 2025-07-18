@@ -34,10 +34,9 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		validateData();
 		String currentDocAction = docApprove.getZZ_DocAction();
 		String currentDocStatus = docApprove.getZZ_DocStatus();
-		if(docApprove.isZZ_AllowLineManageApproved() && 
-				IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction)) {  // User presses Action button
+		if(IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction)) {  // User presses Action button
 			doSubmitDocForLineManage();			
-		}else if(docApprove.isZZ_AllowLineManageApproved() &&     // Line Manager presses Action button	
+		}else if(    // Line Manager presses Action button	
 				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
 				IDocApprove.ZZ_DOCSTATUS_Submitted.equals(currentDocStatus)) {		
 			doLineManageApprove();

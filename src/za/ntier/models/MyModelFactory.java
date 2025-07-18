@@ -17,6 +17,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_ZZ_Program_Master_Data.Table_Name)) {
+			return MZZProgramMasterData.class;
+		}
 		if (tableName.equals(I_ZZ_System_Access_Application.Table_Name)) {
 			return MZZSystemAccessApplication.class;
 		}
@@ -58,6 +61,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
+		if (tableName.equals(I_ZZ_Program_Master_Data.Table_Name)) {
+			return new MZZProgramMasterData(Env.getCtx(),Record_ID,trxName);
+		}
 		if (tableName.equals(I_ZZ_System_Access_Application.Table_Name)) {
 			return new MZZSystemAccessApplication(Env.getCtx(),Record_ID,trxName);
 		}
@@ -100,6 +106,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_ZZ_Program_Master_Data.Table_Name)) {
+			return new MZZProgramMasterData(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_ZZ_System_Access_Application.Table_Name)) {
 			return new MZZSystemAccessApplication(Env.getCtx(),rs,trxName);
 		}
