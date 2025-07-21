@@ -80,6 +80,19 @@ public interface I_ZZ_System_Access_Application
 	  */
 	public int getCreatedBy();
 
+    /** Column name DocumentNo */
+    public static final String COLUMNNAME_DocumentNo = "DocumentNo";
+
+	/** Set Document No.
+	  * Document sequence number of the document
+	  */
+	public void setDocumentNo (String DocumentNo);
+
+	/** Get Document No.
+	  * Document sequence number of the document
+	  */
+	public String getDocumentNo();
+
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
 
@@ -252,6 +265,24 @@ public interface I_ZZ_System_Access_Application
 
 	public org.compiere.model.I_AD_User getZZ_Manager() throws RuntimeException;
 
+    /** Column name ZZ_New_Org_ID */
+    public static final String COLUMNNAME_ZZ_New_Org_ID = "ZZ_New_Org_ID";
+
+	/** Set User Organization	  */
+	public void setZZ_New_Org_ID (int ZZ_New_Org_ID);
+
+	/** Get User Organization	  */
+	public int getZZ_New_Org_ID();
+
+    /** Column name ZZ_New_User_ID */
+    public static final String COLUMNNAME_ZZ_New_User_ID = "ZZ_New_User_ID";
+
+	/** Set New User Name	  */
+	public void setZZ_New_User_ID (String ZZ_New_User_ID);
+
+	/** Get New User Name	  */
+	public String getZZ_New_User_ID();
+
     /** Column name ZZ_Reason_For_Additional_Access */
     public static final String COLUMNNAME_ZZ_Reason_For_Additional_Access = "ZZ_Reason_For_Additional_Access";
 
@@ -278,6 +309,17 @@ public interface I_ZZ_System_Access_Application
 
 	/** Get Removal Date	  */
 	public Timestamp getZZ_Removal_Date();
+
+    /** Column name ZZ_Requester_ID */
+    public static final String COLUMNNAME_ZZ_Requester_ID = "ZZ_Requester_ID";
+
+	/** Set Requester	  */
+	public void setZZ_Requester_ID (int ZZ_Requester_ID);
+
+	/** Get Requester	  */
+	public int getZZ_Requester_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Requester() throws RuntimeException;
 
     /** Column name ZZ_Roles */
     public static final String COLUMNNAME_ZZ_Roles = "ZZ_Roles";

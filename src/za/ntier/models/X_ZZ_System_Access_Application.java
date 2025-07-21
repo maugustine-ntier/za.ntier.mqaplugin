@@ -32,7 +32,7 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250708L;
+	private static final long serialVersionUID = 20250721L;
 
     /** Standard Constructor */
     public X_ZZ_System_Access_Application (Properties ctx, int ZZ_System_Access_Application_ID, String trxName)
@@ -101,6 +101,22 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	/** Set Document No.
+		@param DocumentNo Document sequence number of the document
+	*/
+	public void setDocumentNo (String DocumentNo)
+	{
+		set_ValueNoCheck (COLUMNNAME_DocumentNo, DocumentNo);
+	}
+
+	/** Get Document No.
+		@return Document sequence number of the document
+	  */
+	public String getDocumentNo()
+	{
+		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
 
 	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException
 	{
@@ -426,6 +442,42 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		return ii.intValue();
 	}
 
+	/** Set User Organization.
+		@param ZZ_New_Org_ID User Organization
+	*/
+	public void setZZ_New_Org_ID (int ZZ_New_Org_ID)
+	{
+		if (ZZ_New_Org_ID < 1)
+			set_Value (COLUMNNAME_ZZ_New_Org_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_New_Org_ID, Integer.valueOf(ZZ_New_Org_ID));
+	}
+
+	/** Get User Organization.
+		@return User Organization	  */
+	public int getZZ_New_Org_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_New_Org_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set New User Name.
+		@param ZZ_New_User_ID New User Name
+	*/
+	public void setZZ_New_User_ID (String ZZ_New_User_ID)
+	{
+		set_Value (COLUMNNAME_ZZ_New_User_ID, ZZ_New_User_ID);
+	}
+
+	/** Get New User Name.
+		@return New User Name	  */
+	public String getZZ_New_User_ID()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_New_User_ID);
+	}
+
 	/** Set Reason For Additional Access.
 		@param ZZ_Reason_For_Additional_Access Reason For Additional Access
 	*/
@@ -469,6 +521,33 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 	public Timestamp getZZ_Removal_Date()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Removal_Date);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Requester() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_Requester_ID(), get_TrxName());
+	}
+
+	/** Set Requester.
+		@param ZZ_Requester_ID Requester
+	*/
+	public void setZZ_Requester_ID (int ZZ_Requester_ID)
+	{
+		if (ZZ_Requester_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Requester_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Requester_ID, Integer.valueOf(ZZ_Requester_ID));
+	}
+
+	/** Get Requester.
+		@return Requester	  */
+	public int getZZ_Requester_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Requester_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Roles.
