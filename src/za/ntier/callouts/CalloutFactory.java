@@ -12,6 +12,7 @@ import org.osgi.service.component.annotations.Component;
 import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_StockPile;
+import za.ntier.models.X_ZZ_System_Access_Application;
 import za.ntier.models.X_ZZ_Transporters;
 import za.ntier.models.X_ZZ_Truck_List;
 
@@ -26,7 +27,7 @@ public class CalloutFactory implements IColumnCalloutFactory {
 	@Override
 	public IColumnCallout[] getColumnCallouts(String tableName, String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-		if (tableName.equals(X_M_InventoryLine.Table_Name))
+		if (tableName.equals(X_M_InventoryLine.Table_Name) || tableName.equals(X_ZZ_System_Access_Application.Table_Name))
 		{
 			list.add(new CalloutFromFactory());
 		}

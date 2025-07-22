@@ -16,6 +16,7 @@ import za.ntier.models.X_ZZ_Driver;
 import za.ntier.models.X_ZZ_Petty_Cash_Advance_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_StockPile;
+import za.ntier.models.X_ZZ_System_Access_Application;
 import za.ntier.models.X_ZZ_Transporters;
 import za.ntier.models.X_ZZ_Truck;
 import za.ntier.models.X_ZZ_Truck_List;
@@ -43,10 +44,24 @@ public class CalloutFromFactory implements IColumnCallout {
 				if (chargeID > 0) {
 					mTab.setValue(X_M_InventoryLine.COLUMNNAME_C_Charge_ID, chargeID);
 				}
-				
+
 			} else {
 				mTab.setValue(X_M_InventoryLine.COLUMNNAME_C_Charge_ID, null);
 			}
+		}
+		if (mTab.getTableName().equals(X_ZZ_System_Access_Application.Table_Name) && 
+				mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Requester_ID)) {
+			if (value != null) {
+				String SQL = "SELECT string_agg(CAST(r.ad_role_id AS TEXT), ',' ORDER BY r.ad_role_id) AS DefaultValue"
+						+ " FROM ad_user_roles r"
+						+ " WHERE r.ad_user_id = ?";
+				String roles = DB.getSQLValueString(null, SQL, value);
+				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, roles);
+
+			} else {
+				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, null);
+			}
+
 		}
 		return null;
 	}
