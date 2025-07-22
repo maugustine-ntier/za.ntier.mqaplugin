@@ -5,21 +5,10 @@ import java.util.Properties;
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
-import org.compiere.model.MBPartner;
-import org.compiere.model.MBPartnerLocation;
-import org.compiere.model.MYear;
-import org.compiere.model.PO;
 import org.compiere.model.X_M_InventoryLine;
 import org.compiere.util.DB;
 
-import za.ntier.models.X_ZZ_Driver;
-import za.ntier.models.X_ZZ_Petty_Cash_Advance_Hdr;
-import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
-import za.ntier.models.X_ZZ_StockPile;
 import za.ntier.models.X_ZZ_System_Access_Application;
-import za.ntier.models.X_ZZ_Transporters;
-import za.ntier.models.X_ZZ_Truck;
-import za.ntier.models.X_ZZ_Truck_List;
 
 public class CalloutFromFactory implements IColumnCallout {
 
@@ -53,8 +42,9 @@ public class CalloutFromFactory implements IColumnCallout {
 				mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Requester_ID)) {
 			if (value != null) {
 				String SQL = "SELECT string_agg(CAST(r.ad_role_id AS TEXT), ',' ORDER BY r.ad_role_id) AS DefaultValue"
-						+ " FROM ad_user_roles r"
-						+ " WHERE r.ad_user_id = ?";
+						+ " FROM ad_user_roles r "
+						+ " join ad_role rol on r.ad_role_id = rol.ad_role_id"
+						+ " WHERE r.ad_user_id = ? and rol.isactive = 'Y'";
 				String roles = DB.getSQLValueString(null, SQL, value);
 				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, roles);
 
