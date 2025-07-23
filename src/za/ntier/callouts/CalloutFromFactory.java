@@ -39,31 +39,28 @@ public class CalloutFromFactory implements IColumnCallout {
 			}
 		}
 		if (mTab.getTableName().equals(X_ZZ_System_Access_Application.Table_Name) && 
-				(mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Requester_ID) || 
+				(mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_User_ID) || 
 						mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Application_Type))) {
-			int user_ID = (int) (mTab.getValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Requester_ID));
-			if (user_ID > 0) {
-				String SQL = "SELECT string_agg(CAST(r.ad_role_id AS TEXT), ',' ORDER BY r.ad_role_id) AS DefaultValue"
-						+ " FROM ad_user_roles r "
-						+ " join ad_role rol on r.ad_role_id = rol.ad_role_id"
-						+ " WHERE r.ad_user_id = ? and rol.isactive = 'Y'";
-				String roles = DB.getSQLValueString(null, SQL, user_ID);
-				if (mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Requester_ID)) {
-					mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, roles);					
-				}
-				if (mField.getColumnName().equals(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Application_Type)) {
-					if (mTab.get_ValueAsString(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Application_Type).equals("U")) {
-						mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, roles);
-					} else {
-						mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, null);
-					}
-				}
-
-			} else {
+			if (mTab.get_ValueAsString(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Application_Type) != null &&
+					!mTab.get_ValueAsString(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Application_Type).equals("U")) {
 				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, null);
 				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, null);
-			}
+			} else {
+				int user_ID = (int) (mTab.getValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_User_ID));
+				if (user_ID > 0) {
+					String SQL = "SELECT string_agg(CAST(r.ad_role_id AS TEXT), ',' ORDER BY r.ad_role_id) AS DefaultValue"
+							+ " FROM ad_user_roles r "
+							+ " join ad_role rol on r.ad_role_id = rol.ad_role_id"
+							+ " WHERE r.ad_user_id = ? and rol.isactive = 'Y'";
+					String roles = DB.getSQLValueString(null, SQL, user_ID);
+					mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, roles);
+					mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, roles);
+				} else {
+					mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, null);
+					mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, null);
+				}
 
+			}
 		}
 		return null;
 	}

@@ -54,12 +54,12 @@ public interface I_ZZ_System_Access_Application
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -274,14 +274,23 @@ public interface I_ZZ_System_Access_Application
 	/** Get User Organization	  */
 	public int getZZ_New_Org_ID();
 
-    /** Column name ZZ_New_User_ID */
-    public static final String COLUMNNAME_ZZ_New_User_ID = "ZZ_New_User_ID";
+    /** Column name ZZ_New_User_Email */
+    public static final String COLUMNNAME_ZZ_New_User_Email = "ZZ_New_User_Email";
+
+	/** Set New User Email	  */
+	public void setZZ_New_User_Email (String ZZ_New_User_Email);
+
+	/** Get New User Email	  */
+	public String getZZ_New_User_Email();
+
+    /** Column name ZZ_New_User_Name */
+    public static final String COLUMNNAME_ZZ_New_User_Name = "ZZ_New_User_Name";
 
 	/** Set New User Name	  */
-	public void setZZ_New_User_ID (String ZZ_New_User_ID);
+	public void setZZ_New_User_Name (String ZZ_New_User_Name);
 
 	/** Get New User Name	  */
-	public String getZZ_New_User_ID();
+	public String getZZ_New_User_Name();
 
     /** Column name ZZ_Reason_For_Additional_Access */
     public static final String COLUMNNAME_ZZ_Reason_For_Additional_Access = "ZZ_Reason_For_Additional_Access";
@@ -368,12 +377,14 @@ public interface I_ZZ_System_Access_Application
 
 	public I_ZZ_System getZZ_System() throws RuntimeException;
 
-    /** Column name ZZ_User */
-    public static final String COLUMNNAME_ZZ_User = "ZZ_User";
+    /** Column name ZZ_User_ID */
+    public static final String COLUMNNAME_ZZ_User_ID = "ZZ_User_ID";
 
-	/** Set User ID	  */
-	public void setZZ_User (String ZZ_User);
+	/** Set User Email	  */
+	public void setZZ_User_ID (int ZZ_User_ID);
 
-	/** Get User ID	  */
-	public String getZZ_User();
+	/** Get User Email	  */
+	public int getZZ_User_ID();
+
+	public org.compiere.model.I_AD_User getZZ_User() throws RuntimeException;
 }

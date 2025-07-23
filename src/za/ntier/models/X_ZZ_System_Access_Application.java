@@ -32,7 +32,7 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250721L;
+	private static final long serialVersionUID = 20250723L;
 
     /** Standard Constructor */
     public X_ZZ_System_Access_Application (Properties ctx, int ZZ_System_Access_Application_ID, String trxName)
@@ -463,19 +463,34 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		return ii.intValue();
 	}
 
-	/** Set New User Name.
-		@param ZZ_New_User_ID New User Name
+	/** Set New User Email.
+		@param ZZ_New_User_Email New User Email
 	*/
-	public void setZZ_New_User_ID (String ZZ_New_User_ID)
+	public void setZZ_New_User_Email (String ZZ_New_User_Email)
 	{
-		set_Value (COLUMNNAME_ZZ_New_User_ID, ZZ_New_User_ID);
+		set_Value (COLUMNNAME_ZZ_New_User_Email, ZZ_New_User_Email);
+	}
+
+	/** Get New User Email.
+		@return New User Email	  */
+	public String getZZ_New_User_Email()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_New_User_Email);
+	}
+
+	/** Set New User Name.
+		@param ZZ_New_User_Name New User Name
+	*/
+	public void setZZ_New_User_Name (String ZZ_New_User_Name)
+	{
+		set_Value (COLUMNNAME_ZZ_New_User_Name, ZZ_New_User_Name);
 	}
 
 	/** Get New User Name.
 		@return New User Name	  */
-	public String getZZ_New_User_ID()
+	public String getZZ_New_User_Name()
 	{
-		return (String)get_Value(COLUMNNAME_ZZ_New_User_ID);
+		return (String)get_Value(COLUMNNAME_ZZ_New_User_Name);
 	}
 
 	/** Set Reason For Additional Access.
@@ -645,18 +660,30 @@ public class X_ZZ_System_Access_Application extends PO implements I_ZZ_System_Ac
 		return ii.intValue();
 	}
 
-	/** Set User ID.
-		@param ZZ_User User ID
-	*/
-	public void setZZ_User (String ZZ_User)
+	public org.compiere.model.I_AD_User getZZ_User() throws RuntimeException
 	{
-		set_Value (COLUMNNAME_ZZ_User, ZZ_User);
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_User_ID(), get_TrxName());
 	}
 
-	/** Get User ID.
-		@return User ID	  */
-	public String getZZ_User()
+	/** Set User Email.
+		@param ZZ_User_ID User Email
+	*/
+	public void setZZ_User_ID (int ZZ_User_ID)
 	{
-		return (String)get_Value(COLUMNNAME_ZZ_User);
+		if (ZZ_User_ID < 1)
+			set_Value (COLUMNNAME_ZZ_User_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_User_ID, Integer.valueOf(ZZ_User_ID));
+	}
+
+	/** Get User Email.
+		@return User Email	  */
+	public int getZZ_User_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_User_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }
