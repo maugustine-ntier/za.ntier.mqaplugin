@@ -68,14 +68,14 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 	//IT Admin presses button
 	protected void doITADminApprove() {
 		docApprove.setZZ_IT_Admin_ID(Env.getAD_User_ID(getCtx()));
-		if("Y".equals(pApprove_Rej_MFC)){
+	//	if("Y".equals(pApprove_Rej_MFC)){
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
 			docApprove.setZZ_Date_Account_Created(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, 
 					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), new MMailText(getCtx(), 1000018, get_TrxName()));
-		}else{
+	//	}else{
 			// IT Admin does not reject, just creates accounts
-		}
+	//	}
 	}
 	
 	protected void doSubmitDocForITManager(boolean isBypassLineManage) {

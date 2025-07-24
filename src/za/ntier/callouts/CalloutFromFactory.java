@@ -46,7 +46,11 @@ public class CalloutFromFactory implements IColumnCallout {
 				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles, null);
 				mTab.setValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_Roles_Updated, null);
 			} else {
-				int user_ID = (int) (mTab.getValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_User_ID));
+				int user_ID = 0;
+				Object user = (mTab.getValue(X_ZZ_System_Access_Application.COLUMNNAME_ZZ_User_ID));
+				if (user != null) {
+					user_ID = (int)user;
+				}
 				if (user_ID > 0) {
 					String SQL = "SELECT string_agg(CAST(r.ad_role_id AS TEXT), ',' ORDER BY r.ad_role_id) AS DefaultValue"
 							+ " FROM ad_user_roles r "
