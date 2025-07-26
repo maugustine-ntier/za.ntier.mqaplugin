@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.compiere.model.I_AD_User;
+import org.compiere.model.PO;
 
 import za.co.ntier.fa.process.api.IDocApprove;
 
@@ -284,5 +285,23 @@ public class MZZProgramMasterData extends X_ZZ_Program_Master_Data implements ID
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	protected boolean afterSave(boolean newRecord, boolean success) {
+		if (newRecord) {
+			int ids[] = PO.getAllIDs(X_ZZ_Gen_Rules.Table_Name, null, get_TrxName());
+			for (int id:ids) {
+				X_ZZ_Gen_Rules X_ZZ_Gen_Rules = new X_ZZ_Gen_Rules(getCtx(),id,get_TrxName());
+				MZZProgramGenRules mZZProgramGenRules = new MZZProgramGenRules(getCtx(), 0, get_TrxName());
+				mZZProgramGenRules.setZZ_Program_Master_Data_ID(getZZ_Program_Master_Data_ID());
+				mZZProgramGenRules.setLine(X_ZZ_Gen_Rules.getLine());
+				mZZProgramGenRules.setName(X_ZZ_Gen_Rules.getName());
+				mZZProgramGenRules.saveEx();
+			}
+		}
+		return super.afterSave(newRecord, success);
+	}
+	
+	
 
 }
