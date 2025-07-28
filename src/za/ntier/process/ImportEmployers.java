@@ -55,7 +55,7 @@ public class ImportEmployers extends SvrProcess {
                     for (int i = 0; i < columns.length; i++) {
                         String col = columns[i].trim().toLowerCase();
 
-                        if (col.contains("levy number")) levyIndex = i;
+                        if (col.contains("SDL Number")) levyIndex = i;
                         else if (col.equals("organization name")) orgNameIndex = i;
                         else if (col.equals("registration number")) regNumberIndex = i;
                         else if (col.equals("business address line 1")) addressIndexes[0] = i;
