@@ -9,6 +9,8 @@ import java.util.Arrays;
 import org.adempiere.base.annotation.Parameter;
 import org.compiere.process.SvrProcess;
 
+
+@org.adempiere.base.annotation.Process(name="za.ntier.process.ImportEmployers")
 public class ImportEmployers extends SvrProcess {
 	@Parameter(name="FileName")
 	protected String pFileName;
