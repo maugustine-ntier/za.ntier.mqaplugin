@@ -89,7 +89,7 @@ public class ImportCityFromCSV extends SvrProcess {
                     line = removeUTF8BOM(line);
                     firstLine = false;
                 }
-
+                
                 if (line.trim().isEmpty()) {
                     continue;
                 }

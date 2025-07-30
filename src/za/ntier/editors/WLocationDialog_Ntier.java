@@ -49,10 +49,10 @@ import org.adempiere.webui.session.SessionManager;
 import org.adempiere.webui.theme.ThemeManager;
 import org.adempiere.webui.util.ZKUpdateUtil;
 import org.adempiere.webui.window.Dialog;
-import org.adempiere.webui.window.WAutoCompleterCity;
 import org.adempiere.webui.window.WLocationDialog;
 import org.compiere.model.GridField;
 import org.compiere.model.MAddressValidation;
+import org.compiere.model.MCity;
 import org.compiere.model.MCountry;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
@@ -297,7 +297,11 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		txtCity.setMaxlength(MLocation.getFieldLength(MLocation.COLUMNNAME_City));
 		txtCity.setAutodrop(true);
 		txtCity.setAutocomplete(true);
-		txtCity.addEventListener(Events.ON_CHANGING, this);
+		txtCity.addEventListener(Events.ON_CHANGING, this);  
+		// 🔔 Custom event listener for when a city is selected
+		txtCity.addEventListener("onCitySelected", this);
+	//	txtCity.addEventListener(Events.ON_CHANGE, this);  // Martin 29/7/2025
+
 		//txtCity
 
 		txtPostal = new Textbox();
@@ -970,7 +974,18 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			//  refresh
 			initLocation();
 			lstRegion.focus();
-		}
+		} if (event.getTarget().equals(txtCity)) {   // Martin 29/7/2025
+			if ("onCitySelected".equals(event.getName())) {
+	            String selectedCity = txtCity.getText();
+	            MRegion r = MRegion.get(txtCity.getC_Region_ID());
+	            m_location.setRegion(r);
+	            setRegion();
+	            MCity mCity = MCity.get(txtCity.getC_City_ID());
+	            m_location.setPostal(mCity.getPostal());
+	            txtPostal.setValue(mCity.getPostal());
+	            System.out.println("City selected: " + selectedCity);
+	        }
+	    }
 		else if ("onSaveError".equals(event.getName())) {
 			onSaveError = false;
 			doPopup();
