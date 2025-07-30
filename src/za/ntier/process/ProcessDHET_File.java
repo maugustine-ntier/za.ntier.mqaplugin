@@ -2,20 +2,24 @@ package za.ntier.process;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.math.BigDecimal;
 
-import org.compiere.model.MBPartner;
+import org.adempiere.base.annotation.Parameter;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.process.SvrProcess;
 
+import za.ntier.models.MBPartner_New;
+
+@org.adempiere.base.annotation.Process(name="za.ntier.process.ProcessDHET_File")
 public class ProcessDHET_File extends SvrProcess {
 
-
+	@Parameter(name="FILENAME")
 	private String filePath;
 
 	@Override
 	protected void prepare() {
-		
+
 	}
 
 	@Override
@@ -45,64 +49,75 @@ public class ProcessDHET_File extends SvrProcess {
 				String numEmployeesStr = unquote(fields[47]);
 
 				// Check if BP exists
-				MBPartner bp = MBPartner.get(getCtx(), sdlNumber);
+				MBPartner_New bp = MBPartner_New.get(getCtx(), sdlNumber);
 				if (bp == null) {
-					bp = new MBPartner(getCtx(), 0, get_TrxName());
+					bp = new MBPartner_New(getCtx(), 0, get_TrxName());
 					bp.setValue(sdlNumber);
 					bp.setName(name);
 
 					// Custom column ZZ_Number_Of_Employees
 					try {
 						int numEmployees = Integer.parseInt(numEmployeesStr);
-						bp.set_ValueOfColumn("ZZ_Number_Of_Employees", numEmployees);
+						bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
 					} catch (NumberFormatException e) {
 						log.warning("Invalid NumberOfEmployees for " + sdlNumber);
 					}
 
 					bp.saveEx();
+
+
+					// --- BUSINESS ADDRESS ---
+					MLocation businessLoc = new MLocation(getCtx(), 0, get_TrxName());
+					businessLoc.setAddress1(unquote(fields[27]));
+					businessLoc.setAddress2(unquote(fields[28]));
+					businessLoc.setAddress3(unquote(fields[29]));
+					businessLoc.setAddress4(unquote(fields[30]));
+					businessLoc.setPostal(unquote(fields[31]));
+					businessLoc.saveEx();
+
+					MBPartnerLocation businessBPL = new MBPartnerLocation(bp);
+					businessBPL.setC_Location_ID(businessLoc.getC_Location_ID());
+					businessBPL.setName("Business Address");
+					businessBPL.saveEx();
+
+					// --- RESIDENTIAL ADDRESS ---
+					MLocation residentialLoc = new MLocation(getCtx(), 0, get_TrxName());
+					residentialLoc.setAddress1(unquote(fields[16]));
+					residentialLoc.setAddress2(unquote(fields[17]));
+					residentialLoc.setAddress3(unquote(fields[18]));
+					residentialLoc.setAddress4(unquote(fields[19]));
+					residentialLoc.setPostal(unquote(fields[20]));
+					residentialLoc.saveEx();
+
+					MBPartnerLocation residentialBPL = new MBPartnerLocation(bp);
+					residentialBPL.setC_Location_ID(residentialLoc.getC_Location_ID());
+					residentialBPL.setName("Residential Address");
+					residentialBPL.saveEx();
+
+					// --- POSTAL ADDRESS ---
+					MLocation postalLoc = new MLocation(getCtx(), 0, get_TrxName());
+					postalLoc.setAddress1(unquote(fields[37]));
+					postalLoc.setAddress2(unquote(fields[38]));
+					postalLoc.setAddress3(unquote(fields[39]));
+					postalLoc.setAddress4(unquote(fields[40]));
+					postalLoc.setPostal(unquote(fields[41]));
+					postalLoc.saveEx();
+
+					MBPartnerLocation postalBPL = new MBPartnerLocation(bp);
+					postalBPL.setC_Location_ID(postalLoc.getC_Location_ID());
+					postalBPL.setName("Postal Address");
+					postalBPL.saveEx();
+				} else {
+					if (bp.getZZ_Number_Of_Employees().compareTo(new BigDecimal("0")) <= 0) {
+						try {
+							int numEmployees = Integer.parseInt(numEmployeesStr);
+							bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
+						} catch (NumberFormatException e) {
+							log.warning("Invalid NumberOfEmployees for " + sdlNumber);
+						}
+					}
+					bp.saveEx();
 				}
-
-				// --- BUSINESS ADDRESS ---
-				MLocation businessLoc = new MLocation(getCtx(), 0, get_TrxName());
-				businessLoc.setAddress1(unquote(fields[27]));
-				businessLoc.setAddress2(unquote(fields[28]));
-				businessLoc.setAddress3(unquote(fields[29]));
-				businessLoc.setAddress4(unquote(fields[30]));
-				businessLoc.setPostal(unquote(fields[31]));
-				businessLoc.saveEx();
-
-				MBPartnerLocation businessBPL = new MBPartnerLocation(bp);
-				businessBPL.setC_Location_ID(businessLoc.getC_Location_ID());
-				businessBPL.setName("Business Address");
-				businessBPL.saveEx();
-
-				// --- RESIDENTIAL ADDRESS ---
-				MLocation residentialLoc = new MLocation(getCtx(), 0, get_TrxName());
-				residentialLoc.setAddress1(unquote(fields[16]));
-				residentialLoc.setAddress2(unquote(fields[17]));
-				residentialLoc.setAddress3(unquote(fields[18]));
-				residentialLoc.setAddress4(unquote(fields[19]));
-				residentialLoc.setPostal(unquote(fields[20]));
-				residentialLoc.saveEx();
-
-				MBPartnerLocation residentialBPL = new MBPartnerLocation(bp);
-				residentialBPL.setC_Location_ID(residentialLoc.getC_Location_ID());
-				residentialBPL.setName("Residential Address");
-				residentialBPL.saveEx();
-
-				// --- POSTAL ADDRESS ---
-				MLocation postalLoc = new MLocation(getCtx(), 0, get_TrxName());
-				postalLoc.setAddress1(unquote(fields[37]));
-				postalLoc.setAddress2(unquote(fields[38]));
-				postalLoc.setAddress3(unquote(fields[39]));
-				postalLoc.setAddress4(unquote(fields[40]));
-				postalLoc.setPostal(unquote(fields[41]));
-				postalLoc.saveEx();
-
-				MBPartnerLocation postalBPL = new MBPartnerLocation(bp);
-				postalBPL.setC_Location_ID(postalLoc.getC_Location_ID());
-				postalBPL.setName("Postal Address");
-				postalBPL.saveEx();
 			}
 		}
 

@@ -80,12 +80,12 @@ public interface I_C_BPartner
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -981,4 +981,58 @@ s business as a percentage
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
+
+    /** Column name ZZ_Business_Reg_No */
+    public static final String COLUMNNAME_ZZ_Business_Reg_No = "ZZ_Business_Reg_No";
+
+	/** Set Business Registration No	  */
+	public void setZZ_Business_Reg_No (String ZZ_Business_Reg_No);
+
+	/** Get Business Registration No	  */
+	public String getZZ_Business_Reg_No();
+
+    /** Column name ZZ_Is_Employer */
+    public static final String COLUMNNAME_ZZ_Is_Employer = "ZZ_Is_Employer";
+
+	/** Set Is Employer	  */
+	public void setZZ_Is_Employer (boolean ZZ_Is_Employer);
+
+	/** Get Is Employer	  */
+	public boolean isZZ_Is_Employer();
+
+    /** Column name ZZ_Is_MQA_Sector */
+    public static final String COLUMNNAME_ZZ_Is_MQA_Sector = "ZZ_Is_MQA_Sector";
+
+	/** Set MQA Sector	  */
+	public void setZZ_Is_MQA_Sector (boolean ZZ_Is_MQA_Sector);
+
+	/** Get MQA Sector	  */
+	public boolean isZZ_Is_MQA_Sector();
+
+    /** Column name ZZ_Municipality_District */
+    public static final String COLUMNNAME_ZZ_Municipality_District = "ZZ_Municipality_District";
+
+	/** Set Municipality/District	  */
+	public void setZZ_Municipality_District (String ZZ_Municipality_District);
+
+	/** Get Municipality/District	  */
+	public String getZZ_Municipality_District();
+
+    /** Column name ZZ_Number_Of_Employees */
+    public static final String COLUMNNAME_ZZ_Number_Of_Employees = "ZZ_Number_Of_Employees";
+
+	/** Set Number Of Employees	  */
+	public void setZZ_Number_Of_Employees (BigDecimal ZZ_Number_Of_Employees);
+
+	/** Get Number Of Employees	  */
+	public BigDecimal getZZ_Number_Of_Employees();
+
+    /** Column name ZZ_SDL_No */
+    public static final String COLUMNNAME_ZZ_SDL_No = "ZZ_SDL_No";
+
+	/** Set SDL Number	  */
+	public void setZZ_SDL_No (String ZZ_SDL_No);
+
+	/** Get SDL Number	  */
+	public String getZZ_SDL_No();
 }

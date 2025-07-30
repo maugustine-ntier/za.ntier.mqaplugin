@@ -1,5 +1,6 @@
 package za.ntier.models;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 
@@ -74,8 +75,107 @@ public class MBPartner_New extends MBPartner implements za.ntier.models.I_C_BPar
 				.firstOnly();
 		return retValue;
 	}
-	
-	
+
+	public static MBPartner_New get (Properties ctx, String Value) {
+		return get(ctx,Value,null);		
+	}
+
+	/**
+	 * 	Get BPartner with Value in a transaction
+	 *	@param ctx context 
+	 *	@param Value value
+	 * 	@param trxName transaction
+	 *	@return BPartner or null
+	 */
+	public static MBPartner_New get (Properties ctx, String Value, String trxName)
+	{
+		if (Value == null || Value.length() == 0)
+			return null;
+		final String whereClause = "Value=? AND AD_Client_ID=?";
+		MBPartner_New retValue = new Query(ctx, I_C_BPartner.Table_Name, whereClause, trxName)
+				.setParameters(Value,Env.getAD_Client_ID(ctx))
+				.firstOnly();
+		return retValue;
+	}	//	get
+
+	@Override
+	public void setZZ_Business_Reg_No(String ZZ_Business_Reg_No) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getZZ_Business_Reg_No() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Is_Employer(boolean ZZ_Is_Employer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isZZ_Is_Employer() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setZZ_Is_MQA_Sector(boolean ZZ_Is_MQA_Sector) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isZZ_Is_MQA_Sector() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setZZ_Municipality_District(String ZZ_Municipality_District) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getZZ_Municipality_District() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/** Set Number Of Employees.
+	@param ZZ_Number_Of_Employees Number Of Employees
+	 */
+	public void setZZ_Number_Of_Employees (BigDecimal ZZ_Number_Of_Employees)
+	{
+		set_Value (COLUMNNAME_ZZ_Number_Of_Employees, ZZ_Number_Of_Employees);
+	}
+
+	/** Get Number Of Employees.
+	@return Number Of Employees	  */
+	public BigDecimal getZZ_Number_Of_Employees()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Number_Of_Employees);
+		if (bd == null)
+			return Env.ZERO;
+		return bd;
+	}
+
+
+	@Override
+	public void setZZ_SDL_No(String ZZ_SDL_No) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getZZ_SDL_No() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/*
 	 * @Override protected boolean afterSave(boolean newRecord, boolean success) {
@@ -99,8 +199,8 @@ public class MBPartner_New extends MBPartner implements za.ntier.models.I_C_BPar
 	 * copyLinkedTableRecords(MBPartnerLocation_New.Table_Name); } } return true; }
 	 */
 
-	
-	
+
+
 
 
 

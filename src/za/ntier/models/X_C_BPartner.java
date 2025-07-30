@@ -35,7 +35,7 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250116L;
+	private static final long serialVersionUID = 20250730L;
 
     /** Standard Constructor */
     public X_C_BPartner (Properties ctx, int C_BPartner_ID, String trxName)
@@ -56,12 +56,17 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 // N
 			setIsSalesRep (false);
 			setIsSummary (false);
-			setIsVendor (false);
+			setIsVendor (true);
+// 'Y'
 			setName (null);
 			setSO_CreditLimit (Env.ZERO);
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
+			setZZ_Is_Employer (false);
+// N
+			setZZ_Is_MQA_Sector (false);
+// N
         } */
     }
 
@@ -84,12 +89,17 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 // N
 			setIsSalesRep (false);
 			setIsSummary (false);
-			setIsVendor (false);
+			setIsVendor (true);
+// 'Y'
 			setName (null);
 			setSO_CreditLimit (Env.ZERO);
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
+			setZZ_Is_Employer (false);
+// N
+			setZZ_Is_MQA_Sector (false);
+// N
         } */
     }
 
@@ -112,12 +122,17 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 // N
 			setIsSalesRep (false);
 			setIsSummary (false);
-			setIsVendor (false);
+			setIsVendor (true);
+// 'Y'
 			setName (null);
 			setSO_CreditLimit (Env.ZERO);
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
+			setZZ_Is_Employer (false);
+// N
+			setZZ_Is_MQA_Sector (false);
+// N
         } */
     }
 
@@ -140,12 +155,17 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 // N
 			setIsSalesRep (false);
 			setIsSummary (false);
-			setIsVendor (false);
+			setIsVendor (true);
+// 'Y'
 			setName (null);
 			setSO_CreditLimit (Env.ZERO);
 			setSO_CreditUsed (Env.ZERO);
 			setSendEMail (false);
 			setValue (null);
+			setZZ_Is_Employer (false);
+// N
+			setZZ_Is_MQA_Sector (false);
+// N
         } */
     }
 
@@ -1664,5 +1684,112 @@ public class X_C_BPartner extends PO implements I_C_BPartner, I_Persistent
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
+	}
+
+	/** Set Business Registration No.
+		@param ZZ_Business_Reg_No Business Registration No
+	*/
+	public void setZZ_Business_Reg_No (String ZZ_Business_Reg_No)
+	{
+		set_Value (COLUMNNAME_ZZ_Business_Reg_No, ZZ_Business_Reg_No);
+	}
+
+	/** Get Business Registration No.
+		@return Business Registration No	  */
+	public String getZZ_Business_Reg_No()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Business_Reg_No);
+	}
+
+	/** Set Is Employer.
+		@param ZZ_Is_Employer Is Employer
+	*/
+	public void setZZ_Is_Employer (boolean ZZ_Is_Employer)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_Employer, Boolean.valueOf(ZZ_Is_Employer));
+	}
+
+	/** Get Is Employer.
+		@return Is Employer	  */
+	public boolean isZZ_Is_Employer()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_Employer);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set MQA Sector.
+		@param ZZ_Is_MQA_Sector MQA Sector
+	*/
+	public void setZZ_Is_MQA_Sector (boolean ZZ_Is_MQA_Sector)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_MQA_Sector, Boolean.valueOf(ZZ_Is_MQA_Sector));
+	}
+
+	/** Get MQA Sector.
+		@return MQA Sector	  */
+	public boolean isZZ_Is_MQA_Sector()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_MQA_Sector);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Municipality/District.
+		@param ZZ_Municipality_District Municipality/District
+	*/
+	public void setZZ_Municipality_District (String ZZ_Municipality_District)
+	{
+		set_Value (COLUMNNAME_ZZ_Municipality_District, ZZ_Municipality_District);
+	}
+
+	/** Get Municipality/District.
+		@return Municipality/District	  */
+	public String getZZ_Municipality_District()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Municipality_District);
+	}
+
+	/** Set Number Of Employees.
+		@param ZZ_Number_Of_Employees Number Of Employees
+	*/
+	public void setZZ_Number_Of_Employees (BigDecimal ZZ_Number_Of_Employees)
+	{
+		set_Value (COLUMNNAME_ZZ_Number_Of_Employees, ZZ_Number_Of_Employees);
+	}
+
+	/** Get Number Of Employees.
+		@return Number Of Employees	  */
+	public BigDecimal getZZ_Number_Of_Employees()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ZZ_Number_Of_Employees);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set SDL Number.
+		@param ZZ_SDL_No SDL Number
+	*/
+	public void setZZ_SDL_No (String ZZ_SDL_No)
+	{
+		set_Value (COLUMNNAME_ZZ_SDL_No, ZZ_SDL_No);
+	}
+
+	/** Get SDL Number.
+		@return SDL Number	  */
+	public String getZZ_SDL_No()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_SDL_No);
 	}
 }
