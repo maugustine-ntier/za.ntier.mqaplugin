@@ -122,15 +122,25 @@ public class MBPartner_New extends MBPartner implements za.ntier.models.I_C_BPar
 		return false;
 	}
 
-	@Override
-	public void setZZ_Is_MQA_Sector(boolean ZZ_Is_MQA_Sector) {
-		// TODO Auto-generated method stub
-
+	/** Set MQA Sector.
+	@param ZZ_Is_MQA_Sector MQA Sector
+	 */
+	public void setZZ_Is_MQA_Sector (boolean ZZ_Is_MQA_Sector)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_MQA_Sector, Boolean.valueOf(ZZ_Is_MQA_Sector));
 	}
 
-	@Override
-	public boolean isZZ_Is_MQA_Sector() {
-		// TODO Auto-generated method stub
+	/** Get MQA Sector.
+	@return MQA Sector	  */
+	public boolean isZZ_Is_MQA_Sector()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_MQA_Sector);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
 		return false;
 	}
 

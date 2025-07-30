@@ -8,6 +8,7 @@ import org.adempiere.base.annotation.Parameter;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 
 import za.ntier.models.MBPartner_New;
 
@@ -27,6 +28,12 @@ public class ProcessDHET_File extends SvrProcess {
 		if (filePath == null || filePath.isEmpty()) {
 			throw new IllegalArgumentException("File path not provided.");
 		}
+		
+	    // STEP 1: Reset MQA_Sector to 'N' for all BPs currently marked 'Y'
+	    String resetSQL = "UPDATE C_BPartner SET ZZ_Is_MQA_Sector = 'N' WHERE ZZ_Is_MQA_Sector = 'Y'";
+	    int resetCount = DB.executeUpdateEx(resetSQL, get_TrxName());
+	    addLog("Reset MQA_Sector to 'N' for " + resetCount + " BPs");
+
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
@@ -62,6 +69,7 @@ public class ProcessDHET_File extends SvrProcess {
 					} catch (NumberFormatException e) {
 						log.warning("Invalid NumberOfEmployees for " + sdlNumber);
 					}
+					bp.setZZ_Is_MQA_Sector(true);
 
 					bp.saveEx();
 
@@ -108,6 +116,7 @@ public class ProcessDHET_File extends SvrProcess {
 					postalBPL.setName("Postal Address");
 					postalBPL.saveEx();
 				} else {
+					bp.setZZ_Is_MQA_Sector(true);
 					if (bp.getZZ_Number_Of_Employees().compareTo(new BigDecimal("0")) <= 0) {
 						try {
 							int numEmployees = Integer.parseInt(numEmployeesStr);
