@@ -15,7 +15,7 @@ import za.ntier.models.MBPartner_New;
 @org.adempiere.base.annotation.Process(name="za.ntier.process.ProcessDHET_File")
 public class ProcessDHET_File extends SvrProcess {
 
-	@Parameter(name="FILENAME")
+	@Parameter(name="FileName")
 	private String filePath;
 
 	@Override
@@ -30,11 +30,13 @@ public class ProcessDHET_File extends SvrProcess {
 		}
 		
 	    // STEP 1: Reset MQA_Sector to 'N' for all BPs currently marked 'Y'
-	    String resetSQL = "UPDATE C_BPartner SET ZZ_Is_MQA_Sector = 'N' WHERE ZZ_Is_MQA_Sector = 'Y'";
+	    String resetSQL = "UPDATE C_BPartner SET ZZ_Is_MQA_Sector = 'N' WHERE ZZ_Is_MQA_Sector = 'Y' and AD_Client_ID = 1000000";
 	    int resetCount = DB.executeUpdateEx(resetSQL, get_TrxName());
 	    addLog("Reset MQA_Sector to 'N' for " + resetCount + " BPs");
 
 
+	    int cntBPsAdded = 0;
+	    int cntBPsUpdated = 0;
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
 			boolean isFirstLine = true;
@@ -52,12 +54,22 @@ public class ProcessDHET_File extends SvrProcess {
 				}
 
 				String sdlNumber = unquote(fields[0]);
+				if (sdlNumber == null || sdlNumber.length() <= 0) {
+					log.warning("Skipping invalid line with no sdlNumber: " + line);
+					continue;
+				}
 				String name = unquote(fields[4]);
-				String numEmployeesStr = unquote(fields[47]);
+				String numEmployeesStr = unquote(fields[59]);
 
 				// Check if BP exists
-				MBPartner_New bp = MBPartner_New.get(getCtx(), sdlNumber);
-				if (bp == null) {
+				MBPartner_New bp = null;
+				int cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",sdlNumber);
+				if (cnt > 0) {
+					int c_BPartner_ID =  DB.getSQLValue(get_TrxName(),"Select C_BPartner_id from C_Bpartner bp where bp.value = ?",sdlNumber);
+					bp = new MBPartner_New(getCtx(), c_BPartner_ID, get_TrxName());
+				}
+				if (cnt  <= 0) {
+					cntBPsAdded++;
 					bp = new MBPartner_New(getCtx(), 0, get_TrxName());
 					bp.setValue(sdlNumber);
 					bp.setName(name);
@@ -116,6 +128,7 @@ public class ProcessDHET_File extends SvrProcess {
 					postalBPL.setName("Postal Address");
 					postalBPL.saveEx();
 				} else {
+					cntBPsUpdated++;
 					bp.setZZ_Is_MQA_Sector(true);
 					if (bp.getZZ_Number_Of_Employees().compareTo(new BigDecimal("0")) <= 0) {
 						try {
@@ -129,6 +142,8 @@ public class ProcessDHET_File extends SvrProcess {
 				}
 			}
 		}
+		addLog("New Business Partners Created:  " + cntBPsAdded) ;
+		addLog("Business Partners Updated    :  " + cntBPsUpdated);
 
 		return "CSV file processed and Business Partners created.";
 	}
