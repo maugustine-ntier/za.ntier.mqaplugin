@@ -3,6 +3,7 @@ package za.ntier.process;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +15,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.compiere.model.MBPartner;
 import org.compiere.process.ProcessInfo;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
+import za.ntier.models.MBPartner_New;
 import za.ntier.models.X_ZZ_WSP_ATR_Approvals;
 
 
-@org.adempiere.base.annotation.Process(name="za.ntier.process.ProcessDHET_File")
+@org.adempiere.base.annotation.Process(name="za.ntier.process.ImportWSPATRData")
 public class ImportWSPATRData extends SvrProcess {
 	@Parameter(name="FileName")
 	private String filePath;
@@ -51,12 +52,23 @@ public class ImportWSPATRData extends SvrProcess {
 			String grantStatus = getCell(row, 7);
 			String numEmployeesStr = getCell(row, 14);
 
-			MBPartner bp = MBPartner.get(getCtx(), key1);
-			if (bp == null && key2 != null && !key2.isBlank()) {
-				bp = MBPartner.get(getCtx(), key2);
+			
+			String value = null;
+			MBPartner_New bp = null;
+			int cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",key1);
+			value = key1;
+			if (cnt <= 0) {
+				if (key2 != null && !key2.isBlank()) {
+					cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",key2);
+					if (cnt > 0) {
+						value = key2;
+					}
+				}
 			}
-
-			if (bp == null) {
+			if (cnt > 0) {
+				int c_BPartner_ID =  DB.getSQLValue(get_TrxName(),"Select C_BPartner_id from C_Bpartner bp where bp.value = ?",value);
+				bp = new MBPartner_New(getCtx(), c_BPartner_ID, get_TrxName());
+			} else {			
 				unresolvedList.add(key1 + "," + key2);
 				continue;
 			}
@@ -64,14 +76,15 @@ public class ImportWSPATRData extends SvrProcess {
 			// Update number of employees on BP
 			try {
 				int numEmployees = Integer.parseInt(numEmployeesStr);
-				bp.set_ValueOfColumn("ZZ_Number_Of_Employees", numEmployees);
+				bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
 				bp.saveEx();
 			} catch (Exception e) {
 				log.warning("Invalid employee count for: " + key1);
+				continue;
 			}
 
 			// Check if record exists for same BP and Financial Year
-			String sql = "SELECT ZZ_WSP_ATR_Approvals_ID FROM ZZ_WSP_ATR_Approvals WHERE C_BPartner_ID=? AND FinancialYear=?";
+			String sql = "SELECT ZZ_WSP_ATR_Approvals_ID FROM ZZ_WSP_ATR_Approvals WHERE C_BPartner_ID=? AND zz_financial_year=?";
 			int wspID = DB.getSQLValue(get_TrxName(), sql, bp.get_ID(), financialYear);
 
 			X_ZZ_WSP_ATR_Approvals record;
@@ -83,7 +96,7 @@ public class ImportWSPATRData extends SvrProcess {
 
 			record.setC_BPartner_ID(bp.get_ID());
 			record.setZZ_Financial_Year(financialYear);
-			record.setZZ_Grant_Status(grantStatus);
+			record.setZZ_Grant_Status((grantStatus.equals("Approved"))? "A" : "R" );
 			record.setProcessedOn(new Timestamp(System.currentTimeMillis()));
 			record.saveEx();
 		}
