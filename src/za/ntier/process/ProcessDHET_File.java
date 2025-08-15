@@ -60,6 +60,7 @@ public class ProcessDHET_File extends SvrProcess {
 				}
 				String name = unquote(fields[4]);
 				String numEmployeesStr = unquote(fields[59]);
+				String regNo = unquote(fields[9]);
 
 				// Check if BP exists
 				MBPartner_New bp = null;
@@ -73,6 +74,7 @@ public class ProcessDHET_File extends SvrProcess {
 					bp = new MBPartner_New(getCtx(), 0, get_TrxName());
 					bp.setValue(sdlNumber);
 					bp.setName(name);
+					bp.setReferenceNo(regNo);
 
 					// Custom column ZZ_Number_Of_Employees
 					try {

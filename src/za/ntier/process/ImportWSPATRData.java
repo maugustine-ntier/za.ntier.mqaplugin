@@ -117,8 +117,11 @@ public class ImportWSPATRData extends SvrProcess {
 			// ✅ This enables the Download link in Process Monitor
 			ProcessInfo pi = getProcessInfo();
 			if (pi != null) {
+				pi.setExport(true);
 				pi.setExportFile(logFile);
+				pi.setExportFileExtension("csv");
 			}
+			 addLog("Unresolved BPs: " + unresolvedList.size() + " (Download from Process Monitor)");
 		}
 
 
