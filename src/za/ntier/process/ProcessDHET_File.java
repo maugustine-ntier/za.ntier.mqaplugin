@@ -48,7 +48,7 @@ public class ProcessDHET_File extends SvrProcess {
 				}
 
 				String[] fields = parseCSVLine(line);
-				if (fields.length < 60) {
+				if (fields.length < 59) {
 					log.warning("Skipping invalid line: " + line);
 					continue;
 				}
@@ -59,7 +59,7 @@ public class ProcessDHET_File extends SvrProcess {
 					continue;
 				}
 				String name = unquote(fields[4]);
-				String numEmployeesStr = unquote(fields[59]);
+				String numEmployeesStr = unquote(fields[46]);
 				String regNo = unquote(fields[9]);
 
 				// Check if BP exists
