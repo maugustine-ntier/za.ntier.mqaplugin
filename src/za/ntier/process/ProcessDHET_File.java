@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 
 import org.adempiere.base.annotation.Parameter;
+import org.compiere.model.MBPGroup;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.process.SvrProcess;
@@ -75,6 +76,11 @@ public class ProcessDHET_File extends SvrProcess {
 					bp.setValue(sdlNumber);
 					bp.setName(name);
 					bp.setReferenceNo(regNo);
+					bp.setC_BP_Group_ID(1000018);  // UNKNOWN GROUP
+					bp.setIsVendor(true);
+					bp.setIsCustomer(false);
+					bp.setIsEmployee(false);
+					bp.setIsProspect(false);
 
 					// Custom column ZZ_Number_Of_Employees
 					try {
@@ -132,6 +138,9 @@ public class ProcessDHET_File extends SvrProcess {
 				} else {
 					cntBPsUpdated++;
 					bp.setZZ_Is_MQA_Sector(true);
+					if (bp.getReferenceNo() == null && regNo != null) {
+						bp.setReferenceNo(regNo);
+					}
 					if (bp.getZZ_Number_Of_Employees().compareTo(new BigDecimal("0")) <= 0) {
 						try {
 							int numEmployees = Integer.parseInt(numEmployeesStr);
