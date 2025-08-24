@@ -32,7 +32,7 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250822L;
+	private static final long serialVersionUID = 20250824L;
 
     /** Standard Constructor */
     public X_ZZ_Open_Application (Properties ctx, int ZZ_Open_Application_ID, String trxName)
@@ -387,5 +387,32 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	public String getZZ_Programs()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Programs);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Recommender() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_Recommender_ID(), get_TrxName());
+	}
+
+	/** Set Recommender.
+		@param ZZ_Recommender_ID Recommender
+	*/
+	public void setZZ_Recommender_ID (int ZZ_Recommender_ID)
+	{
+		if (ZZ_Recommender_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Recommender_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Recommender_ID, Integer.valueOf(ZZ_Recommender_ID));
+	}
+
+	/** Get Recommender.
+		@return Recommender	  */
+	public int getZZ_Recommender_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Recommender_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }

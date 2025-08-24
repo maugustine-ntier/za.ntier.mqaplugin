@@ -249,4 +249,15 @@ public interface I_ZZ_Open_Application
 
 	/** Get Programs	  */
 	public String getZZ_Programs();
+
+    /** Column name ZZ_Recommender_ID */
+    public static final String COLUMNNAME_ZZ_Recommender_ID = "ZZ_Recommender_ID";
+
+	/** Set Recommender	  */
+	public void setZZ_Recommender_ID (int ZZ_Recommender_ID);
+
+	/** Get Recommender	  */
+	public int getZZ_Recommender_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Recommender() throws RuntimeException;
 }

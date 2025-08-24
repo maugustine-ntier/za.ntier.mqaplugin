@@ -101,17 +101,17 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
             docApprove.setZZ_Date_Submitted(now);
 
         // Identify/validate recommender (Snr Mgr SPU)
-        int recommenderId = docApprove.get_ValueAsInt("ZZ_Recommender_ID");
+        int recommenderId = docApprove.getZZ_Recommender_ID();
         if (recommenderId <= 0) {
             // fallback: pick any user with ROLE_SNR_MGR_SPU if that’s your pattern
             recommenderId = findFirstUserInRole(IDocApprove.ROLE_SNR_MGR_SPU);
             if (recommenderId <= 0)
                 throw new AdempiereException("No Recommender (Snr Mgr SPU) found/configured.");
-            docApprove.set_ValueOfColumn("ZZ_Recommender_ID", recommenderId);
+            docApprove.setZZ_Recommender_ID(recommenderId);
         }
 
         // Validate exec approver selection at submit time (spec: “Choose Exec Approver – (COO, EMCS)”)
-        final int execApproverId = docApprove.get_ValueAsInt("ZZ_Exec_Approver_ID");
+        final int execApproverId = docApprove.getZZ_Exec_Approver_ID();
         if (execApproverId <= 0)
             throw new AdempiereException("Please choose an Executive Approver (COO or EMCS) before submitting.");
 
@@ -135,7 +135,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
         docApprove.setZZ_Date_Manager_Approved(now()); // reuse this “manager approved” field for the recommender timestamp
 
         // Notify the Exec approver (COO/EMCS)
-        final int execApproverId = docApprove.get_ValueAsInt("ZZ_Exec_Approver_ID");
+        final int execApproverId = docApprove.getZZ_Exec_Approver_ID();
         if (execApproverId <= 0)
             throw new AdempiereException("Exec Approver is not selected.");
 
@@ -160,8 +160,8 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
     /** Core data validation from the spec */
     protected void validateData() {
         // These getters assume your model has fields with these column names; adjust if needed.
-        Timestamp openTs  = (Timestamp) docApprove.get_Value("ZZ_OpenDate");
-        Timestamp closeTs = (Timestamp) docApprove.get_Value("ZZ_CloseDate");
+        Timestamp openTs  = (Timestamp) docApprove.getStartDate();
+        Timestamp closeTs = (Timestamp) docApprove.getEndDate();
 
         if (openTs == null || closeTs == null)
             throw new AdempiereException("Please enter both Open and Close date & time.");
@@ -175,10 +175,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
         if (!openTs.after(now) || !closeTs.after(now))
             throw new AdempiereException("Open and Close date/time must be in the future.");
 
-        // Description must exist
-        String desc = docApprove.get_ValueAsString("ZZ_Description");
-        if (Util.isEmpty(desc, true))
-            throw new AdempiereException("Please enter a Description for the Application window.");
+      
 
         // Optional: validate that excluded programs list is consistent with “approved programs” set.
         // e.g., ensure IDs exist and belong to the approved list for this window.
@@ -231,9 +228,9 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
     private void addUsersOfRole(int roleId) {
         if (roleId <= 0) return;
-        MUser[] users = MUser.getOfRole(getCtx(), roleId);
+        MUserRoles[] users = MUserRoles.getOfRole(getCtx(), roleId);
         if (users == null) return;
-        for (MUser u : users) {
+        for (MUserRoles u : users) {
             if (u.isActive()) broadcastUserIds.add(u.getAD_User_ID());
         }
     }
