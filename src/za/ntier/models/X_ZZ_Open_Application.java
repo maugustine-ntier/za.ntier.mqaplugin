@@ -221,6 +221,21 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Approved);
 	}
 
+	/** Set Date Recommended.
+		@param ZZ_Date_Recommended Date Recommended
+	*/
+	public void setZZ_Date_Recommended (Timestamp ZZ_Date_Recommended)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recommended, ZZ_Date_Recommended);
+	}
+
+	/** Get Date Recommended.
+		@return Date Recommended	  */
+	public Timestamp getZZ_Date_Recommended()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recommended);
+	}
+
 	/** Set Date Submitted.
 		@param ZZ_Date_Submitted Date Submitted
 	*/
@@ -242,6 +257,8 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Recommend = RE */
+	public static final String ZZ_DOCACTION_Recommend = "RE";
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to SDL Finance Mgr = SD */
@@ -284,6 +301,8 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ZZ_DOCSTATUS_Recommended = "RC";
 	/** Submitted to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted To SDL Finance Mgr = SD */

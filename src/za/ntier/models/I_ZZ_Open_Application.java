@@ -185,6 +185,15 @@ public interface I_ZZ_Open_Application
 	/** Get Date Approved	  */
 	public Timestamp getZZ_Date_Approved();
 
+    /** Column name ZZ_Date_Recommended */
+    public static final String COLUMNNAME_ZZ_Date_Recommended = "ZZ_Date_Recommended";
+
+	/** Set Date Recommended	  */
+	public void setZZ_Date_Recommended (Timestamp ZZ_Date_Recommended);
+
+	/** Get Date Recommended	  */
+	public Timestamp getZZ_Date_Recommended();
+
     /** Column name ZZ_Date_Submitted */
     public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
 

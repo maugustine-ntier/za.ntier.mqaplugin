@@ -58,7 +58,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
         }
         else if (IDocApprove.ZZ_DOCACTION_ApproveExec.equals(action)) {
             // From Recommended -> Approved (by Exec: COO/EMCS)
-            if (!"RC".equals(status)) { // ZZ_DOCSTATUS_Recommended
+            if (!IDocApprove.ZZ_DOCSTATUS_Recommended.equals(status)) { // ZZ_DOCSTATUS_Recommended
                 throw wrongState("Approve", status, action);
             }
             doExecApprove();
@@ -95,7 +95,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
         // Set state
         docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
-        docApprove.setZZ_DocAction(null);
+        docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_Recommend);
         Timestamp now = now();
         if (docApprove.getZZ_Date_Submitted() == null)
             docApprove.setZZ_Date_Submitted(now);
@@ -130,9 +130,9 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
         // int ctxUserId = Env.getAD_User_ID(getCtx());
         // if (ctxUserId != docApprove.get_ValueAsInt("ZZ_Recommender_ID")) throw new AdempiereException("Only the configured Recommender may perform this action.");
 
-        docApprove.setZZ_DocStatus("RC"); // ZZ_DOCSTATUS_Recommended
-        docApprove.setZZ_DocAction(null);
-        docApprove.setZZ_Date_Manager_Approved(now()); // reuse this “manager approved” field for the recommender timestamp
+        docApprove.setZZ_DocStatus(docApprove.ZZ_DOCSTATUS_Recommended); // ZZ_DOCSTATUS_Recommended
+        docApprove.setZZ_DocAction(docApprove.ZZ_DOCACTION_ApproveExec);
+        docApprove.setZZ_Date_Recommended(now());
 
         // Notify the Exec approver (COO/EMCS)
         final int execApproverId = docApprove.getZZ_Exec_Approver_ID();
