@@ -32,7 +32,7 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250824L;
+	private static final long serialVersionUID = 20250825L;
 
     /** Standard Constructor */
     public X_ZZ_Open_Application (Properties ctx, int ZZ_Open_Application_ID, String trxName)
@@ -221,6 +221,36 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Approved);
 	}
 
+	/** Set Date Not Approved.
+		@param ZZ_Date_Not_Approved Date Not Approved
+	*/
+	public void setZZ_Date_Not_Approved (Timestamp ZZ_Date_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Approved, ZZ_Date_Not_Approved);
+	}
+
+	/** Get Date Not Approved.
+		@return Date Not Approved	  */
+	public Timestamp getZZ_Date_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved);
+	}
+
+	/** Set Date Not Recommended.
+		@param ZZ_Date_Not_Recommended Date Not Recommended
+	*/
+	public void setZZ_Date_Not_Recommended (Timestamp ZZ_Date_Not_Recommended)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recommended, ZZ_Date_Not_Recommended);
+	}
+
+	/** Get Date Not Recommended.
+		@return Date Not Recommended	  */
+	public Timestamp getZZ_Date_Not_Recommended()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recommended);
+	}
+
 	/** Set Date Recommended.
 		@param ZZ_Date_Recommended Date Recommended
 	*/
@@ -299,6 +329,8 @@ public class X_ZZ_Open_Application extends PO implements I_ZZ_Open_Application, 
 	public static final String ZZ_DOCSTATUS_NotApprovedByITManager = "NI";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_DOCSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
 	/** Recommended = RC */
