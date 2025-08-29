@@ -67,12 +67,12 @@ public interface I_M_Inventory
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -667,6 +667,15 @@ public interface I_M_Inventory
 	  * Value set to ZZ_DocStatus when reach to end of approve workflow
 	  */
 	public String getZZ_FinalWorkflowStateValue();
+
+    /** Column name ZZ_Internal_Request_Rpt */
+    public static final String COLUMNNAME_ZZ_Internal_Request_Rpt = "ZZ_Internal_Request_Rpt";
+
+	/** Set Internal Request Report	  */
+	public void setZZ_Internal_Request_Rpt (String ZZ_Internal_Request_Rpt);
+
+	/** Get Internal Request Report	  */
+	public String getZZ_Internal_Request_Rpt();
 
     /** Column name ZZ_Mgr_Fin_Consumables_ID */
     public static final String COLUMNNAME_ZZ_Mgr_Fin_Consumables_ID = "ZZ_Mgr_Fin_Consumables_ID";

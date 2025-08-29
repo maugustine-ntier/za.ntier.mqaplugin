@@ -35,7 +35,7 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250602L;
+	private static final long serialVersionUID = 20250829L;
 
     /** Standard Constructor */
     public X_M_Inventory (Properties ctx, int M_Inventory_ID, String trxName)
@@ -1194,6 +1194,8 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Recommend = RE */
+	public static final String ZZ_DOCACTION_Recommend = "RE";
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to SDL Finance Mgr = SD */
@@ -1230,14 +1232,24 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved By SDL Finance Mgr = ND */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_DOCSTATUS_NotApprovedByITManager = "NI";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_DOCSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ZZ_DOCSTATUS_Recommended = "RC";
 	/** Submitted to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted To SDL Finance Mgr = SD */
 	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_DOCSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_DOCSTATUS_SubmittedToITAdmin = "ST";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
@@ -1270,14 +1282,24 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved By SDL Finance Mgr = ND */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByITManager = "NI";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Recommended = "RC";
 	/** Submitted to Manager Finance Consumables = SC */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted To SDL Finance Mgr = SD */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToITAdmin = "ST";
 	/** Submitted = SU */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
 	/** Set Final Workflow State Value.
@@ -1295,6 +1317,21 @@ public class X_M_Inventory extends PO implements I_M_Inventory, I_Persistent
 	public String getZZ_FinalWorkflowStateValue()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_FinalWorkflowStateValue);
+	}
+
+	/** Set Internal Request Report.
+		@param ZZ_Internal_Request_Rpt Internal Request Report
+	*/
+	public void setZZ_Internal_Request_Rpt (String ZZ_Internal_Request_Rpt)
+	{
+		set_Value (COLUMNNAME_ZZ_Internal_Request_Rpt, ZZ_Internal_Request_Rpt);
+	}
+
+	/** Get Internal Request Report.
+		@return Internal Request Report	  */
+	public String getZZ_Internal_Request_Rpt()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Internal_Request_Rpt);
 	}
 
 	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException

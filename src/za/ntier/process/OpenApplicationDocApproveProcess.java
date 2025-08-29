@@ -117,11 +117,11 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 		// Notify recommender
 		AbstractDocApproveProcess.queueNotify(queueNotifis, recommenderId, getTable_ID(), getRecord_ID(),
-				getMailOrNull("getZZMailRequestRecommender"));
+				docApprove.getZZMailRequestLine());
 
 		// Optional: also notify submitter for confirmation
-		AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(),
-				getMailOrNull("getZZMailRequestLine")); // reuse if you prefer
+		//AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(),
+		//		docApprove.getZZ); // reuse if you prefer
 	}
 
 	/** Submitted -> Recommended by Snr Mgr SPU */
@@ -137,7 +137,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 				throw new AdempiereException("Exec Approver is not selected.");
 
 			AbstractDocApproveProcess.queueNotify(queueNotifis, execApproverId, getTable_ID(), getRecord_ID(),
-					getMailOrNull("getZZMailNotifyExecApprover"));
+					docApprove.getZZMailRequestSnr());
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NOT_RECOMMENDED);
 			docApprove.setZZ_Date_Not_Recommended(now);
@@ -156,7 +156,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 			collectBroadcastAudience();
 			for (int userId : broadcastUserIds) {
 				AbstractDocApproveProcess.queueNotify(queueNotifis, userId, getTable_ID(), getRecord_ID(),
-						getMailOrNull("getZZMailWindowApproved"));
+						docApprove.getZZMailLineApproved());
 			}
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApproved);
@@ -223,15 +223,17 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
 	private void collectBroadcastAudience() {
 		// Replace these with your org’s real role IDs
-		final int ROLE_MANAGER_LP       = 0;  // TODO: put your AD_Role_ID
-		final int ROLE_SNR_MANAGER_LP   = 0;  // TODO
+		final int ROLE_MANAGER_LP       = 1000022;  // TODO: put your AD_Role_ID
+		final int ROLE_MANAGER_SPU      = 1000029;
+		final int ROLE_SNR_MANAGER_LP   = 1000019;  // TODO
 		final int ROLE_SNR_MANAGER_SPU  = IDocApprove.ROLE_SNR_MGR_SPU; // known
-		final int ROLE_COMMS            = 0;  // TODO
+		//final int ROLE_COMMS            = 0;  // TODO
 
 		addUsersOfRole(ROLE_MANAGER_LP);
 		addUsersOfRole(ROLE_SNR_MANAGER_LP);
 		addUsersOfRole(ROLE_SNR_MANAGER_SPU);
-		addUsersOfRole(ROLE_COMMS);
+		addUsersOfRole(ROLE_MANAGER_SPU);
+		//addUsersOfRole(ROLE_COMMS);
 	}
 
 	private void addUsersOfRole(int roleId) {

@@ -747,5 +747,17 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return null;
 	}
 
+	@Override
+	public void setZZ_Internal_Request_Rpt(String ZZ_Internal_Request_Rpt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_Internal_Request_Rpt() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
