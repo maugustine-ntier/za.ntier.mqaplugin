@@ -89,7 +89,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			docApprove.setZZ_Date_Submitted(now());
 
 
-		AbstractDocApproveProcess.queueNotify(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP, getTable_ID(), getRecord_ID(),
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 
 
