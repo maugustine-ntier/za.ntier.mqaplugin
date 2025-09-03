@@ -5,23 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.MUser;
 import org.compiere.model.MUserRoles;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 
 import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 import za.co.ntier.fa.process.api.IDocApprove;
-import za.ntier.models.MZZProgramMasterData;
+import za.ntier.models.MZZOpenApplication;
 import za.ntier.models.X_ZZ_Program_Master_Data;
 
 @org.adempiere.base.annotation.Process(
 		name = "za.ntier.process.OpenApplicationDocApproveProcess"
 		)
-public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<MZZProgramMasterData> {
+public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<MZZOpenApplication> {
 
 	// Convenience recipient buckets
-	private final List<Integer> broadcastUserIds = new ArrayList<>();
+	private final List<Integer> broadcastRoleIds = new ArrayList<>();
 
 	@Override
 	protected void initDocApproveObj() {
@@ -42,7 +41,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		final String action = docApprove.getZZ_DocAction();
 		final String status = docApprove.getZZ_DocStatus();
 
-		if (IDocApprove.ZZ_DOCACTION_SubmitOpenWindow.equals(action)) {
+		if (IDocApprove.ZZ_DOCACTION_SubmitToRecommender.equals(action)) {
 			// From Draft -> Submitted
 			if (!IDocApprove.ZZ_DOCSTATUS_Draft.equals(status) && !Util.isEmpty(status, true)) {
 				throw wrongState("Submit", status, action);
@@ -92,6 +91,10 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 	/** Draft -> Submitted */
 	private void doSubmitToRecommender() {
 		// Ensure future dates and ordering already checked in validateData()
+		// Validate exec approver selection at submit time (spec: “Choose Exec Approver – (COO, EMCS)”)
+		final int execApproverId = docApprove.getZZ_Exec_Approver_ID();
+		if (execApproverId <= 0)
+			throw new AdempiereException("Please choose an Executive Approver (COO or EMCS) before submitting.");
 
 		// Set state
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
@@ -101,6 +104,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 			docApprove.setZZ_Date_Submitted(now);
 
 		// Identify/validate recommender (Snr Mgr SPU)
+		/*
 		int recommenderId = docApprove.getZZ_Recommender_ID();
 		if (recommenderId <= 0) {
 			// fallback: pick any user with ROLE_SNR_MGR_SPU if that’s your pattern
@@ -109,14 +113,12 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 				throw new AdempiereException("No Recommender (Snr Mgr SPU) found/configured.");
 			docApprove.setZZ_Recommender_ID(recommenderId);
 		}
+		 */
 
-		// Validate exec approver selection at submit time (spec: “Choose Exec Approver – (COO, EMCS)”)
-		final int execApproverId = docApprove.getZZ_Exec_Approver_ID();
-		if (execApproverId <= 0)
-			throw new AdempiereException("Please choose an Executive Approver (COO or EMCS) before submitting.");
+
 
 		// Notify recommender
-		AbstractDocApproveProcess.queueNotify(queueNotifis, recommenderId, getTable_ID(), getRecord_ID(),
+		AbstractDocApproveProcess.queueNotify(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 
 		// Optional: also notify submitter for confirmation
@@ -126,9 +128,10 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 	/** Submitted -> Recommended by Snr Mgr SPU */
 	private void doRecommenderRecommend() {     
+		docApprove.setZZ_Recommender_ID(getAD_User_ID());
 		if ("Y".equals(pRecommend_Rej_Snr_SPU)) {
-			docApprove.setZZ_DocStatus(docApprove.ZZ_DOCSTATUS_Recommended); // ZZ_DOCSTATUS_Recommended
-			docApprove.setZZ_DocAction(docApprove.ZZ_DOCACTION_ApproveExec);
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Recommended); // ZZ_DOCSTATUS_Recommended
+			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveExec);
 			docApprove.setZZ_Date_Recommended(now);
 
 			// Notify the Exec approver (COO/EMCS)
@@ -147,6 +150,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 	/** Recommended -> Approved by Exec (COO/EMCS) */
 	private void doExecApprove() {
+		docApprove.setZZ_Exec_Approver_ID(getAD_User_ID());
 		if ("Y".equals(pApprove_Rej_COO_EMCS)) {
 			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
 			docApprove.setZZ_DocAction(null);
@@ -154,8 +158,8 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 			// Broadcast: all Managers LP, Snr Managers (LP, SPU), Comms
 			collectBroadcastAudience();
-			for (int userId : broadcastUserIds) {
-				AbstractDocApproveProcess.queueNotify(queueNotifis, userId, getTable_ID(), getRecord_ID(),
+			for (int roleID : broadcastRoleIds) {
+				AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleID, getTable_ID(), getRecord_ID(),
 						docApprove.getZZMailLineApproved());
 			}
 		} else {
@@ -180,8 +184,8 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		Timestamp now = now();
 
 		// “Both dates are in the future”
-		if (!openTs.after(now) || !closeTs.after(now))
-			throw new AdempiereException("Open and Close date/time must be in the future.");
+		//	if (!openTs.after(now) || !closeTs.after(now))
+		//	throw new AdempiereException("Open and Close date/time must be in the future.");
 
 
 
@@ -202,15 +206,6 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 	// --- Helpers -------------------------------------------------------------
 
-	/** Best-effort: return first active user in a role */
-	private int findFirstUserInRole(int roleId) {
-		// Minimal/naive lookup (replace with a proper query util you already use)
-		// NOTE: You might already have a helper for this in your codebase.
-		MUserRoles[] users = MUserRoles.getOfRole(getCtx(), roleId);
-		if (users != null && users.length > 0) return users[0].getAD_User_ID();
-		return 0;
-	}
-
 	/** Reflective getter for optional mail templates (keeps compile-safe if not configured everywhere) */
 	private org.compiere.model.MMailText getMailOrNull(String method) {
 		try {
@@ -222,26 +217,12 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
 	private void collectBroadcastAudience() {
-		// Replace these with your org’s real role IDs
-		final int ROLE_MANAGER_LP       = 1000022;  // TODO: put your AD_Role_ID
-		final int ROLE_MANAGER_SPU      = 1000029;
-		final int ROLE_SNR_MANAGER_LP   = 1000019;  // TODO
-		final int ROLE_SNR_MANAGER_SPU  = IDocApprove.ROLE_SNR_MGR_SPU; // known
 		//final int ROLE_COMMS            = 0;  // TODO
 
-		addUsersOfRole(ROLE_MANAGER_LP);
-		addUsersOfRole(ROLE_SNR_MANAGER_LP);
-		addUsersOfRole(ROLE_SNR_MANAGER_SPU);
-		addUsersOfRole(ROLE_MANAGER_SPU);
-		//addUsersOfRole(ROLE_COMMS);
-	}
-
-	private void addUsersOfRole(int roleId) {
-		if (roleId <= 0) return;
-		MUserRoles[] users = MUserRoles.getOfRole(getCtx(), roleId);
-		if (users == null) return;
-		for (MUserRoles u : users) {
-			if (u.isActive()) broadcastUserIds.add(u.getAD_User_ID());
-		}
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP);
+		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_LP);
+		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SPU);
+		//addUsersOfRole(IDocApprove.ROLE_COMMS);
 	}
 }
