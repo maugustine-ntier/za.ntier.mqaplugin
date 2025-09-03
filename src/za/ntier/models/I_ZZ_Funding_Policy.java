@@ -21,18 +21,18 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_Program_Master_Data
+/** Generated Interface for ZZ_Funding_Policy
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_Program_Master_Data 
+public interface I_ZZ_Funding_Policy 
 {
 
-    /** TableName=ZZ_Program_Master_Data */
-    public static final String Table_Name = "ZZ_Program_Master_Data";
+    /** TableName=ZZ_Funding_Policy */
+    public static final String Table_Name = "ZZ_Funding_Policy";
 
-    /** AD_Table_ID=1000034 */
+    /** AD_Table_ID=1000055 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -64,35 +64,18 @@ public interface I_ZZ_Program_Master_Data
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name C_Project_ID */
-    public static final String COLUMNNAME_C_Project_ID = "C_Project_ID";
+    /** Column name Comments */
+    public static final String COLUMNNAME_Comments = "Comments";
 
-	/** Set Project.
-	  * Financial Project
+	/** Set Comments.
+	  * Comments or additional information
 	  */
-	public void setC_Project_ID (int C_Project_ID);
+	public void setComments (String Comments);
 
-	/** Get Project.
-	  * Financial Project
+	/** Get Comments.
+	  * Comments or additional information
 	  */
-	public int getC_Project_ID();
-
-	public org.compiere.model.I_C_Project getC_Project() throws RuntimeException;
-
-    /** Column name C_Year_ID */
-    public static final String COLUMNNAME_C_Year_ID = "C_Year_ID";
-
-	/** Set Year.
-	  * Calendar Year
-	  */
-	public void setC_Year_ID (int C_Year_ID);
-
-	/** Get Year.
-	  * Calendar Year
-	  */
-	public int getC_Year_ID();
-
-	public org.compiere.model.I_C_Year getC_Year() throws RuntimeException;
+	public String getComments();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -110,19 +93,6 @@ public interface I_ZZ_Program_Master_Data
 	  */
 	public int getCreatedBy();
 
-    /** Column name Description */
-    public static final String COLUMNNAME_Description = "Description";
-
-	/** Set Description.
-	  * Optional short description of the record
-	  */
-	public void setDescription (String Description);
-
-	/** Get Description.
-	  * Optional short description of the record
-	  */
-	public String getDescription();
-
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
 
@@ -135,6 +105,19 @@ public interface I_ZZ_Program_Master_Data
 	  * Document sequence number of the document
 	  */
 	public String getDocumentNo();
+
+    /** Column name EndDate */
+    public static final String COLUMNNAME_EndDate = "EndDate";
+
+	/** Set End Date.
+	  * Last effective date (inclusive)
+	  */
+	public void setEndDate (Timestamp EndDate);
+
+	/** Get End Date.
+	  * Last effective date (inclusive)
+	  */
+	public Timestamp getEndDate();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -149,42 +132,18 @@ public interface I_ZZ_Program_Master_Data
 	  */
 	public boolean isActive();
 
-    /** Column name Line_Manager_ID */
-    public static final String COLUMNNAME_Line_Manager_ID = "Line_Manager_ID";
+    /** Column name StartDate */
+    public static final String COLUMNNAME_StartDate = "StartDate";
 
-	/** Set Snr Mgr	  */
-	public void setLine_Manager_ID (int Line_Manager_ID);
-
-	/** Get Snr Mgr	  */
-	public int getLine_Manager_ID();
-
-	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException;
-
-    /** Column name Name */
-    public static final String COLUMNNAME_Name = "Name";
-
-	/** Set Name.
-	  * Alphanumeric identifier of the entity
+	/** Set Start Date.
+	  * First effective day (inclusive)
 	  */
-	public void setName (String Name);
+	public void setStartDate (Timestamp StartDate);
 
-	/** Get Name.
-	  * Alphanumeric identifier of the entity
+	/** Get Start Date.
+	  * First effective day (inclusive)
 	  */
-	public String getName();
-
-    /** Column name Title */
-    public static final String COLUMNNAME_Title = "Title";
-
-	/** Set Title.
-	  * Name this entity is referred to as
-	  */
-	public void setTitle (String Title);
-
-	/** Get Title.
-	  * Name this entity is referred to as
-	  */
-	public String getTitle();
+	public Timestamp getStartDate();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
@@ -201,33 +160,6 @@ public interface I_ZZ_Program_Master_Data
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
-
-    /** Column name ZZ_Criteria */
-    public static final String COLUMNNAME_ZZ_Criteria = "ZZ_Criteria";
-
-	/** Set Criteria	  */
-	public void setZZ_Criteria (String ZZ_Criteria);
-
-	/** Get Criteria	  */
-	public String getZZ_Criteria();
-
-    /** Column name ZZ_Date_Approved */
-    public static final String COLUMNNAME_ZZ_Date_Approved = "ZZ_Date_Approved";
-
-	/** Set Date Approved	  */
-	public void setZZ_Date_Approved (Timestamp ZZ_Date_Approved);
-
-	/** Get Date Approved	  */
-	public Timestamp getZZ_Date_Approved();
-
-    /** Column name ZZ_Date_Submitted */
-    public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
-
-	/** Set Date Submitted	  */
-	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted);
-
-	/** Get Date Submitted	  */
-	public Timestamp getZZ_Date_Submitted();
 
     /** Column name ZZ_DocAction */
     public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
@@ -247,32 +179,30 @@ public interface I_ZZ_Program_Master_Data
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
 
-    /** Column name ZZ_Program_Master_Data_ID */
-    public static final String COLUMNNAME_ZZ_Program_Master_Data_ID = "ZZ_Program_Master_Data_ID";
+    /** Column name ZZ_Funding_Policy_ID */
+    public static final String COLUMNNAME_ZZ_Funding_Policy_ID = "ZZ_Funding_Policy_ID";
 
-	/** Set Program Master Data	  */
-	public void setZZ_Program_Master_Data_ID (int ZZ_Program_Master_Data_ID);
+	/** Set Funding Policy	  */
+	public void setZZ_Funding_Policy_ID (int ZZ_Funding_Policy_ID);
 
-	/** Get Program Master Data	  */
-	public int getZZ_Program_Master_Data_ID();
+	/** Get Funding Policy	  */
+	public int getZZ_Funding_Policy_ID();
 
-    /** Column name ZZ_Program_Master_Data_UU */
-    public static final String COLUMNNAME_ZZ_Program_Master_Data_UU = "ZZ_Program_Master_Data_UU";
+    /** Column name ZZ_Funding_Policy_UU */
+    public static final String COLUMNNAME_ZZ_Funding_Policy_UU = "ZZ_Funding_Policy_UU";
 
-	/** Set ZZ_Program_Master_Data_UU	  */
-	public void setZZ_Program_Master_Data_UU (String ZZ_Program_Master_Data_UU);
+	/** Set ZZ_Funding_Policy_UU	  */
+	public void setZZ_Funding_Policy_UU (String ZZ_Funding_Policy_UU);
 
-	/** Get ZZ_Program_Master_Data_UU	  */
-	public String getZZ_Program_Master_Data_UU();
+	/** Get ZZ_Funding_Policy_UU	  */
+	public String getZZ_Funding_Policy_UU();
 
-    /** Column name ZZ_Snr_Mgr_LP_ID */
-    public static final String COLUMNNAME_ZZ_Snr_Mgr_LP_ID = "ZZ_Snr_Mgr_LP_ID";
+    /** Column name ZZ_Is_Policy_Document_Uploaded */
+    public static final String COLUMNNAME_ZZ_Is_Policy_Document_Uploaded = "ZZ_Is_Policy_Document_Uploaded";
 
-	/** Set Snr Mgr LP	  */
-	public void setZZ_Snr_Mgr_LP_ID (int ZZ_Snr_Mgr_LP_ID);
+	/** Set Policy Document Uploaded	  */
+	public void setZZ_Is_Policy_Document_Uploaded (boolean ZZ_Is_Policy_Document_Uploaded);
 
-	/** Get Snr Mgr LP	  */
-	public int getZZ_Snr_Mgr_LP_ID();
-
-	public org.compiere.model.I_AD_User getZZ_Snr_Mgr_LP() throws RuntimeException;
+	/** Get Policy Document Uploaded	  */
+	public boolean isZZ_Is_Policy_Document_Uploaded();
 }
