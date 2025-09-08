@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.MUserRoles;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 
@@ -118,7 +117,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 
 		// Notify recommender
-		AbstractDocApproveProcess.queueNotify(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 
 		// Optional: also notify submitter for confirmation
