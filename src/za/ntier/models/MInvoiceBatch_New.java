@@ -1,7 +1,6 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
-import java.util.List;
 import java.util.Properties;
 
 import org.compiere.model.MInvoiceBatch;

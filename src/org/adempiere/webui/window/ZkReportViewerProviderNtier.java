@@ -25,7 +25,6 @@ import org.compiere.print.ReportEngine;
 import org.compiere.print.ReportViewerProvider;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
-import org.osgi.service.component.annotations.Component;
 import org.zkoss.zk.ui.Executions;
 
 /**

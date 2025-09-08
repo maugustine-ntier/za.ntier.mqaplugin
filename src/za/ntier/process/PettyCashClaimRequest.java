@@ -20,7 +20,6 @@ import org.compiere.util.Env;
 
 import za.ntier.models.MZZPettyCashAdvanceHdr;
 import za.ntier.models.MZZPettyCashClaimHdr;
-import za.ntier.models.MZZPettyCashClaimLine;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
 import za.ntier.models.X_ZZ_Petty_Cash_Claim_Line;
 import za.ntier.utils.Notifications;

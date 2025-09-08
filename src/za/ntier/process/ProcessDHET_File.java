@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 
 import org.adempiere.base.annotation.Parameter;
-import org.compiere.model.MBPGroup;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.process.SvrProcess;
