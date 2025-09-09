@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import org.adempiere.webui.window.IReportViewerExportSource.ExportFormat;
 import org.compiere.tools.FileUtil;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
@@ -59,8 +60,6 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleWriterExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
-
-import static org.adempiere.webui.window.IReportViewerExportSource.ExportFormat;
 
 /**
  * Media renderer for JasperPrint

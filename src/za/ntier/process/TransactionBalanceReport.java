@@ -3,8 +3,8 @@ package za.ntier.process;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import org.adempiere.base.annotation.Parameter;
 import org.compiere.process.SvrProcess;

@@ -17,15 +17,10 @@
 package za.ntier.report.fin;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.logging.Level;
 
 import org.compiere.model.MAcctSchemaElement;
-import org.compiere.model.MElementValue;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MProcessPara;
 import org.compiere.model.MYear;
@@ -34,7 +29,6 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.report.MReportTree;
 import org.compiere.util.DB;
-import org.compiere.util.Language;
 import org.compiere.util.Msg;
 
 /**

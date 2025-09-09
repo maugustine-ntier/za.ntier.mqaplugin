@@ -1,7 +1,5 @@
 package za.ntier.report.jasper;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,7 +32,7 @@ public class HeaderLogoImageLoader {
 			image = new MImage(Env.getCtx(), orgInfo.getLogo_ID(), null);
 		}
 		else {
-			MClientInfo clientInfo = MClientInfo.get(Env.getCtx(), new Integer(Env.getAD_Client_ID(Env.getCtx())), null);
+			MClientInfo clientInfo = MClientInfo.get(Env.getCtx(),  Integer.valueOf(Env.getAD_Client_ID(Env.getCtx())), null);
 
 			if ( clientInfo != null && clientInfo.getLogoReport_ID() != 0 ) {
 				image = new MImage(Env.getCtx(), clientInfo.getLogoReport_ID(), null);

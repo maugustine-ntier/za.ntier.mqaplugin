@@ -21,16 +21,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -38,7 +33,6 @@ import java.util.logging.Level;
 import javax.activation.FileDataSource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.adempiere.base.Core;
 import org.adempiere.base.upload.IUploadService;
 import org.adempiere.exceptions.DBException;
 import org.adempiere.pdf.Document;
@@ -91,16 +85,11 @@ import org.compiere.model.MTable;
 import org.compiere.model.MToolBarButtonRestrict;
 import org.compiere.model.MUser;
 import org.compiere.model.PO;
-import org.compiere.model.PrintInfo;
 import org.compiere.model.SystemIDs;
 import org.compiere.model.X_AD_ToolBarButton;
-import org.compiere.print.ArchiveEngine;
 import org.compiere.print.MPrintFormat;
 import org.compiere.print.ReportEngine;
-import org.compiere.print.ServerReportCtl;
-import org.compiere.process.ProcessCall;
 import org.compiere.process.ProcessInfo;
-import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.ProcessInfoUtil;
 import org.compiere.tools.FileUtil;
 import org.compiere.util.CLogger;
@@ -110,7 +99,6 @@ import org.compiere.util.KeyNamePair;
 import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
-import org.compiere.util.ValueNamePair;
 import org.idempiere.print.renderer.CSVReportRendererConfiguration;
 import org.idempiere.print.renderer.HTMLReportRendererConfiguration;
 import org.idempiere.print.renderer.PDFReportRendererConfiguration;
@@ -149,8 +137,6 @@ import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vlayout;
 import org.zkoss.zul.impl.Utils;
 import org.zkoss.zul.impl.XulElement;
-
-import net.sf.jasperreports.engine.JasperPrint;
 
 /**
  *	Report Viewer.

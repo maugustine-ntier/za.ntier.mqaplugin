@@ -22,18 +22,12 @@
 package org.idempiere.ui.zk.report;
 
 import java.io.File;
-import java.util.logging.Level;
 
-import org.adempiere.base.Core;
 import org.adempiere.webui.window.IReportViewerRendererRGN;
 import org.adempiere.webui.window.ZkReportViewerRGN;
-import org.compiere.print.ReportEngine;
-import org.compiere.tools.FileUtil;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.idempiere.print.renderer.IReportRenderer;
-import org.idempiere.print.renderer.IReportRendererConfiguration;
 import org.idempiere.print.renderer.XLSXReportRendererConfiguration;
 import org.zkoss.util.media.AMedia;
 

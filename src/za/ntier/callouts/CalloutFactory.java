@@ -5,16 +5,10 @@ import java.util.List;
 
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
-import org.compiere.model.MProduct;
 import org.compiere.model.X_M_InventoryLine;
 import org.osgi.service.component.annotations.Component;
 
-import za.ntier.models.X_ZZ_Driver;
-import za.ntier.models.X_ZZ_Petty_Cash_Claim_Hdr;
-import za.ntier.models.X_ZZ_StockPile;
 import za.ntier.models.X_ZZ_System_Access_Application;
-import za.ntier.models.X_ZZ_Transporters;
-import za.ntier.models.X_ZZ_Truck_List;
 
 @Component(
 
