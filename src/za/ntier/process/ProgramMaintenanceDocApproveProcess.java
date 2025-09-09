@@ -89,7 +89,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			docApprove.setZZ_Date_Submitted(now());
 
 
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP, getTable_ID(), getRecord_ID(),
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP_OPS, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 
 
@@ -112,7 +112,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 	
 	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
 	private void collectBroadcastAudience() {
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP);
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP_OPS);
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
 	}
 
