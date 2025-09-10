@@ -114,6 +114,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 	private void collectBroadcastAudience() {
 		broadcastRoleIds.add(getRoleIDForOrg(docApprove.getAD_Org_ID()));
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SPU);
 	}
 
 	private Timestamp now() {
