@@ -23,7 +23,7 @@ public class FundingPolicyDocApproveProcess extends AbstractDocApproveProcess<X_
 				mailTemplate);
 		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP_OPS, getTable_ID(), getRecord_ID(),
 				mailTemplate);
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis, docApprove,get_TrxName());
 		return "";
 	}
 

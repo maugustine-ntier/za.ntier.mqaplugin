@@ -83,7 +83,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		}
 
 		// Flush notifications
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis, docApprove,get_TrxName());
 		return null;
 	}
 

@@ -60,7 +60,7 @@ public class ITSystemAccessApplicationDocApproveProcess extends AbstractDocAppro
 			doLogic();
 		}
 		
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis,docApprove,get_TrxName());
 		return null;
 	}
 

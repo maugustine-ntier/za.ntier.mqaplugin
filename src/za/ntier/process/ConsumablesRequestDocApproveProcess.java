@@ -71,7 +71,7 @@ public class ConsumablesRequestDocApproveProcess extends AbstractDocApproveProce
 			doLogic();
 		}
 		
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis, docApprove,get_TrxName());
 		return null;
 	}
 

@@ -56,7 +56,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			doLogic();
 		}
 
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis,docApprove, get_TrxName());
 		return null;
 	}
 
@@ -88,8 +88,8 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now());
 
-
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP_OPS, getTable_ID(), getRecord_ID(),
+		// IDocApprove.ROLE_SNR_MANAGER_LP
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, getRoleIDForOrg(docApprove.getAD_Org_ID()), getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 
 
@@ -112,7 +112,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 	
 	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
 	private void collectBroadcastAudience() {
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP_OPS);
+		broadcastRoleIds.add(getRoleIDForOrg(docApprove.getAD_Org_ID()));
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
 	}
 
@@ -127,5 +127,21 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		//	throw new AdempiereException("@NoLines@");
 		//}
 	}
+	
+	
+
+	public int getRoleIDForOrg(int ad_Org_ID) {
+	    if (IDocApprove.ROLES_SNR_MANAGER_LP.length != IDocApprove.ORGS_SNR_MANAGER_LP.length) {
+	        throw new IllegalStateException("Role/Org arrays are not the same length.");
+	    }
+
+	    for (int i = 0; i < IDocApprove.ORGS_SNR_MANAGER_LP.length; i++) {
+	        if (IDocApprove.ORGS_SNR_MANAGER_LP[i] == ad_Org_ID) {
+	            return IDocApprove.ROLES_SNR_MANAGER_LP[i];
+	        }
+	    }
+	    throw new IllegalArgumentException("No role mapped for org " + ad_Org_ID);
+	}
+
 
 }
