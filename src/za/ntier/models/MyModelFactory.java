@@ -8,6 +8,8 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.osgi.service.component.annotations.Component;
 
+import za.co.ntier.api.model.I_ZZ_Program_Master_Data;
+
 @Component(
 
 		 property= {"service.ranking:Integer=2"},

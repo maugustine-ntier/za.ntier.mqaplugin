@@ -8,10 +8,10 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 
+import za.co.ntier.api.model.X_ZZ_Program_Master_Data;
 import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 import za.co.ntier.fa.process.api.IDocApprove;
 import za.ntier.models.MZZOpenApplication;
-import za.ntier.models.X_ZZ_Program_Master_Data;
 
 @org.adempiere.base.annotation.Process(
 		name = "za.ntier.process.OpenApplicationDocApproveProcess"

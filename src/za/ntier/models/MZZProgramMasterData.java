@@ -8,6 +8,7 @@ import org.compiere.model.I_AD_User;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
 
+import za.co.ntier.api.model.X_ZZ_Program_Master_Data;
 import za.co.ntier.fa.process.api.IDocApprove;
 
 public class MZZProgramMasterData extends X_ZZ_Program_Master_Data implements IDocApprove{
