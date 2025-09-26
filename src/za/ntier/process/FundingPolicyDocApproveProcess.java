@@ -27,11 +27,7 @@ public class FundingPolicyDocApproveProcess extends AbstractDocApproveProcess<X_
 		return "";
 	}
 
-	@Override
-	protected void prepare() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 
 
