@@ -124,6 +124,33 @@ public interface I_ZZ_Monthly_Levy_Files_Hdr
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Is_Clear_Existing */
+    public static final String COLUMNNAME_ZZ_Is_Clear_Existing = "ZZ_Is_Clear_Existing";
+
+	/** Set Clear Existing	  */
+	public void setZZ_Is_Clear_Existing (boolean ZZ_Is_Clear_Existing);
+
+	/** Get Clear Existing	  */
+	public boolean isZZ_Is_Clear_Existing();
+
+    /** Column name ZZ_Last_Import_Note */
+    public static final String COLUMNNAME_ZZ_Last_Import_Note = "ZZ_Last_Import_Note";
+
+	/** Set Last Import Note	  */
+	public void setZZ_Last_Import_Note (String ZZ_Last_Import_Note);
+
+	/** Get Last Import Note	  */
+	public String getZZ_Last_Import_Note();
+
+    /** Column name ZZ_Lines_Imported */
+    public static final String COLUMNNAME_ZZ_Lines_Imported = "ZZ_Lines_Imported";
+
+	/** Set Lines Imported	  */
+	public void setZZ_Lines_Imported (int ZZ_Lines_Imported);
+
+	/** Get Lines Imported	  */
+	public int getZZ_Lines_Imported();
+
     /** Column name ZZ_Month */
     public static final String COLUMNNAME_ZZ_Month = "ZZ_Month";
 

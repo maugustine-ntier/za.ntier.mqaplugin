@@ -39,6 +39,8 @@ public class X_ZZ_Monthly_Levy_Files_Hdr extends PO implements I_ZZ_Monthly_Levy
       super (ctx, ZZ_Monthly_Levy_Files_Hdr_ID, trxName);
       /** if (ZZ_Monthly_Levy_Files_Hdr_ID == 0)
         {
+			setZZ_Is_Clear_Existing (false);
+// N
 			setZZ_Monthly_Levy_Files_Hdr_ID (0);
         } */
     }
@@ -49,6 +51,8 @@ public class X_ZZ_Monthly_Levy_Files_Hdr extends PO implements I_ZZ_Monthly_Levy
       super (ctx, ZZ_Monthly_Levy_Files_Hdr_ID, trxName, virtualColumns);
       /** if (ZZ_Monthly_Levy_Files_Hdr_ID == 0)
         {
+			setZZ_Is_Clear_Existing (false);
+// N
 			setZZ_Monthly_Levy_Files_Hdr_ID (0);
         } */
     }
@@ -59,6 +63,8 @@ public class X_ZZ_Monthly_Levy_Files_Hdr extends PO implements I_ZZ_Monthly_Levy
       super (ctx, ZZ_Monthly_Levy_Files_Hdr_UU, trxName);
       /** if (ZZ_Monthly_Levy_Files_Hdr_UU == null)
         {
+			setZZ_Is_Clear_Existing (false);
+// N
 			setZZ_Monthly_Levy_Files_Hdr_ID (0);
         } */
     }
@@ -69,6 +75,8 @@ public class X_ZZ_Monthly_Levy_Files_Hdr extends PO implements I_ZZ_Monthly_Levy
       super (ctx, ZZ_Monthly_Levy_Files_Hdr_UU, trxName, virtualColumns);
       /** if (ZZ_Monthly_Levy_Files_Hdr_UU == null)
         {
+			setZZ_Is_Clear_Existing (false);
+// N
 			setZZ_Monthly_Levy_Files_Hdr_ID (0);
         } */
     }
@@ -124,6 +132,61 @@ public class X_ZZ_Monthly_Levy_Files_Hdr extends PO implements I_ZZ_Monthly_Levy
 	public int getC_Year_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_C_Year_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Clear Existing.
+		@param ZZ_Is_Clear_Existing Clear Existing
+	*/
+	public void setZZ_Is_Clear_Existing (boolean ZZ_Is_Clear_Existing)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_Clear_Existing, Boolean.valueOf(ZZ_Is_Clear_Existing));
+	}
+
+	/** Get Clear Existing.
+		@return Clear Existing	  */
+	public boolean isZZ_Is_Clear_Existing()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_Clear_Existing);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Last Import Note.
+		@param ZZ_Last_Import_Note Last Import Note
+	*/
+	public void setZZ_Last_Import_Note (String ZZ_Last_Import_Note)
+	{
+		set_Value (COLUMNNAME_ZZ_Last_Import_Note, ZZ_Last_Import_Note);
+	}
+
+	/** Get Last Import Note.
+		@return Last Import Note	  */
+	public String getZZ_Last_Import_Note()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Last_Import_Note);
+	}
+
+	/** Set Lines Imported.
+		@param ZZ_Lines_Imported Lines Imported
+	*/
+	public void setZZ_Lines_Imported (int ZZ_Lines_Imported)
+	{
+		set_Value (COLUMNNAME_ZZ_Lines_Imported, Integer.valueOf(ZZ_Lines_Imported));
+	}
+
+	/** Get Lines Imported.
+		@return Lines Imported	  */
+	public int getZZ_Lines_Imported()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Lines_Imported);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

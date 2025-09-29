@@ -27,6 +27,7 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 
 	private int p_Record_ID; // Header record
 	private X_ZZ_Monthly_Levy_Files_Hdr hdr;
+	private String fiscalYear;
 
 	@Override
 	protected void prepare() {
@@ -48,7 +49,7 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 		if (C_Year_ID <= 0) throw new AdempiereException("Year (C_Year_ID) is required on header.");
 		if (month2 == null || month2.length() != 2) throw new AdempiereException("Month (ZZ_Month) must be 2 chars (01..12).");
 
-		String fiscalYear = DB.getSQLValueStringEx(get_TrxName(),
+		fiscalYear = DB.getSQLValueStringEx(get_TrxName(),
 				"SELECT FiscalYear FROM C_Year WHERE C_Year_ID=?", C_Year_ID);
 		if (fiscalYear == null || !fiscalYear.matches("\\d{4}"))
 			throw new AdempiereException("Could not resolve 4-digit FiscalYear from C_Year_ID=" + C_Year_ID);
@@ -62,7 +63,7 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 			throw new AdempiereException("No attachments found on header. Please attach .csv files and try again.");
 
 		// Optional: clear existing rows for this header (or for year+month scope)
-		boolean clearExisting = hasColumn(hdr, "IsClearExisting") && "Y".equalsIgnoreCase(hdr.get_ValueAsString("IsClearExisting"));
+		boolean clearExisting = hasColumn(hdr, "ZZ_Is_Clear_Existing") && "Y".equalsIgnoreCase(hdr.get_ValueAsString("ZZ_Is_Clear_Existing"));
 		int deleted = 0;
 		if (clearExisting) {
 			// safest: clear by header link if re-import is meant to be scoped to this header
@@ -99,20 +100,14 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 
 		// Update header tracking fields (if present)
 		safeSet(hdr, "Processed", "Y");
-		safeSet(hdr, "LinesImported", totalInserted);
-		safeSet(hdr, "LastImportNote",
+		safeSet(hdr, "ZZ_Lines_Imported", totalInserted);
+		safeSet(hdr, "ZZ_Last_Import_Note",
 				"Files: " + filesProcessed +
 				(clearExisting ? (" | Deleted existing: " + deleted) : "") +
 				(skippedFiles.length() > 0 ? (" | Skipped(non-matching): " + skippedFiles) : ""));
 		hdr.saveEx();
 
-		String yearName = DB.getSQLValueStringEx(get_TrxName(),
-				"SELECT Name FROM C_Year WHERE C_Year_ID=?", C_Year_ID);
-		if (yearName == null || yearName.isBlank())
-			yearName = "Year#" + C_Year_ID; // fallback
-
-
-		String headerLabel = yearName + " " + monthName(month2);
+		String headerLabel = fiscalYear + " " + monthName(month2);
 
 		return String.format(
 				"%s: Processed %d file(s), Inserted %d row(s).%s%s",
