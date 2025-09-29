@@ -20,6 +20,9 @@ import za.ntier.models.X_ZZ_Monthly_Levy_Files;
 // If you generated the header X-model, import it here:
 import za.ntier.models.X_ZZ_Monthly_Levy_Files_Hdr;
 
+@org.adempiere.base.annotation.Process(
+		name = "za.ntier.process.ImportMonthlyLevyFromHdrAttachments"
+		)
 public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 
 	private int p_Record_ID; // Header record
@@ -80,14 +83,15 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 		StringBuilder skippedFiles = new StringBuilder();
 
 		for (MAttachmentEntry e : att.getEntries()) {
-			String fname = e.getName() != null ? e.getName() : "";
+			String rawName  = e.getName() != null ? e.getName() : "";
+			String fname = normalizeFileName(rawName);
 			if (!fname.toLowerCase().endsWith(".csv")) continue;
 			if (!filePattern.matcher(fname).matches()) {
 				if (skippedFiles.length() > 0) skippedFiles.append(", ");
 				skippedFiles.append(fname);
 				continue;
 			}
-			int inserted = importCsvEntry(e, C_Year_ID, month2);
+			int inserted = importCsvEntry(e, C_Year_ID, month2,fname);
 			addLog("Imported " + inserted + " rows from " + fname);
 			totalInserted += inserted;
 			filesProcessed++;
@@ -101,26 +105,26 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				(clearExisting ? (" | Deleted existing: " + deleted) : "") +
 				(skippedFiles.length() > 0 ? (" | Skipped(non-matching): " + skippedFiles) : ""));
 		hdr.saveEx();
-		
+
 		String yearName = DB.getSQLValueStringEx(get_TrxName(),
-		        "SELECT Name FROM C_Year WHERE C_Year_ID=?", C_Year_ID);
+				"SELECT Name FROM C_Year WHERE C_Year_ID=?", C_Year_ID);
 		if (yearName == null || yearName.isBlank())
-		    yearName = "Year#" + C_Year_ID; // fallback
+			yearName = "Year#" + C_Year_ID; // fallback
 
 
 		String headerLabel = yearName + " " + monthName(month2);
 
 		return String.format(
-		    "%s: Processed %d file(s), Inserted %d row(s).%s%s",
-		    headerLabel,
-		    filesProcessed,
-		    totalInserted,
-		    clearExisting ? (" Deleted existing: " + deleted + ".") : "",
-		    skippedFiles.length() > 0 ? (" Skipped(non-matching): " + skippedFiles + ".") : ""
-		);
+				"%s: Processed %d file(s), Inserted %d row(s).%s%s",
+				headerLabel,
+				filesProcessed,
+				totalInserted,
+				clearExisting ? (" Deleted existing: " + deleted + ".") : "",
+						skippedFiles.length() > 0 ? (" Skipped(non-matching): " + skippedFiles + ".") : ""
+				);
 	}
 
-	private int importCsvEntry(MAttachmentEntry entry, int C_Year_ID, String month2) {
+	private int importCsvEntry(MAttachmentEntry entry, int C_Year_ID, String month2, String fileName) {
 		int inserted = 0;
 		try (BufferedReader br = new BufferedReader(
 				new InputStreamReader(new ByteArrayInputStream(entry.getData()), StandardCharsets.UTF_8))) {
@@ -128,39 +132,15 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 			String line;
 			while ((line = br.readLine()) != null) {
 				if (line.trim().isEmpty()) continue;
-
 				List<String> cols = parseCsvLine(line);
-				if (cols.size() != 13) {
-					addLog("WARN: Skipping row with " + cols.size() + " cols (expected 13) in " + entry.getName());
-					continue;
-				}
-
-				// Index mapping (0-based):
-				// 0  Current Scheme Year and Month   -> ignore
-				// 1  SETA Code                       -> ZZ_Seta_Code
-				// 2  SDL Number                      -> ZZ_SDL_No
-				// 3  Current Scheme Year and Month   -> ignore
-				// 4  MG                              -> ZZ_MG
-				// 5  DG                              -> ZZ_DG
-				// 6  Admin                           -> ZZ_Admin
-				// 7  Penalties                       -> ZZ_Penalties
-				// 8  Interest                        -> zz_Interest
-				// 9  Total                           -> zz_Total
-				// 10 Number 1                        -> ignore
-				// 11 Number 1                        -> ignore
-				// 12 Scheme Year Adjustment          -> ZZ_Scheme_Year_Adjust
-
-				String setaCode = cols.get(1).trim();
-				String sdlNo    = cols.get(2).trim();
-				// Skip empty key lines
-				if (setaCode.isEmpty() && sdlNo.isEmpty()) continue;
+				if (cols.size() != 13) { addLog("WARN: Skipping row with " + cols.size() + " cols in " + fileName); continue; }
 
 				X_ZZ_Monthly_Levy_Files rec = new X_ZZ_Monthly_Levy_Files(getCtx(), 0, get_TrxName());
-				rec.setAD_Org_ID(0);
+				rec.setAD_Org_ID(1000017);
 				rec.setC_Year_ID(C_Year_ID);
 				rec.setZZ_Month(month2);
-				rec.setZZ_Seta_Code(setaCode);
-				rec.setZZ_SDL_No(sdlNo);
+				rec.setZZ_Seta_Code(cols.get(1).trim());
+				rec.setZZ_SDL_No(cols.get(2).trim());
 				rec.setZZ_MG(toBD(cols.get(4)));
 				rec.setZZ_DG(toBD(cols.get(5)));
 				rec.setZZ_Admin(toBD(cols.get(6)));
@@ -171,22 +151,27 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				if (!schemeAdj.isEmpty()) rec.setZZ_Scheme_Year_Adjust(schemeAdj);
 				rec.setZZ_Current_Date(new Timestamp(System.currentTimeMillis()));
 
-				String fname = entry.getName();                    // attachment file name
+				// link to header
+				if (hasColumn(rec, "ZZ_Monthly_Levy_Files_Hdr_ID")) {
+					rec.setZZ_Monthly_Levy_Files_Hdr_ID(hdr.get_ID());
+				}
 
-				if (fname != null && fname.length() > 255) fname = fname.substring(0, 255);
-				rec.setZZ_File_Name(fname);
+
+				String fn = fileName;
+				if (fn.length() > 255) fn = fn.substring(0, 255);
+				// use generated setter if you have it:
+				rec.setZZ_File_Name(fn);
 
 
-
-				rec.setZZ_Monthly_Levy_Files_Hdr_ID(hdr.get_ID());
 				rec.saveEx();
 				inserted++;
 			}
 		} catch (Exception ex) {
-			throw new AdempiereException("Failed on attachment: " + entry.getName() + " -> " + ex.getMessage(), ex);
+			throw new AdempiereException("Failed on attachment: " + fileName + " -> " + ex.getMessage(), ex);
 		}
 		return inserted;
 	}
+
 
 	// Helpers
 
@@ -237,24 +222,34 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 		out.add(cur.toString());
 		return out;
 	}
-	
-	
+
+
 	private static String monthName(String mm) {
-	    switch (mm) {
-	        case "01": return "January";
-	        case "02": return "February";
-	        case "03": return "March";
-	        case "04": return "April";
-	        case "05": return "May";
-	        case "06": return "June";
-	        case "07": return "July";
-	        case "08": return "August";
-	        case "09": return "September";
-	        case "10": return "October";
-	        case "11": return "November";
-	        case "12": return "December";
-	        default:   return mm; // fallback
-	    }
+		switch (mm) {
+		case "01": return "January";
+		case "02": return "February";
+		case "03": return "March";
+		case "04": return "April";
+		case "05": return "May";
+		case "06": return "June";
+		case "07": return "July";
+		case "08": return "August";
+		case "09": return "September";
+		case "10": return "October";
+		case "11": return "November";
+		case "12": return "December";
+		default:   return mm; // fallback
+		}
+	}
+
+
+	private static String normalizeFileName(String name) {
+		if (name == null) return "";
+		String s = name.trim();
+		// strip leading/trailing tildes commonly added by attachments
+		while (s.startsWith("~")) s = s.substring(1);
+		while (s.endsWith("~"))  s = s.substring(0, s.length()-1);
+		return s.trim();
 	}
 }
 
