@@ -99,9 +99,9 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 		}
 
 		// Update header tracking fields (if present)
-		safeSet(hdr, "Processed", "Y");
-		safeSet(hdr, "ZZ_Lines_Imported", totalInserted);
-		safeSet(hdr, "ZZ_Last_Import_Note",
+		//safeSet(hdr, "Processed", "Y");
+		hdr.setZZ_Lines_Imported(totalInserted);
+		hdr.setZZ_Last_Import_Note(
 				"Files: " + filesProcessed +
 				(clearExisting ? (" | Deleted existing: " + deleted) : "") +
 				(skippedFiles.length() > 0 ? (" | Skipped(non-matching): " + skippedFiles) : ""));
