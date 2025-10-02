@@ -131,7 +131,7 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				if (cols.size() != 13) { addLog("WARN: Skipping row with " + cols.size() + " cols in " + fileName); continue; }
 
 				X_ZZ_Monthly_Levy_Files rec = new X_ZZ_Monthly_Levy_Files(getCtx(), 0, get_TrxName());
-				rec.setAD_Org_ID(1000017);
+				rec.setAD_Org_ID(0);
 				rec.setC_Year_ID(C_Year_ID);
 				rec.setZZ_Month(month2);
 				rec.setZZ_Seta_Code(cols.get(1).trim());

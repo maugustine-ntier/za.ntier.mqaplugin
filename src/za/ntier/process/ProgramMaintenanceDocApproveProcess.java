@@ -35,7 +35,10 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		validateData();
 		String currentDocAction = docApprove.getZZ_DocAction();
 		String currentDocStatus = docApprove.getZZ_DocStatus();
-		if(IDocApprove.ZZ_DOCACTION_SubmitToSnrMgrLP.equals(currentDocAction)) {  // User presses Action button
+		if (IDocApprove.ZZ_DOCACTIONS[0].equals(currentDocAction) || 
+				IDocApprove.ZZ_DOCACTIONS[1].equals(currentDocAction) || 
+				IDocApprove.ZZ_DOCACTIONS[2].equals(currentDocAction) || 
+				IDocApprove.ZZ_DOCACTIONS[3].equals(currentDocAction)) {  // User presses Action button
 			doSubmitToSnrMgrLP();			
 		}else if(    
 				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
@@ -62,12 +65,19 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 
 
 	protected void doApproval(boolean isBypassLineManage) {
-		docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
-		docApprove.setZZ_DocAction(null);
-		docApprove.setZZ_Date_Manager_Approved(now);
-		if (docApprove.getZZ_Date_Submitted() == null)
-			docApprove.setZZ_Date_Submitted(now);
-		AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
+		if("Y".equals(pApproveRejLM)){
+			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
+			docApprove.setZZ_DocAction(null);
+			docApprove.setZZ_Date_Manager_Approved(now);
+			if (docApprove.getZZ_Date_Submitted() == null)
+				docApprove.setZZ_Date_Submitted(now);
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
+		} else {
+			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_NotApprovedBySnrManager);
+			docApprove.setZZ_DocAction(null);
+			docApprove.setZZ_Date_Not_Approved(now);
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
+		}
 	}
 
 	// Line Manager presses Action button
@@ -97,19 +107,26 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 
 	private void doLPApprove() {
 		docApprove.setZZ_Snr_Mgr_LP_ID(getAD_User_ID());
-		docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
-		docApprove.setZZ_DocAction(null);
-		docApprove.setZZ_Date_Approved(now());
+		if("Y".equals(pApproveRejLM)){
+			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_Approved);
+			docApprove.setZZ_DocAction(null);
+			docApprove.setZZ_Date_Approved(now());
 
-		// Broadcast: all Managers LP, Snr Managers (LP, SPU), Comms
-		collectBroadcastAudience();
-		for (int roleID : broadcastRoleIds) {
-			AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleID, getTable_ID(), getRecord_ID(),
-					docApprove.getZZMailLineApproved());
+			// Broadcast: all Managers LP, Snr Managers (LP, SPU), Comms
+			collectBroadcastAudience();
+			for (int roleID : broadcastRoleIds) {
+				AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleID, getTable_ID(), getRecord_ID(),
+						docApprove.getZZMailLineApproved());
+			}
+		} else {
+			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_NotApprovedBySnrManager);
+			docApprove.setZZ_DocAction(null);
+			docApprove.setZZ_Date_Not_Approved(now);
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 
 	}
-	
+
 	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
 	private void collectBroadcastAudience() {
 		broadcastRoleIds.add(getRoleIDForOrg(docApprove.getAD_Org_ID()));
@@ -128,20 +145,20 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		//	throw new AdempiereException("@NoLines@");
 		//}
 	}
-	
-	
+
+
 
 	public int getRoleIDForOrg(int ad_Org_ID) {
-	    if (IDocApprove.ROLES_SNR_MANAGER_LP.length != IDocApprove.ORGS_SNR_MANAGER_LP.length) {
-	        throw new IllegalStateException("Role/Org arrays are not the same length.");
-	    }
+		if (IDocApprove.ROLES_SNR_MANAGER_LP.length != IDocApprove.ORGS_SNR_MANAGER_LP.length) {
+			throw new IllegalStateException("Role/Org arrays are not the same length.");
+		}
 
-	    for (int i = 0; i < IDocApprove.ORGS_SNR_MANAGER_LP.length; i++) {
-	        if (IDocApprove.ORGS_SNR_MANAGER_LP[i] == ad_Org_ID) {
-	            return IDocApprove.ROLES_SNR_MANAGER_LP[i];
-	        }
-	    }
-	    throw new IllegalArgumentException("No role mapped for org " + ad_Org_ID);
+		for (int i = 0; i < IDocApprove.ORGS_SNR_MANAGER_LP.length; i++) {
+			if (IDocApprove.ORGS_SNR_MANAGER_LP[i] == ad_Org_ID) {
+				return IDocApprove.ROLES_SNR_MANAGER_LP[i];
+			}
+		}
+		throw new IllegalArgumentException("No role mapped for org " + ad_Org_ID);
 	}
 
 

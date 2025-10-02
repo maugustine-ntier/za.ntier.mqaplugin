@@ -631,18 +631,18 @@ public class MZZProgramMasterData extends X_ZZ_Program_Master_Data implements ID
 		return null;
 	}
 
-	@Override
-	public void setZZ_Date_Not_Approved(Timestamp ZZ_Date_Not_Approved) {
-		// TODO Auto-generated method stub
-		
+	public void setZZ_Date_Not_Approved (Timestamp ZZ_Date_Not_Approved)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Approved, ZZ_Date_Not_Approved);
 	}
 
-	@Override
-	public Timestamp getZZ_Date_Not_Approved() {
-		// TODO Auto-generated method stub
-		return null;
+	/** Get Date Not Approved.
+		@return Date Not Approved	  */
+	public Timestamp getZZ_Date_Not_Approved()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Approved);
 	}
-
+	
 	@Override
 	public void setZZ_Date_Not_Recommended(Timestamp ZZ_Date_Not_Recommended) {
 		// TODO Auto-generated method stub
