@@ -120,7 +120,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			}
 		} else {
 			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_NotApprovedBySnrManager);
-			docApprove.setZZ_DocAction(null);
+			docApprove.setZZ_DocAction(getDocActionForOrg(docApprove.getAD_Org_ID()));
 			docApprove.setZZ_Date_Not_Approved(now);
 			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
@@ -159,6 +159,19 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			}
 		}
 		throw new IllegalArgumentException("No role mapped for org " + ad_Org_ID);
+	}
+	
+	public String getDocActionForOrg(int ad_Org_ID) {
+		if (IDocApprove.ROLES_SNR_MANAGER_LP.length != IDocApprove.ORGS_SNR_MANAGER_LP.length) {
+			throw new IllegalStateException("Role/Org arrays are not the same length.");
+		}
+
+		for (int i = 0; i < IDocApprove.ORGS_SNR_MANAGER_LP.length; i++) {
+			if (IDocApprove.ORGS_SNR_MANAGER_LP[i] == ad_Org_ID) {
+				return IDocApprove.ZZ_DOCACTIONS[i];
+			}
+		}
+		throw new IllegalArgumentException("No Doc Action mapped for org " + ad_Org_ID);
 	}
 
 
