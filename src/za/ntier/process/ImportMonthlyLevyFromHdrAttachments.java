@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -63,20 +64,12 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 			throw new AdempiereException("No attachments found on header. Please attach .csv files and try again.");
 
 		// Optional: clear existing rows for this header (or for year+month scope)
-		boolean clearExisting = hasColumn(hdr, "ZZ_Is_Clear_Existing") && "Y".equalsIgnoreCase(hdr.get_ValueAsString("ZZ_Is_Clear_Existing"));
+		boolean clearExisting = hdr.isZZ_Is_Clear_Existing();
 		int deleted = 0;
-		if (clearExisting) {
-			// safest: clear by header link if re-import is meant to be scoped to this header
-			if (hasColumn(new X_ZZ_Monthly_Levy_Files(getCtx(), 0, get_TrxName()), "ZZ_Monthly_Levy_Files_Hdr_ID")) {
-				deleted = DB.executeUpdateEx(
-						"DELETE FROM ZZ_Monthly_Levy_Files WHERE ZZ_Monthly_Levy_Files_Hdr_ID=?",
-						new Object[]{hdr.get_ID()}, get_TrxName());
-			} else {
-				// or fallback: clear by Year+Month
-				deleted = DB.executeUpdateEx(
-						"DELETE FROM ZZ_Monthly_Levy_Files WHERE C_Year_ID=? AND ZZ_Month=?",
-						new Object[]{C_Year_ID, month2}, get_TrxName());
-			}
+		if (clearExisting) {			
+			deleted = DB.executeUpdateEx(
+					"DELETE FROM ZZ_Monthly_Levy_Files WHERE ZZ_Monthly_Levy_Files_Hdr_ID=?",
+					new Object[]{hdr.getZZ_Monthly_Levy_Files_Hdr_ID()}, get_TrxName());
 		}
 
 		int filesProcessed = 0;
@@ -119,6 +112,14 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				);
 	}
 
+	private static final Pattern TRAILING_YEAR = Pattern.compile("-(\\d{4})(?:\\.[^.]+)?$");
+
+	private String extractYearFromFileName(String fileName) {
+		if (fileName == null) return null;
+		Matcher m = TRAILING_YEAR.matcher(fileName);
+		return m.find() ? m.group(1) : null;
+	}
+
 	private int importCsvEntry(MAttachmentEntry entry, int C_Year_ID, String month2, String fileName) {
 		int inserted = 0;
 		try (BufferedReader br = new BufferedReader(
@@ -129,7 +130,6 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				if (line.trim().isEmpty()) continue;
 				List<String> cols = parseCsvLine(line);
 				if (cols.size() != 13) { addLog("WARN: Skipping row with " + cols.size() + " cols in " + fileName); continue; }
-
 				X_ZZ_Monthly_Levy_Files rec = new X_ZZ_Monthly_Levy_Files(getCtx(), 0, get_TrxName());
 				rec.setAD_Org_ID(0);
 				rec.setC_Year_ID(C_Year_ID);
@@ -142,6 +142,7 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				rec.setZZ_Penalties(toBD(cols.get(7)));
 				rec.setzz_Interest(toBD(cols.get(8)));
 				rec.setzz_Total(toBD(cols.get(9)));
+				
 				String schemeAdj = cols.get(12).trim();
 				if (!schemeAdj.isEmpty()) rec.setZZ_Scheme_Year_Adjust(schemeAdj);
 				rec.setZZ_Current_Date(new Timestamp(System.currentTimeMillis()));
@@ -156,6 +157,12 @@ public class ImportMonthlyLevyFromHdrAttachments extends SvrProcess {
 				if (fn.length() > 255) fn = fn.substring(0, 255);
 				// use generated setter if you have it:
 				rec.setZZ_File_Name(fn);
+				String fileYear = extractYearFromFileName(fileName);
+				if (fileYear != null) {
+					rec.setZZ_Year(fileYear);
+				} else {
+					addLog("WARN: No 4-digit trailing year found in filename: " + fileName);
+				}
 
 
 				rec.saveEx();

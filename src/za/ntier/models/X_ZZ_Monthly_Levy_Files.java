@@ -34,7 +34,7 @@ public class X_ZZ_Monthly_Levy_Files extends PO implements I_ZZ_Monthly_Levy_Fil
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250929L;
+	private static final long serialVersionUID = 20251006L;
 
     /** Standard Constructor */
     public X_ZZ_Monthly_Levy_Files (Properties ctx, int ZZ_Monthly_Levy_Files_ID, String trxName)
@@ -380,6 +380,21 @@ public class X_ZZ_Monthly_Levy_Files extends PO implements I_ZZ_Monthly_Levy_Fil
 	public String getZZ_Seta_Code()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Seta_Code);
+	}
+
+	/** Set Year.
+		@param ZZ_Year Year
+	*/
+	public void setZZ_Year (String ZZ_Year)
+	{
+		set_Value (COLUMNNAME_ZZ_Year, ZZ_Year);
+	}
+
+	/** Get Year.
+		@return Year	  */
+	public String getZZ_Year()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Year);
 	}
 
 	/** Set Interest.

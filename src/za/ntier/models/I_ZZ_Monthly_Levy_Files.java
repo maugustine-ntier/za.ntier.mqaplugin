@@ -243,6 +243,15 @@ public interface I_ZZ_Monthly_Levy_Files
 	/** Get Seta Code	  */
 	public String getZZ_Seta_Code();
 
+    /** Column name ZZ_Year */
+    public static final String COLUMNNAME_ZZ_Year = "ZZ_Year";
+
+	/** Set Year	  */
+	public void setZZ_Year (String ZZ_Year);
+
+	/** Get Year	  */
+	public String getZZ_Year();
+
     /** Column name zz_Interest */
     public static final String COLUMNNAME_zz_Interest = "zz_Interest";
 
