@@ -54,12 +54,12 @@ public interface I_C_InvoiceBatch
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -279,10 +279,10 @@ public interface I_C_InvoiceBatch
     /** Column name ZZ_Account_Reconned */
     public static final String COLUMNNAME_ZZ_Account_Reconned = "ZZ_Account_Reconned";
 
-	/** Set Account Reconciled / O/S Invoices Verified	  */
+	/** Set Account reconciled / O/S invoices verified	  */
 	public void setZZ_Account_Reconned (boolean ZZ_Account_Reconned);
 
-	/** Get Account Reconciled / O/S Invoices Verified	  */
+	/** Get Account reconciled / O/S invoices verified	  */
 	public boolean isZZ_Account_Reconned();
 
     /** Column name ZZ_Auth_PO_Order */
@@ -322,6 +322,17 @@ public interface I_C_InvoiceBatch
 
 	/** Get GL Allocation Checked	  */
 	public boolean isZZ_GL_Allocation_Checked();
+
+    /** Column name ZZ_Monthly_Levy_Files_Hdr_ID */
+    public static final String COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID = "ZZ_Monthly_Levy_Files_Hdr_ID";
+
+	/** Set Monthly Levy Files Hdr	  */
+	public void setZZ_Monthly_Levy_Files_Hdr_ID (int ZZ_Monthly_Levy_Files_Hdr_ID);
+
+	/** Get Monthly Levy Files Hdr	  */
+	public int getZZ_Monthly_Levy_Files_Hdr_ID();
+
+	public I_ZZ_Monthly_Levy_Files_Hdr getZZ_Monthly_Levy_Files_Hdr() throws RuntimeException;
 
     /** Column name ZZ_Policy_Procedure_Ck */
     public static final String COLUMNNAME_ZZ_Policy_Procedure_Ck = "ZZ_Policy_Procedure_Ck";

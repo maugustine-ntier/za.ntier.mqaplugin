@@ -34,7 +34,7 @@ public class X_ZZ_Monthly_Levy_Files extends PO implements I_ZZ_Monthly_Levy_Fil
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251006L;
+	private static final long serialVersionUID = 20251007L;
 
     /** Standard Constructor */
     public X_ZZ_Monthly_Levy_Files (Properties ctx, int ZZ_Monthly_Levy_Files_ID, String trxName)
@@ -103,6 +103,34 @@ public class X_ZZ_Monthly_Levy_Files extends PO implements I_ZZ_Monthly_Levy_Fil
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	public org.compiere.model.I_C_InvoiceBatchLine getC_InvoiceBatchLine() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_InvoiceBatchLine)MTable.get(getCtx(), org.compiere.model.I_C_InvoiceBatchLine.Table_ID)
+			.getPO(getC_InvoiceBatchLine_ID(), get_TrxName());
+	}
+
+	/** Set Invoice Batch Line.
+		@param C_InvoiceBatchLine_ID Expense Invoice Batch Line
+	*/
+	public void setC_InvoiceBatchLine_ID (int C_InvoiceBatchLine_ID)
+	{
+		if (C_InvoiceBatchLine_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_C_InvoiceBatchLine_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_C_InvoiceBatchLine_ID, Integer.valueOf(C_InvoiceBatchLine_ID));
+	}
+
+	/** Get Invoice Batch Line.
+		@return Expense Invoice Batch Line
+	  */
+	public int getC_InvoiceBatchLine_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_InvoiceBatchLine_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	public org.compiere.model.I_C_Year getC_Year() throws RuntimeException
 	{

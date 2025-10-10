@@ -64,6 +64,21 @@ public interface I_ZZ_Monthly_Levy_Files
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name C_InvoiceBatchLine_ID */
+    public static final String COLUMNNAME_C_InvoiceBatchLine_ID = "C_InvoiceBatchLine_ID";
+
+	/** Set Invoice Batch Line.
+	  * Expense Invoice Batch Line
+	  */
+	public void setC_InvoiceBatchLine_ID (int C_InvoiceBatchLine_ID);
+
+	/** Get Invoice Batch Line.
+	  * Expense Invoice Batch Line
+	  */
+	public int getC_InvoiceBatchLine_ID();
+
+	public org.compiere.model.I_C_InvoiceBatchLine getC_InvoiceBatchLine() throws RuntimeException;
+
     /** Column name C_Year_ID */
     public static final String COLUMNNAME_C_Year_ID = "C_Year_ID";
 

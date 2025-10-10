@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import org.compiere.model.MInvoiceBatch;
 import org.compiere.model.MSysConfig;
+import org.compiere.model.MTable;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
@@ -227,6 +228,33 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	public I_ZZ_Monthly_Levy_Files_Hdr getZZ_Monthly_Levy_Files_Hdr() throws RuntimeException
+	{
+		return (I_ZZ_Monthly_Levy_Files_Hdr)MTable.get(getCtx(), I_ZZ_Monthly_Levy_Files_Hdr.Table_ID)
+			.getPO(getZZ_Monthly_Levy_Files_Hdr_ID(), get_TrxName());
+	}
+
+	/** Set Monthly Levy Files Hdr.
+		@param ZZ_Monthly_Levy_Files_Hdr_ID Monthly Levy Files Hdr
+	*/
+	public void setZZ_Monthly_Levy_Files_Hdr_ID (int ZZ_Monthly_Levy_Files_Hdr_ID)
+	{
+		if (ZZ_Monthly_Levy_Files_Hdr_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID, Integer.valueOf(ZZ_Monthly_Levy_Files_Hdr_ID));
+	}
+
+	/** Get Monthly Levy Files Hdr.
+		@return Monthly Levy Files Hdr	  */
+	public int getZZ_Monthly_Levy_Files_Hdr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 

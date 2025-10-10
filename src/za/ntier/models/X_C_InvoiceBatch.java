@@ -35,7 +35,7 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250128L;
+	private static final long serialVersionUID = 20251008L;
 
     /** Standard Constructor */
     public X_C_InvoiceBatch (Properties ctx, int C_InvoiceBatch_ID, String trxName)
@@ -476,16 +476,16 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 		return ii.intValue();
 	}
 
-	/** Set Account Reconciled / O/S Invoices Verified.
-		@param ZZ_Account_Reconned Account Reconciled / O/S Invoices Verified
+	/** Set Account reconciled / O/S invoices verified.
+		@param ZZ_Account_Reconned Account reconciled / O/S invoices verified
 	*/
 	public void setZZ_Account_Reconned (boolean ZZ_Account_Reconned)
 	{
 		set_Value (COLUMNNAME_ZZ_Account_Reconned, Boolean.valueOf(ZZ_Account_Reconned));
 	}
 
-	/** Get Account Reconciled / O/S Invoices Verified.
-		@return Account Reconciled / O/S Invoices Verified	  */
+	/** Get Account reconciled / O/S invoices verified.
+		@return Account reconciled / O/S invoices verified	  */
 	public boolean isZZ_Account_Reconned()
 	{
 		Object oo = get_Value(COLUMNNAME_ZZ_Account_Reconned);
@@ -584,6 +584,33 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	public I_ZZ_Monthly_Levy_Files_Hdr getZZ_Monthly_Levy_Files_Hdr() throws RuntimeException
+	{
+		return (I_ZZ_Monthly_Levy_Files_Hdr)MTable.get(getCtx(), I_ZZ_Monthly_Levy_Files_Hdr.Table_ID)
+			.getPO(getZZ_Monthly_Levy_Files_Hdr_ID(), get_TrxName());
+	}
+
+	/** Set Monthly Levy Files Hdr.
+		@param ZZ_Monthly_Levy_Files_Hdr_ID Monthly Levy Files Hdr
+	*/
+	public void setZZ_Monthly_Levy_Files_Hdr_ID (int ZZ_Monthly_Levy_Files_Hdr_ID)
+	{
+		if (ZZ_Monthly_Levy_Files_Hdr_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID, Integer.valueOf(ZZ_Monthly_Levy_Files_Hdr_ID));
+	}
+
+	/** Get Monthly Levy Files Hdr.
+		@return Monthly Levy Files Hdr	  */
+	public int getZZ_Monthly_Levy_Files_Hdr_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Policy Procedure Checklist.
