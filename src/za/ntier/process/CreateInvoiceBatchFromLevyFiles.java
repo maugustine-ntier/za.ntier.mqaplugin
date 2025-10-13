@@ -38,6 +38,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
     private int skippedNoBP = 0;
     private int skippedZeroAmt = 0;
     private int batchesCreated = 0;
+    private int skippedNoApproval = 0;
 
     // lazy-per-year state
     private final Map<String, MInvoiceBatch_New> batchByYear = new LinkedHashMap<>();
@@ -130,6 +131,13 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
                 skippedNoBP++;
                 continue;
             }
+            
+            if ("UNKNOWN".equals(yearKey)) {
+                addLog("INFO: Missing ZZ_Year on row " + rec.get_ID() + " — skipping (no approval year to match).");
+                skippedNoApproval++;
+                continue;
+            }
+
             MBPartner bp = new Query(m_ctx, MBPartner.Table_Name, "Value=? AND IsActive='Y'", get_TrxName())
                     .setParameters(sdl)
                     .setOnlyActiveRecords(true)
@@ -140,6 +148,13 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
                 continue;
             }
             int bpLocID = getBillToOrAnyBPLocation(bp);
+            
+         // Ensure BP has an Approved WSP/ATR for this year
+            if (!hasApprovedForYear(bp.getC_BPartner_ID(), yearKey)) {
+                addLog("INFO: No Approved WSP/ATR for BP=" + bp.getValue() + " year=" + yearKey + " (row " + rec.get_ID() + ")");
+                skippedNoApproval++;
+                continue;
+            }
 
             // amounts (MG only in your current flow; uncomment DG if needed)
             BigDecimal mg = nz(rec.getZZ_MG());
@@ -290,6 +305,21 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
             if (l.isBillTo()) return l.getC_BPartner_Location_ID();
         }
         return any != null ? any.getC_BPartner_Location_ID() : 0;
+    }
+    
+ // helper: does BP have an Approved WSP/ATR for the given year?
+    private boolean hasApprovedForYear(int cBPartnerId, String yearKey) {
+        if (cBPartnerId <= 0 || yearKey == null || yearKey.trim().isEmpty()) return false;
+        final String sql =
+            "SELECT 1 " +
+            "FROM ZZ_WSP_ATR_Approvals " +
+            "WHERE C_BPartner_ID=? " +
+            "  AND ZZ_Grant_Status='A' " +            // Approved
+            "  AND IsActive = 'Y'" +
+            "  AND COALESCE(TRIM(ZZ_Financial_Year),'') = TRIM(?) " +
+            "FETCH FIRST 1 ROWS ONLY";
+        Integer one = DB.getSQLValue(get_TrxName(), sql, cBPartnerId, yearKey.trim());
+        return one != null && one == 1;
     }
 
     private static String safe(String s) { return s == null ? "" : s.trim(); }
