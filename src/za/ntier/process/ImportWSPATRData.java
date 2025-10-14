@@ -20,6 +20,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.compiere.model.MClient;
+import org.compiere.model.MUser;
 import org.compiere.process.ProcessInfo;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -151,8 +153,11 @@ public class ImportWSPATRData extends SvrProcess {
 						writer.println(line);
 					}
 				}
+				List<File> fileList = new ArrayList<File>();
+				fileList.add(logFile);
 
 				addLog("Unresolved BPs: " + unresolvedList.size());
+				/*
 
 				// ✅ This enables the Download link in Process Monitor
 				ProcessInfo pi = getProcessInfo();
@@ -161,7 +166,19 @@ public class ImportWSPATRData extends SvrProcess {
 					pi.setExportFile(logFile);
 					pi.setExportFileExtension("csv");
 				}
-				addLog("Unresolved BPs: " + unresolvedList.size() + " (Download from Process Monitor)");
+				 */
+
+				MClient client = MClient.get(getCtx(), getAD_Client_ID());
+
+				if (fileList != null && !fileList.isEmpty()) {
+					MUser from = new MUser(getCtx(), getAD_User_ID(), null);
+
+					if (!client.sendEMailAttachments(from, from, "Unresolved List", "Unresolved List for " + filePath, fileList)) {
+						addLog("Could not send Email");
+					}
+
+					addLog("Unresolved BPs: " + unresolvedList.size() + " (Download from Process Monitor)");
+				}
 			}
 
 
