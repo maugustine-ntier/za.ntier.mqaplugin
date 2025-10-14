@@ -27,6 +27,10 @@ import za.ntier.models.X_ZZ_WSP_ATR_Approvals;
 public class ImportWSPATRData extends SvrProcess {
 	@Parameter(name="FileName")
 	private String filePath;
+
+	@Parameter(name="ClearExisting")
+	private boolean clearExisting;  
+
 	private List<String> unresolvedList = new ArrayList<>();
 
 	@Override
@@ -36,6 +40,15 @@ public class ImportWSPATRData extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
+		int deleted = 0;
+		if (clearExisting) {            
+			deleted = DB.executeUpdateEx(
+					"DELETE FROM ZZ_WSP_ATR_Approvals",
+					get_TrxName()
+					);
+			addLog("Cleared existing data: " + deleted + " row(s)");
+		}
+
 		if (filePath == null || filePath.isEmpty())
 			throw new IllegalArgumentException("File path not provided.");
 
@@ -52,7 +65,7 @@ public class ImportWSPATRData extends SvrProcess {
 			String grantStatus = getCell(row, 7);
 			String numEmployeesStr = getCell(row, 14);
 
-			
+
 			String value = null;
 			MBPartner_New bp = null;
 			int cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",key1);
@@ -75,9 +88,11 @@ public class ImportWSPATRData extends SvrProcess {
 
 			// Update number of employees on BP
 			try {
-				int numEmployees = Integer.parseInt(numEmployeesStr);
-				bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
-				bp.saveEx();
+				if (numEmployeesStr != null && !numEmployeesStr.trim().equals("")) {
+					int numEmployees = Integer.parseInt(numEmployeesStr.trim());
+					bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
+					bp.saveEx();
+				}
 			} catch (Exception e) {
 				log.warning("Invalid employee count for: " + key1);
 				continue;
@@ -121,7 +136,7 @@ public class ImportWSPATRData extends SvrProcess {
 				pi.setExportFile(logFile);
 				pi.setExportFileExtension("csv");
 			}
-			 addLog("Unresolved BPs: " + unresolvedList.size() + " (Download from Process Monitor)");
+			addLog("Unresolved BPs: " + unresolvedList.size() + " (Download from Process Monitor)");
 		}
 
 
