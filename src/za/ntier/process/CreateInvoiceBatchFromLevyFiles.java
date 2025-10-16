@@ -36,6 +36,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
     private int sourceRows = 0;
     private int createdLines = 0;
     private int skippedNoBP = 0;
+    private int skippedNotALNumber = 0;
     private int skippedZeroAmt = 0;
     private int batchesCreated = 0;
     private int skippedNoApproval = 0;
@@ -132,6 +133,12 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
                 continue;
             }
             
+            if (sdl != null && !sdl.startsWith("L")) {
+                addLog("WARN: Missing SDL No ,does not start with L " + sdl + " " + rec.get_ID());
+                skippedNotALNumber++;
+                continue;
+            }
+            
             if ("UNKNOWN".equals(yearKey)) {
                 addLog("INFO: Missing ZZ_Year on row " + rec.get_ID() + " — skipping (no approval year to match).");
                 skippedNoApproval++;
@@ -165,7 +172,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
                 int lineNo = nextLineNo(yearKey, batch.getC_InvoiceBatch_ID());
                 createLine(batch.getC_InvoiceBatch_ID(), p_C_DocType_ID, ++createdLines, lineNo,
                         bp.getC_BPartner_ID(), bpLocID, p_C_Charge_ID, lineDate,
-                        mg, "MG", rec);
+                        mg.negate(), "MG", rec);
                 wroteAnyLine = true;
             } else {
                 skippedZeroAmt++;
@@ -195,8 +202,8 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
         }
 
         return String.format(
-            "Batches created: %d. Source rows: %d, Lines created: %d, Skipped (no BP): %d, Skipped (zero/neg amt): %d",
-            batchesCreated, sourceRows, createdLines, skippedNoBP, skippedZeroAmt
+            "Batches created: %d. Source rows: %d, Lines created: %d, Skipped (no BP): %d, Skipped (zero/neg amt): %d, Skipped (Not L Number): %d",
+            batchesCreated, sourceRows, createdLines, skippedNoBP, skippedZeroAmt,skippedNotALNumber
         );
     }
 

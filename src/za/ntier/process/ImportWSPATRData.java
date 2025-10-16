@@ -14,15 +14,14 @@ import java.util.Map;
 
 import org.adempiere.base.annotation.Parameter;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.compiere.model.MClient;
+import org.compiere.model.MLocation;
 import org.compiere.model.MUser;
-import org.compiere.process.ProcessInfo;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
@@ -40,6 +39,28 @@ public class ImportWSPATRData extends SvrProcess {
 
 	private List<String> unresolvedList = new ArrayList<>();
 	private static final DataFormatter DF = new DataFormatter();
+	
+	private static final String[] NAME_HEADERS = {
+		    "organisationlegalname", "organisation legal name",
+		    "organisation name", "organisation_name",
+		    "organization legal name", "organizationlegalname",
+		    "organization name", "organization_name",
+		    "organisation trading name", "trading name",
+		    "trading_name", "organisationtradingname",
+		    "Company Name"
+		};
+
+		private static final String[] NUM_EMP_HEADERS = {
+		    "totalemployment", "total employment", "numberofemployees",
+		    "total_employment", "number_of_employees"
+		};
+
+		private static final String[] ADDRESS_HEADERS = {
+		    "organisation address", "organization address",
+		    "organisationaddress", "organizationaddress",
+		    "organisation physical address", "organization physical address",
+		    "physical address", "physicaladdress", "postal address"
+		};
 
 	@Override
 	protected void prepare() {
@@ -87,47 +108,77 @@ public class ImportWSPATRData extends SvrProcess {
 				Row row = it.next();
 				if (row == null) continue;
 
-				String key1          = byHeader(row, H, "SDLNumber");
-				String key2          = byHeader(row, H, "ParentSDLNumber");
-				String financialYear = byHeader(row, H, "WSPYear");
-				String grantStatus   = byHeader(row, H, "PlanningGrantStatus");
-				String numEmployeesStr  = byHeader(row, H, "TotalEmployment");
+				String sdlNumber   = byHeader(row, H, "SDLNumber");
+		        String parentSDL   = byHeaderAny(row, H,
+		                             new String[]{"parentsdlnumber","parent sdl number","parcntsdlnumber"});
+		        String financialYr = byHeader(row, H, "WSPYear");
+		        String grantStatus = byHeader(row, H, "PlanningGrantStatus");
+		        String numEmpStr   = byHeaderAny(row, H, NUM_EMP_HEADERS);
+		        if (sdlNumber.equals("L999999999") ||  sdlNumber.equals("L000000000")) {
+		        	continue;
+		        }
 
-				String value = null;
-				MBPartner_New bp = null;
-				int cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",key1);
-				value = key1;
-				if (cnt <= 0) {
-					if (key2 != null && !key2.isBlank()) {
-						cnt =  DB.getSQLValue(get_TrxName(),"Select count(*) from C_Bpartner bp where bp.value = ?",key2);
-						if (cnt > 0) {
-							value = key2;
-						}
-					}
-				}
-				if (cnt > 0) {
-					int c_BPartner_ID =  DB.getSQLValue(get_TrxName(),"Select C_BPartner_id from C_Bpartner bp where bp.value = ?",value);
-					bp = new MBPartner_New(getCtx(), c_BPartner_ID, get_TrxName());
-				} else {			
-					unresolvedList.add(key1 + "," + key2);
-					continue;
-				}
+		        // Try to find existing partner by SDL or parent SDL
+		        String value = (sdlNumber != null && !sdlNumber.isBlank()) ? sdlNumber : parentSDL;
+		        int cnt = DB.getSQLValue(get_TrxName(),
+		                   "SELECT COUNT(*) FROM C_BPartner bp WHERE bp.Value=?", value);
+		        MBPartner_New bp = null;
+		        if (cnt > 0) {
+		            int c_BPartner_ID = DB.getSQLValue(get_TrxName(),
+		                               "SELECT C_BPartner_ID FROM C_BPartner WHERE Value=?", value);
+		            bp = new MBPartner_New(getCtx(), c_BPartner_ID, get_TrxName());
+		        } else {
+		            // --- create a new BP ---
+		            String name = byHeaderAny(row, H, NAME_HEADERS);
+		            if (name == null || name.isBlank()) {
+		                // fall back to trading name if present
+		                name = byHeaderAny(row, H,
+		                        new String[]{"organisation trading name","trading name","trading_name"});
+		            }
+		            if (name == null || name.isBlank()) {
+		                // no name found – log unresolved and skip
+		                unresolvedList.add(sdlNumber + "," + parentSDL);
+		                continue;
+		            }
+		            bp = new MBPartner_New(getCtx(), 0, get_TrxName());
+		            bp.setValue(value);
+		            bp.setName(name);
+		            bp.setReferenceNo(parentSDL);      // or another column if you store registration no.
+		            bp.setC_BP_Group_ID(1000018);      // UNKNOWN GROUP
+		            bp.setIsVendor(true);
+		            bp.setIsCustomer(false);
+		            bp.setIsEmployee(false);
+		            bp.setIsProspect(false);
+		            // set number of employees if provided
+		            try {
+		                int n = Integer.parseInt(numEmpStr.replaceAll("\\s", ""));
+		                bp.setZZ_Number_Of_Employees(new BigDecimal(n));
+		            } catch (NumberFormatException ignore) {}
+		            bp.saveEx();
 
-				// Update number of employees on BP
-				try {
-					if (numEmployeesStr != null && !numEmployeesStr.trim().equals("")) {
-						int numEmployees = Integer.parseInt(numEmployeesStr.trim());
-						bp.setZZ_Number_Of_Employees(new BigDecimal(numEmployees));
-						bp.saveEx();
-					}
-				} catch (Exception e) {
-					log.warning("Invalid employee count for: " + key1);
-					continue;
-				}
+		            // Create and assign a location if address is available
+		            String addr = byHeaderAny(row, H, ADDRESS_HEADERS);
+		            MLocation businessLoc = new MLocation(getCtx(), 0, get_TrxName());
+		            if (addr != null && !addr.isBlank()) {
+		                setLocationFromAddress(businessLoc, addr);
+		            }
+		            businessLoc.saveEx();
+
+		            // Create a BP location linking partner and location
+		            org.compiere.model.MBPartnerLocation bpl =
+		                new org.compiere.model.MBPartnerLocation(bp);
+		            bpl.setC_Location_ID(businessLoc.get_ID());
+		            bpl.setIsBillTo(true);
+		            bpl.setIsShipTo(true);
+		            bpl.setIsPayFrom(true);
+		            bpl.setIsRemitTo(true);
+		            bpl.saveEx();
+		        }
+				
 
 				// Check if record exists for same BP and Financial Year
 				String sql = "SELECT ZZ_WSP_ATR_Approvals_ID FROM ZZ_WSP_ATR_Approvals WHERE C_BPartner_ID=? AND zz_financial_year=?";
-				int wspID = DB.getSQLValue(get_TrxName(), sql, bp.get_ID(), financialYear);
+				int wspID = DB.getSQLValue(get_TrxName(), sql, bp.get_ID(), financialYr);
 
 				X_ZZ_WSP_ATR_Approvals record;
 				if (wspID > 0) {
@@ -137,7 +188,7 @@ public class ImportWSPATRData extends SvrProcess {
 				}
 
 				record.setC_BPartner_ID(bp.get_ID());
-				record.setZZ_Financial_Year(financialYear);
+				record.setZZ_Financial_Year(financialYr);
 				record.setZZ_Grant_Status((grantStatus.equals("Approved"))? "A" : "R" );
 				record.setProcessedOn(new Timestamp(System.currentTimeMillis()));
 				record.saveEx();
@@ -186,6 +237,36 @@ public class ImportWSPATRData extends SvrProcess {
 
 			return "WSP-ATR Approvals import complete.";
 		}
+	}
+	
+	/** Returns the first non‑blank value found for any of the supplied headers. */
+	private String byHeaderAny(Row row, Map<String,Integer> H, String[] possible) {
+	    for (String header : possible) {
+	        String val = byHeader(row, H, header);
+	        if (val != null && !val.isBlank()) {
+	            return val.trim();
+	        }
+	    }
+	    return "";
+	}
+
+	/** Splits a full address into lines and postal code. */
+	private void setLocationFromAddress(MLocation loc, String fullAddress) {
+	    // Split on commas; fallback to spaces if no commas
+	    String[] parts = fullAddress.contains(",")
+	            ? fullAddress.split(",")
+	            : fullAddress.split("\\s+");
+	    // Assign up to four address lines
+	    if (parts.length > 0) loc.setAddress1(parts[0].trim());
+	    if (parts.length > 1) loc.setAddress2(parts[1].trim());
+	    if (parts.length > 2) loc.setAddress3(parts[2].trim());
+	    if (parts.length > 3) loc.setAddress4(parts[3].trim());
+	    // Detect a postal code at the end (4–6 digits)
+	    String last = parts[parts.length - 1].trim();
+	    if (last.matches(".*\\b\\d{4,6}\\b$")) {
+	        String code = last.replaceAll(".*?(\\d{4,6})$", "$1");
+	        loc.setPostal(code);
+	    }
 	}
 
 	/** Normalize header text for matching (case/space-insensitive). */
