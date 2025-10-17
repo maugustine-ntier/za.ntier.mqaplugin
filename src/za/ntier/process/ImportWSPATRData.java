@@ -33,6 +33,9 @@ import za.ntier.models.X_ZZ_WSP_ATR_Approvals;
 public class ImportWSPATRData extends SvrProcess {
 	@Parameter(name="FileName")
 	private String filePath;
+	
+    @Parameter(name="FinancialYear")
+    private String filterYear;   
 
 	@Parameter(name="ClearExisting")
 	private boolean clearExisting;  
@@ -70,13 +73,21 @@ public class ImportWSPATRData extends SvrProcess {
 	@Override
 	protected String doIt() throws Exception {
 		int deleted = 0;
-		if (clearExisting) {            
-			deleted = DB.executeUpdateEx(
-					"DELETE FROM ZZ_WSP_ATR_Approvals",
-					get_TrxName()
-					);
-			addLog("Cleared existing data: " + deleted + " row(s)");
-		}
+		if (clearExisting) {
+            if (filterYear != null && !filterYear.trim().isEmpty()) {
+                deleted = DB.executeUpdateEx(
+                    "DELETE FROM ZZ_WSP_ATR_Approvals WHERE zz_financial_year = ?",
+                    new Object[]{filterYear.trim()},
+                    get_TrxName()
+                );
+            } else {
+                deleted = DB.executeUpdateEx(
+                    "DELETE FROM ZZ_WSP_ATR_Approvals",
+                    get_TrxName()
+                );
+            }
+            addLog("Cleared existing data: " + deleted + " row(s)");
+        }
 
 		if (filePath == null || filePath.isEmpty())
 			throw new IllegalArgumentException("File path not provided.");
