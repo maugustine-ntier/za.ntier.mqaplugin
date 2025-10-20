@@ -219,6 +219,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
         batch.setSalesRep_ID(getAD_User_ID());  
         batch.setZZ_Monthly_Levy_Files_Hdr_ID(hdr.get_ID());   // your header reference
         batch.setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
+        batch.setZZ_IS_WSP_ATR(true);
 
         String name = "Levy Batch Hdr#" + hdr.get_ID();
         if (!safe(hdr.getZZ_Month()).isEmpty()) name += " M" + hdr.getZZ_Month();

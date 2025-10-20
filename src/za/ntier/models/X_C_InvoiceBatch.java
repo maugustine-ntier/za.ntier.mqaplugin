@@ -35,7 +35,7 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251008L;
+	private static final long serialVersionUID = 20251020L;
 
     /** Standard Constructor */
     public X_C_InvoiceBatch (Properties ctx, int C_InvoiceBatch_ID, String trxName)
@@ -65,6 +65,8 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 			setZZ_Cred_Bank_Dets_Verified (false);
 // N
 			setZZ_GL_Allocation_Checked (false);
+// N
+			setZZ_IS_WSP_ATR (false);
 // N
         } */
     }
@@ -98,6 +100,8 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setZZ_GL_Allocation_Checked (false);
 // N
+			setZZ_IS_WSP_ATR (false);
+// N
         } */
     }
 
@@ -130,6 +134,8 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 // N
 			setZZ_GL_Allocation_Checked (false);
 // N
+			setZZ_IS_WSP_ATR (false);
+// N
         } */
     }
 
@@ -161,6 +167,8 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 			setZZ_Cred_Bank_Dets_Verified (false);
 // N
 			setZZ_GL_Allocation_Checked (false);
+// N
+			setZZ_IS_WSP_ATR (false);
 // N
         } */
     }
@@ -577,6 +585,28 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	public boolean isZZ_GL_Allocation_Checked()
 	{
 		Object oo = get_Value(COLUMNNAME_ZZ_GL_Allocation_Checked);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Is WSP ATR Batch.
+		@param ZZ_IS_WSP_ATR Is WSP ATR Batch
+	*/
+	public void setZZ_IS_WSP_ATR (boolean ZZ_IS_WSP_ATR)
+	{
+		set_Value (COLUMNNAME_ZZ_IS_WSP_ATR, Boolean.valueOf(ZZ_IS_WSP_ATR));
+	}
+
+	/** Get Is WSP ATR Batch.
+		@return Is WSP ATR Batch	  */
+	public boolean isZZ_IS_WSP_ATR()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_IS_WSP_ATR);
 		if (oo != null)
 		{
 			 if (oo instanceof Boolean)

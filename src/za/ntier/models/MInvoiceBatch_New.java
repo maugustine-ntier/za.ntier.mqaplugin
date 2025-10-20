@@ -40,56 +40,58 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 
 	@Override
 	protected boolean beforeSave(boolean newRecord) {
-		String roles = MSysConfig.getValue(FINANCE_ROLES_FOR_CREATE);  
-		if (!checkRoleSetup(roles,FINANCE_ROLES_FOR_CREATE)) {
-			return false;
-		}
+		if (!isZZ_IS_WSP_ATR()) {
+			String roles = MSysConfig.getValue(FINANCE_ROLES_FOR_CREATE);  
+			if (!checkRoleSetup(roles,FINANCE_ROLES_FOR_CREATE)) {
+				return false;
+			}
 
-		int role_ID = Env.getAD_Role_ID(getCtx());
-		if (newRecord) {
-			if (Roles.checkRole(roles,role_ID)) {
-				if (getZZ_Status() == null || !(getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted))) {
-					log.saveError("Error", Msg.getMsg(getCtx(), "INVOICEBATCHSTATUSDRAFTED")); // "Status must be drafted for New Records");
+			int role_ID = Env.getAD_Role_ID(getCtx());
+			if (newRecord) {
+				if (Roles.checkRole(roles,role_ID)) {
+					if (getZZ_Status() == null || !(getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted))) {
+						log.saveError("Error", Msg.getMsg(getCtx(), "INVOICEBATCHSTATUSDRAFTED")); // "Status must be drafted for New Records");
+						return false;
+					}
+				} else {
+					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHCREATE")); // "Only Finance Roles are allowed to create Invoice Batches.");
 					return false;
 				}
 			} else {
-				log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHCREATE")); // "Only Finance Roles are allowed to create Invoice Batches.");
-				return false;
-			}
-		} else {
-			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
-				if (!Roles.checkRole(roles,role_ID)) {
-					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
-					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHINPROG")); //"Only Finance Roles can change to In Progress");
+				if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
+					if (!Roles.checkRole(roles,role_ID)) {
+						//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
+						log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEROLESINVOICEBATCHINPROG")); //"Only Finance Roles can change to In Progress");
+						return false;
+					}
+					if(getZZ_Policy_Procedure_Ck() == null ) {
+						//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
+						log.saveError("Error", Msg.getMsg(getCtx(), "PROCEDURECHECKLISTMUSTBETICKED")); //One of the policy procedure checklist must be ticked before the status is changed to ‘in progress’
+						return false;
+					}
+				}
+				roles = MSysConfig.getValue(MANAGER_OPS_SDL_ROLES);
+				if (!checkRoleSetup(roles,MANAGER_OPS_SDL_ROLES)) {
 					return false;
 				}
-				if(getZZ_Policy_Procedure_Ck() == null ) {
-					//setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
-					log.saveError("Error", Msg.getMsg(getCtx(), "PROCEDURECHECKLISTMUSTBETICKED")); //One of the policy procedure checklist must be ticked before the status is changed to ‘in progress’
-					return false;
+				if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Completed)) {
+					if (!Roles.checkRole(roles,role_ID)) {
+						log.saveError("Error", Msg.getMsg(getCtx(), "MANAGERINVOICEBATCHCOMPLETED")); //"Only Manager OPS/SDL Roles can change to Completed");
+						return false;
+					}
+				}
+				if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted)) {
+					if (Roles.checkRole(roles,role_ID)) {
+						log.saveError("Error", Msg.getMsg(getCtx(), "MANAGERINVOICEBATCHDRAFT")); //"Only Manager OPS/SDL Roles can change to Completed");
+						return false;
+					}
 				}
 			}
-			roles = MSysConfig.getValue(MANAGER_OPS_SDL_ROLES);
-			if (!checkRoleSetup(roles,MANAGER_OPS_SDL_ROLES)) {
-				return false;
-			}
-			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Completed)) {
-				if (!Roles.checkRole(roles,role_ID)) {
-					log.saveError("Error", Msg.getMsg(getCtx(), "MANAGERINVOICEBATCHCOMPLETED")); //"Only Manager OPS/SDL Roles can change to Completed");
+			if (getZZ_Status() != null && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
+				if (!isZZ_Account_Reconned() || !isZZ_Auth_PO_Order() || !isZZ_Calcs_Checked() || !isZZ_Cred_Bank_Dets_Verified() || !isZZ_GL_Allocation_Checked()) {
+					log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEDEPTCHECKLISTERROR")); 
 					return false;
 				}
-			}
-			if (getZZ_Status() != null && is_ValueChanged(COLUMNNAME_ZZ_Status) && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_Drafted)) {
-				if (Roles.checkRole(roles,role_ID)) {
-					log.saveError("Error", Msg.getMsg(getCtx(), "MANAGERINVOICEBATCHDRAFT")); //"Only Manager OPS/SDL Roles can change to Completed");
-					return false;
-				}
-			}
-		}
-		if (getZZ_Status() != null && getZZ_Status().equals(X_C_InvoiceBatch.ZZ_STATUS_InProgress)) {
-			if (!isZZ_Account_Reconned() || !isZZ_Auth_PO_Order() || !isZZ_Calcs_Checked() || !isZZ_Cred_Bank_Dets_Verified() || !isZZ_GL_Allocation_Checked()) {
-				log.saveError("Error", Msg.getMsg(getCtx(), "FINANCEDEPTCHECKLISTERROR")); 
-				return false;
 			}
 		}
 
@@ -233,12 +235,12 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 	public I_ZZ_Monthly_Levy_Files_Hdr getZZ_Monthly_Levy_Files_Hdr() throws RuntimeException
 	{
 		return (I_ZZ_Monthly_Levy_Files_Hdr)MTable.get(getCtx(), I_ZZ_Monthly_Levy_Files_Hdr.Table_ID)
-			.getPO(getZZ_Monthly_Levy_Files_Hdr_ID(), get_TrxName());
+				.getPO(getZZ_Monthly_Levy_Files_Hdr_ID(), get_TrxName());
 	}
 
 	/** Set Monthly Levy Files Hdr.
 		@param ZZ_Monthly_Levy_Files_Hdr_ID Monthly Levy Files Hdr
-	*/
+	 */
 	public void setZZ_Monthly_Levy_Files_Hdr_ID (int ZZ_Monthly_Levy_Files_Hdr_ID)
 	{
 		if (ZZ_Monthly_Levy_Files_Hdr_ID < 1)
@@ -253,8 +255,30 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID);
 		if (ii == null)
-			 return 0;
+			return 0;
 		return ii.intValue();
+	}
+
+	/** Set Is WSP ATR Batch.
+	@param ZZ_IS_WSP_ATR Is WSP ATR Batch
+	 */
+	public void setZZ_IS_WSP_ATR (boolean ZZ_IS_WSP_ATR)
+	{
+		set_Value (COLUMNNAME_ZZ_IS_WSP_ATR, Boolean.valueOf(ZZ_IS_WSP_ATR));
+	}
+
+	/** Get Is WSP ATR Batch.
+	@return Is WSP ATR Batch	  */
+	public boolean isZZ_IS_WSP_ATR()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_IS_WSP_ATR);
+		if (oo != null)
+		{
+			if (oo instanceof Boolean)
+				return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 

@@ -323,6 +323,15 @@ public interface I_C_InvoiceBatch
 	/** Get GL Allocation Checked	  */
 	public boolean isZZ_GL_Allocation_Checked();
 
+    /** Column name ZZ_IS_WSP_ATR */
+    public static final String COLUMNNAME_ZZ_IS_WSP_ATR = "ZZ_IS_WSP_ATR";
+
+	/** Set Is WSP ATR Batch	  */
+	public void setZZ_IS_WSP_ATR (boolean ZZ_IS_WSP_ATR);
+
+	/** Get Is WSP ATR Batch	  */
+	public boolean isZZ_IS_WSP_ATR();
+
     /** Column name ZZ_Monthly_Levy_Files_Hdr_ID */
     public static final String COLUMNNAME_ZZ_Monthly_Levy_Files_Hdr_ID = "ZZ_Monthly_Levy_Files_Hdr_ID";
 
