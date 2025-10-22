@@ -167,7 +167,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
             BigDecimal mg = nz(rec.getZZ_MG());
             boolean wroteAnyLine = false;
 
-            if (isNegative(mg)) {
+           if (isNegative(mg) || !isNegative(mg) ) {  // Also create debit notes
             	MInvoiceBatch_New batch = ensureBatchForYear(yearKey, hdr, currencyID); // lazy-create here
                 int lineNo = nextLineNo(yearKey, batch.getC_InvoiceBatch_ID());
                 createLine(batch.getC_InvoiceBatch_ID(), p_C_DocType_ID, ++createdLines, lineNo,
@@ -175,7 +175,7 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
                         mg.negate(), "MG", rec);
                 wroteAnyLine = true;
             } else {
-                skippedZeroAmt++;
+               skippedZeroAmt++;
             }
 
             // // DG (positive-only) — optional:
