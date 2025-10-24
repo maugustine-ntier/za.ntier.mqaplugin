@@ -7,7 +7,6 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MClient;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.util.Env;
 
 import za.ntier.service.LevyBatchCreationService;
 
@@ -38,8 +37,6 @@ public class CreateInvoiceBatchFromLevyFiles extends SvrProcess {
     @Override
     protected String doIt() throws Exception {
         final Properties ctx = getCtx();
-        final int adClientId = Env.getAD_Client_ID(ctx);
-
         // Resolve currency if needed (service also checks/fallbacks)
         MClient client = MClient.get(ctx);
 

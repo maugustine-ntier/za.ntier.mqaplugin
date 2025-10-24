@@ -24,7 +24,8 @@ public class ApprovalsRepository {
         List<List<Object>> rows = DB.getSQLArrayObjectsEx(trx, sql, new Object[]{});
         if (rows == null) return out;
         for (List<Object> r : rows) {
-            Integer bpId = (Integer) r.get(0);
+            Number bpNum = (Number) r.get(0);         
+            int bpId = bpNum.intValue();
             String yrStr = (String) r.get(1);
             Integer y = YearUtil.parseYear(yrStr);
             if (y != null) out.add(new Approval(bpId, y));

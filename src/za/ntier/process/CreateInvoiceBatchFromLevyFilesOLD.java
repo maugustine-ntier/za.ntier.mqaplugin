@@ -23,7 +23,7 @@ import za.ntier.models.X_C_InvoiceBatch;
 import za.ntier.models.X_ZZ_Monthly_Levy_Files;
 import za.ntier.models.X_ZZ_Monthly_Levy_Files_Hdr;
 
-@org.adempiere.base.annotation.Process(name="za.ntier.process.CreateInvoiceBatchFromLevyFiles")
+//@org.adempiere.base.annotation.Process(name="za.ntier.process.CreateInvoiceBatchFromLevyFiles")
 public class CreateInvoiceBatchFromLevyFilesOLD extends SvrProcess {
 
     private int p_C_Charge_ID = 0;
