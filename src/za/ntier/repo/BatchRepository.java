@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Properties;
 
-import org.compiere.model.X_C_InvoiceBatchLine;
+import org.compiere.model.MInvoiceBatchLine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
@@ -64,7 +64,7 @@ public class BatchRepository {
         String name = "Levy Batch Hdr#" + hdr.get_ID();
         if (hdr.getZZ_Month() != null && !hdr.getZZ_Month().trim().isEmpty()) name += " M" + hdr.getZZ_Month();
         name += " " + yearKey;
-        b.setDescription("Generated from ZZ_Monthly_Levy_Files_Hdr ID " + hdr.get_ID() + " (ApprovalYear=" + yearKey + ")");
+        b.setDescription("MG Generated for Year: " + yearKey + " Month: " + hdr.getZZ_Month());
         b.setDocumentAmt(Env.ZERO);
         b.saveEx();
 
@@ -87,7 +87,7 @@ public class BatchRepository {
 
     public int createBatchLine(int batchId, int docTypeId, int lineNo, int bpId, int bpLocId,
                                int chargeId, Timestamp date, BigDecimal amount, String description) {
-        X_C_InvoiceBatchLine l = new X_C_InvoiceBatchLine(ctx, 0, trx);
+    	MInvoiceBatchLine l = new MInvoiceBatchLine(ctx, 0, trx);
         l.setAD_Org_ID(1000016);
         l.setC_InvoiceBatch_ID(batchId);
         l.setC_DocType_ID(docTypeId);
