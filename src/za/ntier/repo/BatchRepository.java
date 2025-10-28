@@ -53,7 +53,7 @@ public class BatchRepository {
         if (cached != null) return cached;
 
         MInvoiceBatch_New b = new MInvoiceBatch_New(ctx, 0, trx);
-        b.setAD_Org_ID(1000002);
+        b.setAD_Org_ID(1000016);
         b.setDateDoc(dateDoc);
         b.setC_Currency_ID(currencyId);
         b.setSalesRep_ID(adUserId);
@@ -88,7 +88,7 @@ public class BatchRepository {
     public int createBatchLine(int batchId, int docTypeId, int lineNo, int bpId, int bpLocId,
                                int chargeId, Timestamp date, BigDecimal amount, String description) {
         X_C_InvoiceBatchLine l = new X_C_InvoiceBatchLine(ctx, 0, trx);
-        l.setAD_Org_ID(1000002);
+        l.setAD_Org_ID(1000016);
         l.setC_InvoiceBatch_ID(batchId);
         l.setC_DocType_ID(docTypeId);
         l.setLine(lineNo);
