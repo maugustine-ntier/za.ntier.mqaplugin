@@ -314,6 +314,33 @@ public interface I_C_InvoiceBatch
  Banking Details Verified	  */
 	public boolean isZZ_Cred_Bank_Dets_Verified();
 
+    /** Column name ZZ_DocAction */
+    public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
+
+	/** Set Document Action	  */
+	public void setZZ_DocAction (String ZZ_DocAction);
+
+	/** Get Document Action	  */
+	public String getZZ_DocAction();
+
+    /** Column name ZZ_DocStatus */
+    public static final String COLUMNNAME_ZZ_DocStatus = "ZZ_DocStatus";
+
+	/** Set Document Status	  */
+	public void setZZ_DocStatus (String ZZ_DocStatus);
+
+	/** Get Document Status	  */
+	public String getZZ_DocStatus();
+
+    /** Column name ZZ_ExportInvoiceBatchToCsv */
+    public static final String COLUMNNAME_ZZ_ExportInvoiceBatchToCsv = "ZZ_ExportInvoiceBatchToCsv";
+
+	/** Set Export Invoice BatchTo Csv	  */
+	public void setZZ_ExportInvoiceBatchToCsv (String ZZ_ExportInvoiceBatchToCsv);
+
+	/** Get Export Invoice BatchTo Csv	  */
+	public String getZZ_ExportInvoiceBatchToCsv();
+
     /** Column name ZZ_GL_Allocation_Checked */
     public static final String COLUMNNAME_ZZ_GL_Allocation_Checked = "ZZ_GL_Allocation_Checked";
 
@@ -347,10 +374,10 @@ public interface I_C_InvoiceBatch
     public static final String COLUMNNAME_ZZ_Policy_Procedure_Ck = "ZZ_Policy_Procedure_Ck";
 
 	/** Set Policy Procedure Checklist	  */
-	public void setZZ_Policy_Procedure_Ck (Object ZZ_Policy_Procedure_Ck);
+	public void setZZ_Policy_Procedure_Ck (String ZZ_Policy_Procedure_Ck);
 
 	/** Get Policy Procedure Checklist	  */
-	public Object getZZ_Policy_Procedure_Ck();
+	public String getZZ_Policy_Procedure_Ck();
 
     /** Column name ZZ_Status */
     public static final String COLUMNNAME_ZZ_Status = "ZZ_Status";

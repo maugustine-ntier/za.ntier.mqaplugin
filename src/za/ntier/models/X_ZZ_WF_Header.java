@@ -31,7 +31,7 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251027L;
+	private static final long serialVersionUID = 20251028L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Header (Properties ctx, int ZZ_WF_Header_ID, String trxName)
@@ -92,7 +92,7 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
     }
 
     /** AccessLevel
-      * @return 3 - Client - Org
+      * @return 4 - System
       */
     protected int get_AccessLevel()
     {
@@ -155,6 +155,33 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public String getDescription()
 	{
 		return (String)get_Value(COLUMNNAME_Description);
+	}
+
+	public org.compiere.model.I_R_MailText getMMailText_FinalApproved() throws RuntimeException
+	{
+		return (org.compiere.model.I_R_MailText)MTable.get(getCtx(), org.compiere.model.I_R_MailText.Table_ID)
+			.getPO(getMMailText_FinalApproved_ID(), get_TrxName());
+	}
+
+	/** Set Mail Text Final Approve.
+		@param MMailText_FinalApproved_ID Mail Text Final Approve
+	*/
+	public void setMMailText_FinalApproved_ID (int MMailText_FinalApproved_ID)
+	{
+		if (MMailText_FinalApproved_ID < 1)
+			set_Value (COLUMNNAME_MMailText_FinalApproved_ID, null);
+		else
+			set_Value (COLUMNNAME_MMailText_FinalApproved_ID, Integer.valueOf(MMailText_FinalApproved_ID));
+	}
+
+	/** Get Mail Text Final Approve.
+		@return Mail Text Final Approve	  */
+	public int getMMailText_FinalApproved_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_MMailText_FinalApproved_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Name.

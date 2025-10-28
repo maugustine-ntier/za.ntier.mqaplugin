@@ -31,7 +31,7 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251027L;
+	private static final long serialVersionUID = 20251028L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Lines (Properties ctx, int ZZ_WF_Lines_ID, String trxName)
@@ -108,7 +108,7 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
     }
 
     /** AccessLevel
-      * @return 3 - Client - Org
+      * @return 4 - System
       */
     protected int get_AccessLevel()
     {
@@ -129,11 +129,48 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
       return sb.toString();
     }
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ALLOWEDFROMSTATUS_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String ALLOWEDFROMSTATUS_Approved = "AP";
+	/** Completed = CO */
+	public static final String ALLOWEDFROMSTATUS_Completed = "CO";
+	/** Draft = DR */
+	public static final String ALLOWEDFROMSTATUS_Draft = "DR";
+	/** In Progress = IP */
+	public static final String ALLOWEDFROMSTATUS_InProgress = "IP";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ALLOWEDFROMSTATUS_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ALLOWEDFROMSTATUS_Recommended = "RC";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ALLOWEDFROMSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ALLOWEDFROMSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ALLOWEDFROMSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ALLOWEDFROMSTATUS_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String ALLOWEDFROMSTATUS_Submitted = "SU";
 	/** Set Allowed From Status.
 		@param AllowedFromStatus Allowed From Status
 	*/
 	public void setAllowedFromStatus (String AllowedFromStatus)
 	{
+
 		set_Value (COLUMNNAME_AllowedFromStatus, AllowedFromStatus);
 	}
 
@@ -257,6 +294,94 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 		return (String)get_Value(COLUMNNAME_Name);
 	}
 
+	/** Exec Approve = AE */
+	public static final String NEXTACTIONONAPPROVE_ExecApprove = "AE";
+	/** Approve/Do Not Approve = AP */
+	public static final String NEXTACTIONONAPPROVE_ApproveDoNotApprove = "AP";
+	/** Complete = CO */
+	public static final String NEXTACTIONONAPPROVE_Complete = "CO";
+	/** Final Approval/Do not Approve = FA */
+	public static final String NEXTACTIONONAPPROVE_FinalApprovalDoNotApprove = "FA";
+	/** Recommend = RE */
+	public static final String NEXTACTIONONAPPROVE_Recommend = "RE";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String NEXTACTIONONAPPROVE_SubmitToManagerFinanceConsumables = "SC";
+	/** Submit to SDL Finance Mgr = SD */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSDLFinanceMgr = "SD";
+	/** Submit to Snr Mgr LP = SL */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSnrMgrLP = "SL";
+	/** Submit to Snr Mgr Ops = SO */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSnrMgrOps = "SO";
+	/** Submit to Snr Mgr Projects = SP */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSnrMgrProjects = "SP";
+	/** Submit to Snr Mgr QA = SQ */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSnrMgrQA = "SQ";
+	/** Submit to Recommender = SR */
+	public static final String NEXTACTIONONAPPROVE_SubmitToRecommender = "SR";
+	/** Submit to Snr Mgr SRU = SS */
+	public static final String NEXTACTIONONAPPROVE_SubmitToSnrMgrSRU = "SS";
+	/** Submit to Line Manager = SU */
+	public static final String NEXTACTIONONAPPROVE_SubmitToLineManager = "SU";
+	/** Set Next Action On Approve.
+		@param NextActionOnApprove Next Action On Approve
+	*/
+	public void setNextActionOnApprove (String NextActionOnApprove)
+	{
+
+		set_Value (COLUMNNAME_NextActionOnApprove, NextActionOnApprove);
+	}
+
+	/** Get Next Action On Approve.
+		@return Next Action On Approve	  */
+	public String getNextActionOnApprove()
+	{
+		return (String)get_Value(COLUMNNAME_NextActionOnApprove);
+	}
+
+	/** Exec Approve = AE */
+	public static final String NEXTACTIONONREJECT_ExecApprove = "AE";
+	/** Approve/Do Not Approve = AP */
+	public static final String NEXTACTIONONREJECT_ApproveDoNotApprove = "AP";
+	/** Complete = CO */
+	public static final String NEXTACTIONONREJECT_Complete = "CO";
+	/** Final Approval/Do not Approve = FA */
+	public static final String NEXTACTIONONREJECT_FinalApprovalDoNotApprove = "FA";
+	/** Recommend = RE */
+	public static final String NEXTACTIONONREJECT_Recommend = "RE";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String NEXTACTIONONREJECT_SubmitToManagerFinanceConsumables = "SC";
+	/** Submit to SDL Finance Mgr = SD */
+	public static final String NEXTACTIONONREJECT_SubmitToSDLFinanceMgr = "SD";
+	/** Submit to Snr Mgr LP = SL */
+	public static final String NEXTACTIONONREJECT_SubmitToSnrMgrLP = "SL";
+	/** Submit to Snr Mgr Ops = SO */
+	public static final String NEXTACTIONONREJECT_SubmitToSnrMgrOps = "SO";
+	/** Submit to Snr Mgr Projects = SP */
+	public static final String NEXTACTIONONREJECT_SubmitToSnrMgrProjects = "SP";
+	/** Submit to Snr Mgr QA = SQ */
+	public static final String NEXTACTIONONREJECT_SubmitToSnrMgrQA = "SQ";
+	/** Submit to Recommender = SR */
+	public static final String NEXTACTIONONREJECT_SubmitToRecommender = "SR";
+	/** Submit to Snr Mgr SRU = SS */
+	public static final String NEXTACTIONONREJECT_SubmitToSnrMgrSRU = "SS";
+	/** Submit to Line Manager = SU */
+	public static final String NEXTACTIONONREJECT_SubmitToLineManager = "SU";
+	/** Set Next Action On Reject.
+		@param NextActionOnReject Next Action On Reject
+	*/
+	public void setNextActionOnReject (String NextActionOnReject)
+	{
+
+		set_Value (COLUMNNAME_NextActionOnReject, NextActionOnReject);
+	}
+
+	/** Get Next Action On Reject.
+		@return Next Action On Reject	  */
+	public String getNextActionOnReject()
+	{
+		return (String)get_Value(COLUMNNAME_NextActionOnReject);
+	}
+
 	/** Set Next Status On Approve.
 		@param NextStatusOnApprove Next Status On Approve
 	*/
@@ -306,11 +431,40 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 		return ii.intValue();
 	}
 
+	/** Exec Approve = AE */
+	public static final String SETDOCACTION_ExecApprove = "AE";
+	/** Approve/Do Not Approve = AP */
+	public static final String SETDOCACTION_ApproveDoNotApprove = "AP";
+	/** Complete = CO */
+	public static final String SETDOCACTION_Complete = "CO";
+	/** Final Approval/Do not Approve = FA */
+	public static final String SETDOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Recommend = RE */
+	public static final String SETDOCACTION_Recommend = "RE";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String SETDOCACTION_SubmitToManagerFinanceConsumables = "SC";
+	/** Submit to SDL Finance Mgr = SD */
+	public static final String SETDOCACTION_SubmitToSDLFinanceMgr = "SD";
+	/** Submit to Snr Mgr LP = SL */
+	public static final String SETDOCACTION_SubmitToSnrMgrLP = "SL";
+	/** Submit to Snr Mgr Ops = SO */
+	public static final String SETDOCACTION_SubmitToSnrMgrOps = "SO";
+	/** Submit to Snr Mgr Projects = SP */
+	public static final String SETDOCACTION_SubmitToSnrMgrProjects = "SP";
+	/** Submit to Snr Mgr QA = SQ */
+	public static final String SETDOCACTION_SubmitToSnrMgrQA = "SQ";
+	/** Submit to Recommender = SR */
+	public static final String SETDOCACTION_SubmitToRecommender = "SR";
+	/** Submit to Snr Mgr SRU = SS */
+	public static final String SETDOCACTION_SubmitToSnrMgrSRU = "SS";
+	/** Submit to Line Manager = SU */
+	public static final String SETDOCACTION_SubmitToLineManager = "SU";
 	/** Set Set Doc Action.
 		@param SetDocAction Set Doc Action
 	*/
 	public void setSetDocAction (String SetDocAction)
 	{
+
 		set_Value (COLUMNNAME_SetDocAction, SetDocAction);
 	}
 

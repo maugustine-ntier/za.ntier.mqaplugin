@@ -117,10 +117,11 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 
 	/** Get Policy Procedure Checklist.
 	@return Policy Procedure Checklist	  */
-	public Object getZZ_Policy_Procedure_Ck()
+	public String getZZ_Policy_Procedure_Ck()
 	{
-		return get_Value(COLUMNNAME_ZZ_Policy_Procedure_Ck);
+		return (String)get_Value(COLUMNNAME_ZZ_Policy_Procedure_Ck);
 	}
+
 
 	/** Set Account Reconciled / O/S Invoices Verified.
 	@param ZZ_Account_Reconned Account Reconciled / O/S Invoices Verified
@@ -279,6 +280,48 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	@Override
+	public void setZZ_DocAction(String ZZ_DocAction) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_DocAction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_DocStatus(String ZZ_DocStatus) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_DocStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_ExportInvoiceBatchToCsv(String ZZ_ExportInvoiceBatchToCsv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getZZ_ExportInvoiceBatchToCsv() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Policy_Procedure_Ck(String ZZ_Policy_Procedure_Ck) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -37,9 +37,9 @@ public interface I_ZZ_WF_Header
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 3 - Client - Org 
+    /** AccessLevel = 4 - System 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(3);
+    BigDecimal accessLevel = BigDecimal.valueOf(4);
 
     /** Load Meta Data */
 
@@ -120,6 +120,17 @@ public interface I_ZZ_WF_Header
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name MMailText_FinalApproved_ID */
+    public static final String COLUMNNAME_MMailText_FinalApproved_ID = "MMailText_FinalApproved_ID";
+
+	/** Set Mail Text Final Approve	  */
+	public void setMMailText_FinalApproved_ID (int MMailText_FinalApproved_ID);
+
+	/** Get Mail Text Final Approve	  */
+	public int getMMailText_FinalApproved_ID();
+
+	public org.compiere.model.I_R_MailText getMMailText_FinalApproved() throws RuntimeException;
 
     /** Column name Name */
     public static final String COLUMNNAME_Name = "Name";

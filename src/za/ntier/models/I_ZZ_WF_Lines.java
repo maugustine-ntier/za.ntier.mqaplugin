@@ -37,9 +37,9 @@ public interface I_ZZ_WF_Lines
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 3 - Client - Org 
+    /** AccessLevel = 4 - System 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(3);
+    BigDecimal accessLevel = BigDecimal.valueOf(4);
 
     /** Load Meta Data */
 
@@ -160,6 +160,24 @@ public interface I_ZZ_WF_Lines
 	  * Alphanumeric identifier of the entity
 	  */
 	public String getName();
+
+    /** Column name NextActionOnApprove */
+    public static final String COLUMNNAME_NextActionOnApprove = "NextActionOnApprove";
+
+	/** Set Next Action On Approve	  */
+	public void setNextActionOnApprove (String NextActionOnApprove);
+
+	/** Get Next Action On Approve	  */
+	public String getNextActionOnApprove();
+
+    /** Column name NextActionOnReject */
+    public static final String COLUMNNAME_NextActionOnReject = "NextActionOnReject";
+
+	/** Set Next Action On Reject	  */
+	public void setNextActionOnReject (String NextActionOnReject);
+
+	/** Get Next Action On Reject	  */
+	public String getNextActionOnReject();
 
     /** Column name NextStatusOnApprove */
     public static final String COLUMNNAME_NextStatusOnApprove = "NextStatusOnApprove";
