@@ -109,6 +109,7 @@ public class BatchRepository {
     }
 
     public void updateControlAmt(MInvoiceBatch_New batch) {
+    	batch = new MInvoiceBatch_New(ctx, batch.getC_InvoiceBatch_ID(), batch.get_TrxName());  // Refresh values that were updated by batch lines after save
         batch.setControlAmt(batch.getDocumentAmt());
         batch.saveEx();
     }
