@@ -314,6 +314,51 @@ public interface I_C_InvoiceBatch
  Banking Details Verified	  */
 	public boolean isZZ_Cred_Bank_Dets_Verified();
 
+    /** Column name ZZ_Date_Not_Recom_Snr_Mgr_SDR */
+    public static final String COLUMNNAME_ZZ_Date_Not_Recom_Snr_Mgr_SDR = "ZZ_Date_Not_Recom_Snr_Mgr_SDR";
+
+	/** Set Date Not Recommended By Snr Mgr SDR	  */
+	public void setZZ_Date_Not_Recom_Snr_Mgr_SDR (Timestamp ZZ_Date_Not_Recom_Snr_Mgr_SDR);
+
+	/** Get Date Not Recommended By Snr Mgr SDR	  */
+	public Timestamp getZZ_Date_Not_Recom_Snr_Mgr_SDR();
+
+    /** Column name ZZ_Date_Not_Recomm_Snr_Mgr_Fin */
+    public static final String COLUMNNAME_ZZ_Date_Not_Recomm_Snr_Mgr_Fin = "ZZ_Date_Not_Recomm_Snr_Mgr_Fin";
+
+	/** Set Date Not Recommended By Snr Mgr Finance	  */
+	public void setZZ_Date_Not_Recomm_Snr_Mgr_Fin (Timestamp ZZ_Date_Not_Recomm_Snr_Mgr_Fin);
+
+	/** Get Date Not Recommended By Snr Mgr Finance	  */
+	public Timestamp getZZ_Date_Not_Recomm_Snr_Mgr_Fin();
+
+    /** Column name ZZ_Date_Recom_Snr_Mgr_SDR */
+    public static final String COLUMNNAME_ZZ_Date_Recom_Snr_Mgr_SDR = "ZZ_Date_Recom_Snr_Mgr_SDR";
+
+	/** Set Date Recommended By Snr Mgr SDR	  */
+	public void setZZ_Date_Recom_Snr_Mgr_SDR (Timestamp ZZ_Date_Recom_Snr_Mgr_SDR);
+
+	/** Get Date Recommended By Snr Mgr SDR	  */
+	public Timestamp getZZ_Date_Recom_Snr_Mgr_SDR();
+
+    /** Column name ZZ_Date_Recomm_Snr_Mgr_Fin */
+    public static final String COLUMNNAME_ZZ_Date_Recomm_Snr_Mgr_Fin = "ZZ_Date_Recomm_Snr_Mgr_Fin";
+
+	/** Set Date Recommended By Snr Mgr Finance	  */
+	public void setZZ_Date_Recomm_Snr_Mgr_Fin (Timestamp ZZ_Date_Recomm_Snr_Mgr_Fin);
+
+	/** Get Date Recommended By Snr Mgr Finance	  */
+	public Timestamp getZZ_Date_Recomm_Snr_Mgr_Fin();
+
+    /** Column name ZZ_Date_Submitted */
+    public static final String COLUMNNAME_ZZ_Date_Submitted = "ZZ_Date_Submitted";
+
+	/** Set Date Submitted	  */
+	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted);
+
+	/** Get Date Submitted	  */
+	public Timestamp getZZ_Date_Submitted();
+
     /** Column name ZZ_DocAction */
     public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
 
@@ -378,6 +423,28 @@ public interface I_C_InvoiceBatch
 
 	/** Get Policy Procedure Checklist	  */
 	public String getZZ_Policy_Procedure_Ck();
+
+    /** Column name ZZ_Recommender_ID */
+    public static final String COLUMNNAME_ZZ_Recommender_ID = "ZZ_Recommender_ID";
+
+	/** Set Recommender	  */
+	public void setZZ_Recommender_ID (int ZZ_Recommender_ID);
+
+	/** Get Recommender	  */
+	public int getZZ_Recommender_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Recommender() throws RuntimeException;
+
+    /** Column name ZZ_Snr_Admin_Fin_ID */
+    public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";
+
+	/** Set Snr Admin Finance User	  */
+	public void setZZ_Snr_Admin_Fin_ID (int ZZ_Snr_Admin_Fin_ID);
+
+	/** Get Snr Admin Finance User	  */
+	public int getZZ_Snr_Admin_Fin_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException;
 
     /** Column name ZZ_Status */
     public static final String COLUMNNAME_ZZ_Status = "ZZ_Status";

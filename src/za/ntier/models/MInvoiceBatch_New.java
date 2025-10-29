@@ -1,8 +1,10 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.compiere.model.I_AD_User;
 import org.compiere.model.MInvoiceBatch;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
@@ -282,34 +284,23 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 		return false;
 	}
 
-	@Override
-	public void setZZ_DocAction(String ZZ_DocAction) {
-		// TODO Auto-generated method stub
-		
+	public void setZZ_DocStatus (String ZZ_DocStatus)
+	{
+
+		set_Value (COLUMNNAME_ZZ_DocStatus, ZZ_DocStatus);
 	}
 
-	@Override
-	public String getZZ_DocAction() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setZZ_DocStatus(String ZZ_DocStatus) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getZZ_DocStatus() {
-		// TODO Auto-generated method stub
-		return null;
+	/** Get Document Status.
+		@return Document Status	  */
+	public String getZZ_DocStatus()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
 	@Override
 	public void setZZ_ExportInvoiceBatchToCsv(String ZZ_ExportInvoiceBatchToCsv) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -321,9 +312,147 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 	@Override
 	public void setZZ_Policy_Procedure_Ck(String ZZ_Policy_Procedure_Ck) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	/** Set Date Not Recommended By Snr Mgr SDR.
+	@param ZZ_Date_Not_Recom_Snr_Mgr_SDR Date Not Recommended By Snr Mgr SDR
+	 */
+	public void setZZ_Date_Not_Recom_Snr_Mgr_SDR (Timestamp ZZ_Date_Not_Recom_Snr_Mgr_SDR)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recom_Snr_Mgr_SDR, ZZ_Date_Not_Recom_Snr_Mgr_SDR);
+	}
+
+	/** Get Date Not Recommended By Snr Mgr SDR.
+	@return Date Not Recommended By Snr Mgr SDR	  */
+	public Timestamp getZZ_Date_Not_Recom_Snr_Mgr_SDR()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recom_Snr_Mgr_SDR);
+	}
+
+	/** Set Date Not Recommended By Snr Mgr Finance.
+	@param ZZ_Date_Not_Recomm_Snr_Mgr_Fin Date Not Recommended By Snr Mgr Finance
+	 */
+	public void setZZ_Date_Not_Recomm_Snr_Mgr_Fin (Timestamp ZZ_Date_Not_Recomm_Snr_Mgr_Fin)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recomm_Snr_Mgr_Fin, ZZ_Date_Not_Recomm_Snr_Mgr_Fin);
+	}
+
+	/** Get Date Not Recommended By Snr Mgr Finance.
+	@return Date Not Recommended By Snr Mgr Finance	  */
+	public Timestamp getZZ_Date_Not_Recomm_Snr_Mgr_Fin()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recomm_Snr_Mgr_Fin);
+	}
+
+	/** Set Date Recommended By Snr Mgr SDR.
+	@param ZZ_Date_Recom_Snr_Mgr_SDR Date Recommended By Snr Mgr SDR
+	 */
+	public void setZZ_Date_Recom_Snr_Mgr_SDR (Timestamp ZZ_Date_Recom_Snr_Mgr_SDR)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recom_Snr_Mgr_SDR, ZZ_Date_Recom_Snr_Mgr_SDR);
+	}
+
+	/** Get Date Recommended By Snr Mgr SDR.
+	@return Date Recommended By Snr Mgr SDR	  */
+	public Timestamp getZZ_Date_Recom_Snr_Mgr_SDR()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recom_Snr_Mgr_SDR);
+	}
+
+	/** Set Date Recommended By Snr Mgr Finance.
+	@param ZZ_Date_Recomm_Snr_Mgr_Fin Date Recommended By Snr Mgr Finance
+	 */
+	public void setZZ_Date_Recomm_Snr_Mgr_Fin (Timestamp ZZ_Date_Recomm_Snr_Mgr_Fin)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recomm_Snr_Mgr_Fin, ZZ_Date_Recomm_Snr_Mgr_Fin);
+	}
+
+	/** Get Date Recommended By Snr Mgr Finance.
+	@return Date Recommended By Snr Mgr Finance	  */
+	public Timestamp getZZ_Date_Recomm_Snr_Mgr_Fin()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recomm_Snr_Mgr_Fin);
+	}
+
+	/** Set Date Submitted.
+	@param ZZ_Date_Submitted Date Submitted
+	 */
+	public void setZZ_Date_Submitted (Timestamp ZZ_Date_Submitted)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Submitted, ZZ_Date_Submitted);
+	}
+
+	/** Get Date Submitted.
+	@return Date Submitted	  */
+	public Timestamp getZZ_Date_Submitted()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Submitted);
+	}
+
+	public void setZZ_DocAction (String ZZ_DocAction)
+	{
+
+		set_Value (COLUMNNAME_ZZ_DocAction, ZZ_DocAction);
+	}
+
+	/** Get Document Action.
+	@return Document Action	  */
+	public String getZZ_DocAction()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
+	}
+
+	public void setZZ_Recommender_ID (int ZZ_Recommender_ID)
+	{
+		if (ZZ_Recommender_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Recommender_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Recommender_ID, Integer.valueOf(ZZ_Recommender_ID));
+	}
+
+	/** Get Recommender.
+	@return Recommender	  */
+	public int getZZ_Recommender_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Recommender_ID);
+		if (ii == null)
+			return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+				.getPO(getZZ_Snr_Admin_Fin_ID(), get_TrxName());
+	}
+
+	/** Set Snr Admin Finance User.
+	@param ZZ_Snr_Admin_Fin_ID Snr Admin Finance User
+	 */
+	public void setZZ_Snr_Admin_Fin_ID (int ZZ_Snr_Admin_Fin_ID)
+	{
+		if (ZZ_Snr_Admin_Fin_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Snr_Admin_Fin_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Snr_Admin_Fin_ID, Integer.valueOf(ZZ_Snr_Admin_Fin_ID));
+	}
+
+	/** Get Snr Admin Finance User.
+	@return Snr Admin Finance User	  */
+	public int getZZ_Snr_Admin_Fin_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Snr_Admin_Fin_ID);
+		if (ii == null)
+			return 0;
+		return ii.intValue();
+	}
+
+	@Override
+	public I_AD_User getZZ_Recommender() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 

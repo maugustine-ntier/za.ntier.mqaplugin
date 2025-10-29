@@ -12,6 +12,7 @@ import za.co.ntier.wf.model.MZZWFHeader;
 import za.co.ntier.wf.model.MZZWFLines;
 import za.co.ntier.wf.util.MailNoticeUtil;
 
+@org.adempiere.base.annotation.Process(name="za.co.ntier.wf.process.ZZ_WF_RunProcess")
 public class ZZ_WF_RunProcess extends SvrProcess {
     @Parameter(name="Approve")
     private String pApprove; // 'Y' or 'N' or null

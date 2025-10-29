@@ -31,7 +31,7 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251028L;
+	private static final long serialVersionUID = 20251029L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Header (Properties ctx, int ZZ_WF_Header_ID, String trxName)
@@ -200,11 +200,52 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 		return (String)get_Value(COLUMNNAME_Name);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_FINALSTATUS_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String ZZ_FINALSTATUS_Approved = "AP";
+	/** Completed = CO */
+	public static final String ZZ_FINALSTATUS_Completed = "CO";
+	/** Draft = DR */
+	public static final String ZZ_FINALSTATUS_Draft = "DR";
+	/** In Progress = IP */
+	public static final String ZZ_FINALSTATUS_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ZZ_FINALSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ZZ_FINALSTATUS_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_FINALSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_FINALSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_FINALSTATUS_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String ZZ_FINALSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_FINALSTATUS_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String ZZ_FINALSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ZZ_FINALSTATUS_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ZZ_FINALSTATUS_RecommendedBySeniorMgrSDR = "RD";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_FINALSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_FINALSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_FINALSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_FINALSTATUS_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String ZZ_FINALSTATUS_Submitted = "SU";
 	/** Set Final Status.
 		@param ZZ_FinalStatus Final Status
 	*/
 	public void setZZ_FinalStatus (String ZZ_FinalStatus)
 	{
+
 		set_Value (COLUMNNAME_ZZ_FinalStatus, ZZ_FinalStatus);
 	}
 
@@ -230,11 +271,52 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 		return (String)get_Value(COLUMNNAME_ZZ_NotifyMode);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_STARTSTATUS_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String ZZ_STARTSTATUS_Approved = "AP";
+	/** Completed = CO */
+	public static final String ZZ_STARTSTATUS_Completed = "CO";
+	/** Draft = DR */
+	public static final String ZZ_STARTSTATUS_Draft = "DR";
+	/** In Progress = IP */
+	public static final String ZZ_STARTSTATUS_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ZZ_STARTSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ZZ_STARTSTATUS_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_STARTSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_STARTSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_STARTSTATUS_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String ZZ_STARTSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_STARTSTATUS_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String ZZ_STARTSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String ZZ_STARTSTATUS_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ZZ_STARTSTATUS_RecommendedBySeniorMgrSDR = "RD";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_STARTSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_STARTSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_STARTSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_STARTSTATUS_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String ZZ_STARTSTATUS_Submitted = "SU";
 	/** Set Start Status.
 		@param ZZ_StartStatus Start Status
 	*/
 	public void setZZ_StartStatus (String ZZ_StartStatus)
 	{
+
 		set_Value (COLUMNNAME_ZZ_StartStatus, ZZ_StartStatus);
 	}
 

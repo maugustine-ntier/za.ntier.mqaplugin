@@ -237,6 +237,50 @@ public interface I_ZZ_WF_Lines
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Approved_TS_COL_ID */
+    public static final String COLUMNNAME_ZZ_Approved_TS_COL_ID = "ZZ_Approved_TS_COL_ID";
+
+	/** Set Zz Approved Ts Col Id	  */
+	public void setZZ_Approved_TS_COL_ID (int ZZ_Approved_TS_COL_ID);
+
+	/** Get Zz Approved Ts Col Id	  */
+	public int getZZ_Approved_TS_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_TS_COL() throws RuntimeException;
+
+    /** Column name ZZ_Approved_User_COL_ID */
+    public static final String COLUMNNAME_ZZ_Approved_User_COL_ID = "ZZ_Approved_User_COL_ID";
+
+	/** Set Approved User Col Id	  */
+	public void setZZ_Approved_User_COL_ID (int ZZ_Approved_User_COL_ID);
+
+	/** Get Approved User Col Id	  */
+	public int getZZ_Approved_User_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_User_COL() throws RuntimeException;
+
+    /** Column name ZZ_Rejected_TS_COL_ID */
+    public static final String COLUMNNAME_ZZ_Rejected_TS_COL_ID = "ZZ_Rejected_TS_COL_ID";
+
+	/** Set Zz Rejected Ts Col Id	  */
+	public void setZZ_Rejected_TS_COL_ID (int ZZ_Rejected_TS_COL_ID);
+
+	/** Get Zz Rejected Ts Col Id	  */
+	public int getZZ_Rejected_TS_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_TS_COL() throws RuntimeException;
+
+    /** Column name ZZ_Rejected_User_COL_ID */
+    public static final String COLUMNNAME_ZZ_Rejected_User_COL_ID = "ZZ_Rejected_User_COL_ID";
+
+	/** Set Zz Rejected User Col Id	  */
+	public void setZZ_Rejected_User_COL_ID (int ZZ_Rejected_User_COL_ID);
+
+	/** Get Zz Rejected User Col Id	  */
+	public int getZZ_Rejected_User_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_User_COL() throws RuntimeException;
+
     /** Column name ZZ_Specific_Responsible_Col_ID */
     public static final String COLUMNNAME_ZZ_Specific_Responsible_Col_ID = "ZZ_Specific_Responsible_Col_ID";
 

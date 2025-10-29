@@ -31,7 +31,7 @@ public class X_ZZ_WF_Audit extends PO implements I_ZZ_WF_Audit, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251028L;
+	private static final long serialVersionUID = 20251029L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Audit (Properties ctx, int ZZ_WF_Audit_ID, String trxName)

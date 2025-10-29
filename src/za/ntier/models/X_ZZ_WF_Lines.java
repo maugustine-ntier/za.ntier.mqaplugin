@@ -31,7 +31,7 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251028L;
+	private static final long serialVersionUID = 20251029L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Lines (Properties ctx, int ZZ_WF_Lines_ID, String trxName)
@@ -139,6 +139,8 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String ALLOWEDFROMSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ALLOWEDFROMSTATUS_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ALLOWEDFROMSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
 	/** Not Approved by Snr Manager = NA */
 	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -155,6 +157,8 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrAdminFinance = "NS";
 	/** Recommended = RC */
 	public static final String ALLOWEDFROMSTATUS_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ALLOWEDFROMSTATUS_RecommendedBySeniorMgrSDR = "RD";
 	/** Submitted to Manager Finance Consumables = SC */
 	public static final String ALLOWEDFROMSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted To SDL Finance Mgr = SD */
@@ -382,11 +386,52 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 		return (String)get_Value(COLUMNNAME_NextActionOnReject);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String NEXTSTATUSONAPPROVE_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String NEXTSTATUSONAPPROVE_Approved = "AP";
+	/** Completed = CO */
+	public static final String NEXTSTATUSONAPPROVE_Completed = "CO";
+	/** Draft = DR */
+	public static final String NEXTSTATUSONAPPROVE_Draft = "DR";
+	/** In Progress = IP */
+	public static final String NEXTSTATUSONAPPROVE_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Approved by Snr Manager = NA */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String NEXTSTATUSONAPPROVE_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String NEXTSTATUSONAPPROVE_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String NEXTSTATUSONAPPROVE_RecommendedBySeniorMgrSDR = "RD";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String NEXTSTATUSONAPPROVE_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String NEXTSTATUSONAPPROVE_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String NEXTSTATUSONAPPROVE_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String NEXTSTATUSONAPPROVE_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String NEXTSTATUSONAPPROVE_Submitted = "SU";
 	/** Set Next Status On Approve.
 		@param NextStatusOnApprove Next Status On Approve
 	*/
 	public void setNextStatusOnApprove (String NextStatusOnApprove)
 	{
+
 		set_Value (COLUMNNAME_NextStatusOnApprove, NextStatusOnApprove);
 	}
 
@@ -397,11 +442,52 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 		return (String)get_Value(COLUMNNAME_NextStatusOnApprove);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String NEXTSTATUSONREJECT_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String NEXTSTATUSONREJECT_Approved = "AP";
+	/** Completed = CO */
+	public static final String NEXTSTATUSONREJECT_Completed = "CO";
+	/** Draft = DR */
+	public static final String NEXTSTATUSONREJECT_Draft = "DR";
+	/** In Progress = IP */
+	public static final String NEXTSTATUSONREJECT_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String NEXTSTATUSONREJECT_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Approved by Snr Manager = NA */
+	public static final String NEXTSTATUSONREJECT_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String NEXTSTATUSONREJECT_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String NEXTSTATUSONREJECT_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String NEXTSTATUSONREJECT_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String NEXTSTATUSONREJECT_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String NEXTSTATUSONREJECT_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String NEXTSTATUSONREJECT_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended = RC */
+	public static final String NEXTSTATUSONREJECT_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String NEXTSTATUSONREJECT_RecommendedBySeniorMgrSDR = "RD";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String NEXTSTATUSONREJECT_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String NEXTSTATUSONREJECT_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String NEXTSTATUSONREJECT_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String NEXTSTATUSONREJECT_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String NEXTSTATUSONREJECT_Submitted = "SU";
 	/** Set Next Status On Reject.
 		@param NextStatusOnReject Next Status On Reject
 	*/
 	public void setNextStatusOnReject (String NextStatusOnReject)
 	{
+
 		set_Value (COLUMNNAME_NextStatusOnReject, NextStatusOnReject);
 	}
 
@@ -473,6 +559,114 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public String getSetDocAction()
 	{
 		return (String)get_Value(COLUMNNAME_SetDocAction);
+	}
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_TS_COL() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_Column)MTable.get(getCtx(), org.compiere.model.I_AD_Column.Table_ID)
+			.getPO(getZZ_Approved_TS_COL_ID(), get_TrxName());
+	}
+
+	/** Set Zz Approved Ts Col Id.
+		@param ZZ_Approved_TS_COL_ID Zz Approved Ts Col Id
+	*/
+	public void setZZ_Approved_TS_COL_ID (int ZZ_Approved_TS_COL_ID)
+	{
+		if (ZZ_Approved_TS_COL_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Approved_TS_COL_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Approved_TS_COL_ID, Integer.valueOf(ZZ_Approved_TS_COL_ID));
+	}
+
+	/** Get Zz Approved Ts Col Id.
+		@return Zz Approved Ts Col Id	  */
+	public int getZZ_Approved_TS_COL_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Approved_TS_COL_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_User_COL() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_Column)MTable.get(getCtx(), org.compiere.model.I_AD_Column.Table_ID)
+			.getPO(getZZ_Approved_User_COL_ID(), get_TrxName());
+	}
+
+	/** Set Approved User Col Id.
+		@param ZZ_Approved_User_COL_ID Approved User Col Id
+	*/
+	public void setZZ_Approved_User_COL_ID (int ZZ_Approved_User_COL_ID)
+	{
+		if (ZZ_Approved_User_COL_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Approved_User_COL_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Approved_User_COL_ID, Integer.valueOf(ZZ_Approved_User_COL_ID));
+	}
+
+	/** Get Approved User Col Id.
+		@return Approved User Col Id	  */
+	public int getZZ_Approved_User_COL_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Approved_User_COL_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_TS_COL() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_Column)MTable.get(getCtx(), org.compiere.model.I_AD_Column.Table_ID)
+			.getPO(getZZ_Rejected_TS_COL_ID(), get_TrxName());
+	}
+
+	/** Set Zz Rejected Ts Col Id.
+		@param ZZ_Rejected_TS_COL_ID Zz Rejected Ts Col Id
+	*/
+	public void setZZ_Rejected_TS_COL_ID (int ZZ_Rejected_TS_COL_ID)
+	{
+		if (ZZ_Rejected_TS_COL_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Rejected_TS_COL_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Rejected_TS_COL_ID, Integer.valueOf(ZZ_Rejected_TS_COL_ID));
+	}
+
+	/** Get Zz Rejected Ts Col Id.
+		@return Zz Rejected Ts Col Id	  */
+	public int getZZ_Rejected_TS_COL_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Rejected_TS_COL_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_User_COL() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_Column)MTable.get(getCtx(), org.compiere.model.I_AD_Column.Table_ID)
+			.getPO(getZZ_Rejected_User_COL_ID(), get_TrxName());
+	}
+
+	/** Set Zz Rejected User Col Id.
+		@param ZZ_Rejected_User_COL_ID Zz Rejected User Col Id
+	*/
+	public void setZZ_Rejected_User_COL_ID (int ZZ_Rejected_User_COL_ID)
+	{
+		if (ZZ_Rejected_User_COL_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Rejected_User_COL_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Rejected_User_COL_ID, Integer.valueOf(ZZ_Rejected_User_COL_ID));
+	}
+
+	/** Get Zz Rejected User Col Id.
+		@return Zz Rejected User Col Id	  */
+	public int getZZ_Rejected_User_COL_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Rejected_User_COL_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_AD_Column getZZ_Specific_Responsible_Col() throws RuntimeException
