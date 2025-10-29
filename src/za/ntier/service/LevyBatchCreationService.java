@@ -136,7 +136,7 @@ public class LevyBatchCreationService {
             levyRepo.linkRowsToLine(contributing, lineId);
 
             // roll-up batch documentAmt by original grand (non-negated)
-            batchRepo.addToBatchAmount(batch, grand);
+            batchRepo.updateControlAmt(batch);
 
             createdLines++;
         }

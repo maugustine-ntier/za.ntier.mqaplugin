@@ -108,9 +108,8 @@ public class BatchRepository {
         return l.getC_InvoiceBatchLine_ID();
     }
 
-    public void addToBatchAmount(MInvoiceBatch_New batch, BigDecimal delta) {
-        BigDecimal current = batch.getDocumentAmt() != null ? batch.getDocumentAmt() : org.compiere.util.Env.ZERO;
-        batch.setDocumentAmt(current.add(delta)); // add original (non-negated) sum
+    public void updateControlAmt(MInvoiceBatch_New batch) {
+        batch.setControlAmt(batch.getDocumentAmt());
         batch.saveEx();
     }
 }
