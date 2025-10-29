@@ -15,6 +15,8 @@ import za.co.ntier.wf.util.MailNoticeUtil;
 public class ZZ_WF_RunProcess extends SvrProcess {
     @Parameter(name="Approve")
     private String pApprove; // 'Y' or 'N' or null
+    @Parameter(name="Recommend")
+    private String pRecommend;
     @Parameter(name="Comment")
     private String pComment;
 
@@ -49,9 +51,9 @@ public class ZZ_WF_RunProcess extends SvrProcess {
                 : null;
 
         if (currentStep != null) {
-            if (pApprove == null || pApprove.isBlank())
+            if ((pApprove == null || pApprove.isBlank()) && (pRecommend == null || pRecommend.isBlank()))
                 throw new AdempiereException("Please indicate Approve=Y or Approve=N.");
-            boolean approve = "Y".equalsIgnoreCase(pApprove.trim());
+            boolean approve = ("Y".equalsIgnoreCase(pApprove.trim())) || ("Y".equalsIgnoreCase(pRecommend.trim()));
             doApproveReject(hdr, currentStep, approve, pComment);
         } else {
             doRequest(hdr, curStatus);
