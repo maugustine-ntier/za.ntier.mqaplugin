@@ -9,6 +9,9 @@ import org.compiere.util.Env;
 import org.osgi.service.component.annotations.Component;
 
 import za.co.ntier.api.model.I_ZZ_Program_Master_Data;
+import za.co.ntier.wf.model.MZZWFHeader;
+import za.co.ntier.wf.model.MZZWFLineRole;
+import za.co.ntier.wf.model.MZZWFLines;
 
 @Component(
 
@@ -19,6 +22,15 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
+			return MZZWFLineRole.class;
+		}
+		if (tableName.equals(I_ZZ_WF_Lines.Table_Name)) {
+			return MZZWFLines.class;
+		}
+		if (tableName.equals(I_ZZ_WF_Header.Table_Name)) {
+			return MZZWFHeader.class;
+		}
 		if (tableName.equals(I_ZZ_Monthly_Levy_Files.Table_Name)) {
 			return X_ZZ_Monthly_Levy_Files.class;
 		}
@@ -72,6 +84,15 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
+		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
+			return new MZZWFLineRole(Env.getCtx(),Record_ID,trxName);
+		}
+		if (tableName.equals(I_ZZ_WF_Lines.Table_Name)) {
+			return new MZZWFLines(Env.getCtx(),Record_ID,trxName);
+		}
+		if (tableName.equals(I_ZZ_WF_Header.Table_Name)) {
+			return new MZZWFHeader(Env.getCtx(),Record_ID,trxName);
+		}
 		if (tableName.equals(I_ZZ_Monthly_Levy_Files.Table_Name)) {
 			return new X_ZZ_Monthly_Levy_Files(Env.getCtx(),Record_ID,trxName);
 		}
@@ -126,6 +147,15 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
+			return new MZZWFLineRole(Env.getCtx(),rs,trxName);
+		}
+		if (tableName.equals(I_ZZ_WF_Lines.Table_Name)) {
+			return new MZZWFLines(Env.getCtx(),rs,trxName);
+		}
+		if (tableName.equals(I_ZZ_WF_Header.Table_Name)) {
+			return new MZZWFHeader(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_ZZ_Monthly_Levy_Files.Table_Name)) {
 			return new X_ZZ_Monthly_Levy_Files(Env.getCtx(),rs,trxName);
 		}
