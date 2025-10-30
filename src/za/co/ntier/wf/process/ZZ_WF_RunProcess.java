@@ -73,7 +73,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 
         MailNoticeUtil.requestStepNotifyAll(step, po, hdr, ctx, trxName);
         AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), step.get_ID(),
-                "REQUEST", curStatus, curStatus, oldAction, step.getSetDocAction(), null);
+                "REQUEST", curStatus, curStatus, oldAction, step.getSetDocAction(), null,Env.getAD_User_ID(ctx));
     }
 
     private void doApproveReject(MZZWFHeader hdr, MZZWFLines step, boolean approve, String comment) {
@@ -94,6 +94,8 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 
         // --- Notifications ---
         int requesterUserId = po.getCreatedBy();
+        String respColumn = step.getResponsibleColumnName(step.getCtx(), step.get_TrxName());
+        int responsibleID = (respColumn != null) ? step.get_ValueAsInt(respColumn) : -1;
 
         if (!approve) {
             // NEW: Always notify original requester on ANY REJECTION
@@ -104,9 +106,9 @@ public class ZZ_WF_RunProcess extends SvrProcess {
         } else {
             // On approve: normal “approved step” message (optional)
             int tmplApproved = step.getMMailText_Approved_ID();
-            if (requesterUserId > 0 && tmplApproved > 0) {
+            if (responsibleID > 0 && tmplApproved > 0) {
                 // Optional: send per-step approval notice (keep if you like)
-                MailNoticeUtil.send(ctx, requesterUserId, tmplApproved, po, hdr.getZZ_NotifyMode(), trxName);
+                MailNoticeUtil.send(ctx, responsibleID, tmplApproved, po, hdr.getZZ_NotifyMode(), trxName);
             }
 
             // NEW: If this approval ends the workflow, notify requester (final-approval template if you have one)
@@ -122,9 +124,10 @@ public class ZZ_WF_RunProcess extends SvrProcess {
         }
 
         // Audit decision
+        int currUserID = Env.getAD_User_ID(Env.getCtx());
         AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), step.get_ID(),
                 approve ? "APPROVE" : "REJECT",
-                curStatus, nextStatus, curAction, nextAction, comment);
+                curStatus, nextStatus, curAction, nextAction, comment,currUserID);
 
         // If there is a next action, auto-queue and notify responsible actors for that next step
         if (nextAction != null && !nextAction.isBlank()) {
@@ -132,7 +135,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
             if (nxt != null) {
                 MailNoticeUtil.requestStepNotifyAll(nxt, po, hdr, ctx, trxName);
                 AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), nxt.get_ID(),
-                        "REQUEST", nextStatus, nextStatus, null, nextAction, "Auto-queued next step");
+                        "REQUEST", nextStatus, nextStatus, null, nextAction, "Auto-queued next step",currUserID);
             }
         }
     }

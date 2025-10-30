@@ -1,19 +1,22 @@
 package za.ntier.process;
 
-import org.compiere.process.ProcessInfoParameter;
-import org.compiere.process.SvrProcess;
-import org.compiere.util.DB;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
+
+import org.compiere.process.ProcessInfoParameter;
+import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 
 /**
  * Export C_InvoiceBatch lines to CSV in the required format.
@@ -60,6 +63,9 @@ public class ExportInvoiceBatchToCsv extends SvrProcess {
         if (batchRef == null || batchRef.trim().isEmpty()) {
             batchRef = "Batch-" + m_Record_ID;
         }
+        String description = DB.getSQLValueString(get_TrxName(),
+                "SELECT COALESCE(Description, '') FROM C_InvoiceBatch WHERE C_InvoiceBatch_ID=?",
+                m_Record_ID);
 
         // Lines query (join invoice & BP)
         final String sql =
@@ -83,17 +89,16 @@ public class ExportInvoiceBatchToCsv extends SvrProcess {
         // Output filename
         String baseName = (p_FileName != null && !p_FileName.trim().isEmpty())
                 ? p_FileName.trim()
-                : ("InvoiceBatchExport_" + batchRef.replaceAll("[^A-Za-z0-9_-]", "_"));
-        if (!baseName.toLowerCase(Locale.ROOT).endsWith(".csv")) {
-            baseName += ".csv";
-        }
+                : ("MG_" + extractYearMonth(description) + "_" + batchRef.replaceAll("[^A-Za-z0-9_-]", "_"));
+       // if (!baseName.toLowerCase(Locale.ROOT).endsWith(".csv")) {
+       //    baseName += ".csv";
+       // }
 
-        File tmp = File.createTempFile("export_", "_" + baseName);
-        String exportFile = tmp.getAbsolutePath();
+      
+        Path exportPath = uniqueTempCsv(baseName);
 
         // CSV header + rows
-        try (BufferedWriter w = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(exportFile), StandardCharsets.UTF_8))) {
+        try (BufferedWriter w = Files.newBufferedWriter(exportPath, StandardCharsets.UTF_8)) {
 
             // header
             writeRow(w,
@@ -108,20 +113,20 @@ public class ExportInvoiceBatchToCsv extends SvrProcess {
             );
 
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
+            String monthStr = extractMonth(description);
             for (List<Object> r : rows) {
                 String invoiceNo = safeStr(r.get(0));
                 Timestamp ts = (Timestamp) r.get(1);
                 String invoiceDate = (ts != null) ? df.format(ts) : "";
 
-                String monthStr = "";
+                
                 String yearStr = "";
                 if (ts != null) {
                     java.util.Calendar cal = java.util.Calendar.getInstance();
                     cal.setTimeInMillis(ts.getTime());
                     int month = cal.get(java.util.Calendar.MONTH) + 1;
                     int year = cal.get(java.util.Calendar.YEAR);
-                    monthStr = Integer.toString(month);
+                   // monthStr = Integer.toString(month);
                     yearStr = Integer.toString(year);
                 }
 
@@ -146,13 +151,56 @@ public class ExportInvoiceBatchToCsv extends SvrProcess {
         }
 
         if (processUI != null) {
-            processUI.download(new File(exportFile));
+            processUI.download(exportPath.toFile());
         }
 
-        return "CSV exported: " + new File(exportFile).getName();
+        return "CSV exported: " + exportPath;
     }
 
     // --- helpers ---
+    
+    public static Path uniqueTempCsv(String baseName) throws IOException {
+        Path tmpDir = Path.of(System.getProperty("java.io.tmpdir"));
+        String stem = "Export_" + baseName;           // e.g. Export_MG_202507_IVB100094
+        Path p = tmpDir.resolve(stem + ".csv");
+
+        // Ensure uniqueness without random gibberish
+        for (int i = 0; ; i++) {
+            Path candidate = (i == 0) ? p : tmpDir.resolve(stem + "_" + i + ".csv");
+            try {
+                return Files.createFile(candidate);   // CREATE_NEW semantics
+            } catch (FileAlreadyExistsException ignore) {
+                // try next suffix
+            }
+        }
+    }
+    
+    public static String extractYearMonth(String text) {
+        if (text == null) return null;
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("Year:\\s*(\\d{4})\\s*Month:\\s*(\\d{1,2})");
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            String year = matcher.group(1);
+            String month = String.format("%02d", Integer.parseInt(matcher.group(2)));
+            return year + month;   // e.g. "202507"
+        }
+        return null;  // no match
+    }
+    
+    public static String extractMonth(String text) {
+        if (text == null) return null;
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("Year:\\s*(\\d{4})\\s*Month:\\s*(\\d{1,2})");
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            String year = matcher.group(1);
+            String month = String.format("%02d", Integer.parseInt(matcher.group(2)));
+            return month;   
+        }
+        return null;  // no match
+    }
+
     private static String safeStr(Object o) {
         return o == null ? "" : o.toString();
     }

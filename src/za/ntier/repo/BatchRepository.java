@@ -30,13 +30,8 @@ public class BatchRepository {
     public int resolveDocTypeId(int preferred) {
         if (preferred > 0) return preferred;
         int id = DB.getSQLValue(trx,
-            "SELECT C_DocType_ID FROM C_DocType WHERE DocBaseType='ARI' AND IsActive='Y' AND AD_Client_ID=? ORDER BY IsSOTrx DESC, C_DocType_ID",
+            "SELECT C_DocType_ID FROM C_DocType WHERE DocBaseType='API' AND IsActive='Y' AND AD_Client_ID=? ORDER BY IsSOTrx DESC, C_DocType_ID",
             Env.getAD_Client_ID(ctx));
-        if (id <= 0) {
-            id = DB.getSQLValue(trx,
-                "SELECT C_DocType_ID FROM C_DocType WHERE DocBaseType='API' AND IsActive='Y' AND AD_Client_ID=? ORDER BY C_DocType_ID",
-                Env.getAD_Client_ID(ctx));
-        }
         return id;
     }
 
@@ -61,6 +56,7 @@ public class BatchRepository {
         b.setZZ_Status(X_C_InvoiceBatch.ZZ_STATUS_Drafted);
         b.setZZ_IS_WSP_ATR(true);
         b.setZZ_DocAction(X_C_InvoiceBatch.ZZ_DOCACTION_Recommend);
+        b.setIsSOTrx(false);
 
         String name = "Levy Batch Hdr#" + hdr.get_ID();
         if (hdr.getZZ_Month() != null && !hdr.getZZ_Month().trim().isEmpty()) name += " M" + hdr.getZZ_Month();
