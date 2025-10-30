@@ -1,6 +1,9 @@
 package za.co.ntier.wf.process;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
@@ -11,6 +14,7 @@ import org.compiere.util.Env;
 import za.co.ntier.wf.model.MZZWFHeader;
 import za.co.ntier.wf.model.MZZWFLines;
 import za.co.ntier.wf.util.MailNoticeUtil;
+import za.co.ntier.wf.util.MailNoticeUtil.NotificationFields;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.wf.process.ZZ_WF_RunProcess")
 public class ZZ_WF_RunProcess extends SvrProcess {
@@ -25,6 +29,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
     private String trxName;
     private Properties ctx;
     private Timestamp now;
+    List<Map<NotificationFields, Object>> queueNotifis = new ArrayList<>();
 
     @Override
     protected void prepare() {
@@ -37,6 +42,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 
     @Override
     protected String doIt() {
+    	
         require(po, "ZZ_DocStatus");
         require(po, "ZZ_DocAction");
 
@@ -59,6 +65,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
         } else {
             doRequest(hdr, curStatus);
         }
+        MailNoticeUtil.sentNotify(queueNotifis, po,get_TrxName());
         return "@OK@";
     }
 
@@ -71,7 +78,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
         po.set_ValueOfColumn("ZZ_DocAction", step.getSetDocAction());
         po.saveEx();
 
-        MailNoticeUtil.requestStepNotifyAll(step, po, hdr, ctx, trxName);
+        MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),ctx, trxName);
         AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), step.get_ID(),
                 "REQUEST", curStatus, curStatus, oldAction, step.getSetDocAction(), null,Env.getAD_User_ID(ctx));
     }
@@ -101,24 +108,20 @@ public class ZZ_WF_RunProcess extends SvrProcess {
             // NEW: Always notify original requester on ANY REJECTION
             int tmplReject = step.getMMailText_Rejected_ID();
             if (requesterUserId > 0 && tmplReject > 0) {
-                MailNoticeUtil.send(ctx, requesterUserId, tmplReject, po, hdr.getZZ_NotifyMode(), trxName);
+                MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Rejected(),step));
             }
         } else {
             // On approve: normal “approved step” message (optional)
-            int tmplApproved = step.getMMailText_Approved_ID();
-            if (responsibleID > 0 && tmplApproved > 0) {
+            if (responsibleID > 0) {
                 // Optional: send per-step approval notice (keep if you like)
-                MailNoticeUtil.send(ctx, responsibleID, tmplApproved, po, hdr.getZZ_NotifyMode(), trxName);
+            	MailNoticeUtil.queueNotify(queueNotifis, responsibleID, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step));
             }
 
             // NEW: If this approval ends the workflow, notify requester (final-approval template if you have one)
             if (isFinalTransition(hdr, nextStatus, nextAction)) {
-                int tmplFinal = hdr.getMMailText_FinalApproved_ID(); // optional column on header
+            	int tmplFinal = hdr.getMMailText_FinalApproved_ID(); // optional column on header
                 if (tmplFinal > 0) {
-                    MailNoticeUtil.send(ctx, requesterUserId, tmplFinal, po, hdr.getZZ_NotifyMode(), trxName);
-                } else if (tmplApproved > 0) {
-                    // Fallback: reuse step-approved template if no final template is configured
-                    MailNoticeUtil.send(ctx, requesterUserId, tmplApproved, po, hdr.getZZ_NotifyMode(), trxName);
+                    MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(hdr.getMMailText_FinalApproved(),step));
                 }
             }
         }
@@ -133,7 +136,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
         if (nextAction != null && !nextAction.isBlank()) {
             MZZWFLines nxt = MZZWFLines.findByStatusAndAction(ctx, hdr.get_ID(), nextStatus, nextAction, trxName);
             if (nxt != null) {
-                MailNoticeUtil.requestStepNotifyAll(nxt, po, hdr, ctx, trxName);
+                MailNoticeUtil.requestStepNotifyAll(queueNotifis,nxt, po, hdr, getTable_ID(),getRecord_ID(),ctx, trxName);
                 AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), nxt.get_ID(),
                         "REQUEST", nextStatus, nextStatus, null, nextAction, "Auto-queued next step",currUserID);
             }
