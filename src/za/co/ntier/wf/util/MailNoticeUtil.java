@@ -56,10 +56,10 @@ public final class MailNoticeUtil {
 	*/
 	public static void requestStepNotifyAll(List<Map<NotificationFields, Object>> queueNotifis
 			                                ,MZZWFLines step, PO po, za.co.ntier.wf.model.MZZWFHeader hdr, 
-			                                int tableID,int recordID,
+			                                int tableID,int recordID,MMailText mailText,
 			                                Properties ctx, String trxName) {
 		for (int roleId : MZZWFLineRole.getRoleIds(step.get_ID(), ctx, trxName)) {
-			MailNoticeUtil.queueNotifyForRole(queueNotifis, roleId, tableID, recordID, MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step));
+			MailNoticeUtil.queueNotifyForRole(queueNotifis, roleId, tableID, recordID, mailText);
 		}
 	}
 

@@ -31,7 +31,7 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251029L;
+	private static final long serialVersionUID = 20251031L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Line_Role (Properties ctx, int ZZ_WF_Line_Role_ID, String trxName)
@@ -88,7 +88,7 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
     }
 
     /** AccessLevel
-      * @return 4 - System
+      * @return 6 - System - Client
       */
     protected int get_AccessLevel()
     {

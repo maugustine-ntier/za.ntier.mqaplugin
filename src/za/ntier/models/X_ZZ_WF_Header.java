@@ -31,7 +31,7 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251029L;
+	private static final long serialVersionUID = 20251031L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Header (Properties ctx, int ZZ_WF_Header_ID, String trxName)
@@ -92,7 +92,7 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
     }
 
     /** AccessLevel
-      * @return 4 - System
+      * @return 6 - System - Client
       */
     protected int get_AccessLevel()
     {
@@ -212,6 +212,14 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_FINALSTATUS_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String ZZ_FINALSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_FINALSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_FINALSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_FINALSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_FINALSTATUS_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String ZZ_FINALSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -226,6 +234,10 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_FINALSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_FINALSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_FINALSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_FINALSTATUS_RecommendedByCOO = "R2";
 	/** Recommended = RC */
 	public static final String ZZ_FINALSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -283,6 +295,14 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_STARTSTATUS_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String ZZ_STARTSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_STARTSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_STARTSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_STARTSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_STARTSTATUS_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String ZZ_STARTSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -297,6 +317,10 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_STARTSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_STARTSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_STARTSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_STARTSTATUS_RecommendedByCOO = "R2";
 	/** Recommended = RC */
 	public static final String ZZ_STARTSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */

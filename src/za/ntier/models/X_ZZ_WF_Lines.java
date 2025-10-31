@@ -31,7 +31,7 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251029L;
+	private static final long serialVersionUID = 20251031L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Lines (Properties ctx, int ZZ_WF_Lines_ID, String trxName)
@@ -108,7 +108,7 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
     }
 
     /** AccessLevel
-      * @return 4 - System
+      * @return 6 - System - Client
       */
     protected int get_AccessLevel()
     {
@@ -141,6 +141,14 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String ALLOWEDFROMSTATUS_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String ALLOWEDFROMSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ALLOWEDFROMSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ALLOWEDFROMSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ALLOWEDFROMSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ALLOWEDFROMSTATUS_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -155,6 +163,10 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String ALLOWEDFROMSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ALLOWEDFROMSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ALLOWEDFROMSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ALLOWEDFROMSTATUS_RecommendedByCOO = "R2";
 	/** Recommended = RC */
 	public static final String ALLOWEDFROMSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -213,9 +225,9 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public void setMMailText_Approved_ID (int MMailText_Approved_ID)
 	{
 		if (MMailText_Approved_ID < 1)
-			set_ValueNoCheck (COLUMNNAME_MMailText_Approved_ID, null);
+			set_Value (COLUMNNAME_MMailText_Approved_ID, null);
 		else
-			set_ValueNoCheck (COLUMNNAME_MMailText_Approved_ID, Integer.valueOf(MMailText_Approved_ID));
+			set_Value (COLUMNNAME_MMailText_Approved_ID, Integer.valueOf(MMailText_Approved_ID));
 	}
 
 	/** Get M Mail Text Approved ID.
@@ -398,6 +410,14 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONAPPROVE_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String NEXTSTATUSONAPPROVE_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String NEXTSTATUSONAPPROVE_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String NEXTSTATUSONAPPROVE_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -412,6 +432,10 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONAPPROVE_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String NEXTSTATUSONAPPROVE_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String NEXTSTATUSONAPPROVE_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String NEXTSTATUSONAPPROVE_RecommendedByCOO = "R2";
 	/** Recommended = RC */
 	public static final String NEXTSTATUSONAPPROVE_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -454,6 +478,14 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONREJECT_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String NEXTSTATUSONREJECT_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String NEXTSTATUSONREJECT_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String NEXTSTATUSONREJECT_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String NEXTSTATUSONREJECT_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String NEXTSTATUSONREJECT_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String NEXTSTATUSONREJECT_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -468,6 +500,10 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONREJECT_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String NEXTSTATUSONREJECT_NotApprovedBySnrAdminFinance = "NS";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String NEXTSTATUSONREJECT_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String NEXTSTATUSONREJECT_RecommendedByCOO = "R2";
 	/** Recommended = RC */
 	public static final String NEXTSTATUSONREJECT_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
