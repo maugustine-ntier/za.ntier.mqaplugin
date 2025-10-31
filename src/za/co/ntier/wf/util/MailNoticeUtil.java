@@ -100,6 +100,9 @@ public final class MailNoticeUtil {
 			MMailText mailTemplate = (MMailText) sentNotifyInfo.get(NotificationFields.MAIL_TEMPLATE);
 
 			MUser mUser = new MUser(Env.getCtx(), mailToUserId, null);
+			if (!mUser.isActive()) {
+				return;
+			}
 			mailTemplate.setUser(mUser);
 			String msgHeader = mailTemplate.getMailHeader();
 			String msgBody = mailTemplate.getMailText();
