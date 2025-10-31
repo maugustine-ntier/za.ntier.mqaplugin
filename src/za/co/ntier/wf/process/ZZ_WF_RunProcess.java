@@ -86,8 +86,8 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 
 	private void doApproveReject(MZZWFHeader hdr, MZZWFLines step, boolean approve, String comment) {
 		int actor = Env.getAD_User_ID(ctx);
-		if (!AuthUtil.isActorAuthorized(ctx, trxName, step, po, actor))
-			throw new AdempiereException("You are not authorized to approve/reject this step.");
+		//if (!AuthUtil.isActorAuthorized(ctx, trxName, step, po, actor))
+		//	throw new AdempiereException("You are not authorized to approve/reject this step.");
 
 		String curStatus = po.get_ValueAsString("ZZ_DocStatus");
 		String curAction = po.get_ValueAsString("ZZ_DocAction");
@@ -153,7 +153,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 			MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),
 					MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step),ctx, trxName);
 		}
-		
+
 	}
 
 	private static void require(PO po, String col) {

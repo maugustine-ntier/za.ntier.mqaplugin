@@ -281,6 +281,17 @@ public interface I_ZZ_WF_Lines
 
 	public org.compiere.model.I_AD_Column getZZ_Rejected_User_COL() throws RuntimeException;
 
+    /** Column name ZZ_Resp_Role_ID */
+    public static final String COLUMNNAME_ZZ_Resp_Role_ID = "ZZ_Resp_Role_ID";
+
+	/** Set Responsible Role 	  */
+	public void setZZ_Resp_Role_ID (int ZZ_Resp_Role_ID);
+
+	/** Get Responsible Role 	  */
+	public int getZZ_Resp_Role_ID();
+
+	public org.compiere.model.I_AD_Role getZZ_Resp_Role() throws RuntimeException;
+
     /** Column name ZZ_Specific_Responsible_Col_ID */
     public static final String COLUMNNAME_ZZ_Specific_Responsible_Col_ID = "ZZ_Specific_Responsible_Col_ID";
 

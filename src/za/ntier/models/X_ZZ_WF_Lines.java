@@ -167,6 +167,8 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String ALLOWEDFROMSTATUS_RecommendedBySeniorMgrFinance = "R1";
 	/** Recommended By COO = R2 */
 	public static final String ALLOWEDFROMSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ALLOWEDFROMSTATUS_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String ALLOWEDFROMSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -436,6 +438,8 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONAPPROVE_RecommendedBySeniorMgrFinance = "R1";
 	/** Recommended By COO = R2 */
 	public static final String NEXTSTATUSONAPPROVE_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String NEXTSTATUSONAPPROVE_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String NEXTSTATUSONAPPROVE_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -504,6 +508,8 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public static final String NEXTSTATUSONREJECT_RecommendedBySeniorMgrFinance = "R1";
 	/** Recommended By COO = R2 */
 	public static final String NEXTSTATUSONREJECT_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String NEXTSTATUSONREJECT_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String NEXTSTATUSONREJECT_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -700,6 +706,33 @@ public class X_ZZ_WF_Lines extends PO implements I_ZZ_WF_Lines, I_Persistent
 	public int getZZ_Rejected_User_COL_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Rejected_User_COL_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_Role getZZ_Resp_Role() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_Role)MTable.get(getCtx(), org.compiere.model.I_AD_Role.Table_ID)
+			.getPO(getZZ_Resp_Role_ID(), get_TrxName());
+	}
+
+	/** Set Responsible Role .
+		@param ZZ_Resp_Role_ID Responsible Role 
+	*/
+	public void setZZ_Resp_Role_ID (int ZZ_Resp_Role_ID)
+	{
+		if (ZZ_Resp_Role_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Resp_Role_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Resp_Role_ID, Integer.valueOf(ZZ_Resp_Role_ID));
+	}
+
+	/** Get Responsible Role .
+		@return Responsible Role 	  */
+	public int getZZ_Resp_Role_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Resp_Role_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

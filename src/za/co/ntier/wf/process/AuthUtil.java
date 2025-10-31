@@ -20,8 +20,8 @@ public final class AuthUtil {
 			if (uid == actorUserId) return true;
 		}
 		int currentRole_ID = Env.getAD_Role_ID(ctx);
-		for (int roleId : MZZWFLineRole.getRoleIds(step.get_ID(), ctx, trxName)) {
-			if (currentRole_ID == roleId) return true;
+		if (step.getZZ_Resp_Role_ID() > 0) {
+			if (currentRole_ID == step.getZZ_Resp_Role_ID()) return true;
 		}
 		return false;
 	}

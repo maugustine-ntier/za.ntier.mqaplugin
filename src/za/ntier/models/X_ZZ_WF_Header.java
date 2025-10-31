@@ -238,6 +238,8 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_FINALSTATUS_RecommendedBySeniorMgrFinance = "R1";
 	/** Recommended By COO = R2 */
 	public static final String ZZ_FINALSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_FINALSTATUS_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String ZZ_FINALSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -321,6 +323,8 @@ public class X_ZZ_WF_Header extends PO implements I_ZZ_WF_Header, I_Persistent
 	public static final String ZZ_STARTSTATUS_RecommendedBySeniorMgrFinance = "R1";
 	/** Recommended By COO = R2 */
 	public static final String ZZ_STARTSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_STARTSTATUS_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String ZZ_STARTSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
