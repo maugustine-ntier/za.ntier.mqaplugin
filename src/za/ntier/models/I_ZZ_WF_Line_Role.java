@@ -124,6 +124,24 @@ public interface I_ZZ_WF_Line_Role
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Is_Responsible */
+    public static final String COLUMNNAME_ZZ_Is_Responsible = "ZZ_Is_Responsible";
+
+	/** Set Is Responsible	  */
+	public void setZZ_Is_Responsible (boolean ZZ_Is_Responsible);
+
+	/** Get Is Responsible	  */
+	public boolean isZZ_Is_Responsible();
+
+    /** Column name ZZ_Notify */
+    public static final String COLUMNNAME_ZZ_Notify = "ZZ_Notify";
+
+	/** Set Notify	  */
+	public void setZZ_Notify (boolean ZZ_Notify);
+
+	/** Get Notify	  */
+	public boolean isZZ_Notify();
+
     /** Column name ZZ_WF_Line_Role_ID */
     public static final String COLUMNNAME_ZZ_WF_Line_Role_ID = "ZZ_WF_Line_Role_ID";
 

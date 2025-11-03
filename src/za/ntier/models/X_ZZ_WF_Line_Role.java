@@ -31,7 +31,7 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251031L;
+	private static final long serialVersionUID = 20251103L;
 
     /** Standard Constructor */
     public X_ZZ_WF_Line_Role (Properties ctx, int ZZ_WF_Line_Role_ID, String trxName)
@@ -40,6 +40,10 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
       /** if (ZZ_WF_Line_Role_ID == 0)
         {
 			setAD_Role_ID (0);
+			setZZ_Is_Responsible (false);
+// N
+			setZZ_Notify (false);
+// N
 			setZZ_WF_Line_Role_ID (0);
 			setZZ_WF_Lines_ID (0);
         } */
@@ -52,6 +56,10 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
       /** if (ZZ_WF_Line_Role_ID == 0)
         {
 			setAD_Role_ID (0);
+			setZZ_Is_Responsible (false);
+// N
+			setZZ_Notify (false);
+// N
 			setZZ_WF_Line_Role_ID (0);
 			setZZ_WF_Lines_ID (0);
         } */
@@ -64,6 +72,10 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
       /** if (ZZ_WF_Line_Role_UU == null)
         {
 			setAD_Role_ID (0);
+			setZZ_Is_Responsible (false);
+// N
+			setZZ_Notify (false);
+// N
 			setZZ_WF_Line_Role_ID (0);
 			setZZ_WF_Lines_ID (0);
         } */
@@ -76,6 +88,10 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
       /** if (ZZ_WF_Line_Role_UU == null)
         {
 			setAD_Role_ID (0);
+			setZZ_Is_Responsible (false);
+// N
+			setZZ_Notify (false);
+// N
 			setZZ_WF_Line_Role_ID (0);
 			setZZ_WF_Lines_ID (0);
         } */
@@ -135,6 +151,50 @@ public class X_ZZ_WF_Line_Role extends PO implements I_ZZ_WF_Line_Role, I_Persis
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Is Responsible.
+		@param ZZ_Is_Responsible Is Responsible
+	*/
+	public void setZZ_Is_Responsible (boolean ZZ_Is_Responsible)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_Responsible, Boolean.valueOf(ZZ_Is_Responsible));
+	}
+
+	/** Get Is Responsible.
+		@return Is Responsible	  */
+	public boolean isZZ_Is_Responsible()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_Responsible);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Notify.
+		@param ZZ_Notify Notify
+	*/
+	public void setZZ_Notify (boolean ZZ_Notify)
+	{
+		set_Value (COLUMNNAME_ZZ_Notify, Boolean.valueOf(ZZ_Notify));
+	}
+
+	/** Get Notify.
+		@return Notify	  */
+	public boolean isZZ_Notify()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Notify);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set ZZ_WF_Line_Role.

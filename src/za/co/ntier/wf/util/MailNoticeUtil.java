@@ -28,37 +28,12 @@ import za.co.ntier.wf.model.MZZWFLines;
 public final class MailNoticeUtil {
 	private static final CLogger log = CLogger.getCLogger(MailNoticeUtil.class);
 	public MailNoticeUtil() {}
-	/*
-	public static void send(Properties ctx, int toUserId, int mailTextId, PO po, String mode, String trxName) {
-		if (toUserId <= 0 || mailTextId <= 0) return;
-		MMailText tpl = new MMailText(ctx, mailTextId, trxName);
-		MUser to = new MUser(ctx, toUserId, trxName);
-		tpl.setUser(to);
-		String subject = tpl.getMailHeader();
-		String body = tpl.getMailText();
-		boolean doNotice = "N".equals(mode) || "B".equals(mode);
-		boolean doEmail  = "E".equals(mode) || "B".equals(mode);
-		if (doNotice && (X_AD_User.NOTIFICATIONTYPE_Notice.equals(to.getNotificationType()) ||
-				X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(to.getNotificationType()))) {
-			MNote note = new MNote(ctx, 0, to.getAD_User_ID(), po.get_Table_ID(), po.get_ID(), subject, body, trxName);
-			note.setAD_Org_ID(po.getAD_Org_ID());
-			note.saveEx();
-		}
-		if (doEmail && (X_AD_User.NOTIFICATIONTYPE_EMail.equals(to.getNotificationType()) ||
-				X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(to.getNotificationType()))) {
-			MClient client = MClient.get(ctx);
-			MUser from = MUser.get(ctx, Env.getAD_User_ID(ctx));
-			if (!client.sendEMail(from, to, subject, body, null, tpl.isHtml())) {
-				log.fine("Email send failed for user " + toUserId);
-			}
-		}
-	}
-	*/
+	
 	public static void requestStepNotifyAll(List<Map<NotificationFields, Object>> queueNotifis
 			                                ,MZZWFLines step, PO po, za.co.ntier.wf.model.MZZWFHeader hdr, 
 			                                int tableID,int recordID,MMailText mailText,
 			                                Properties ctx, String trxName) {
-		for (int roleId : MZZWFLineRole.getRoleIds(step.get_ID(), ctx, trxName)) {
+		for (int roleId : MZZWFLineRole.getRoleIds(step.get_ID(), "N","Y",ctx, trxName)) {
 			MailNoticeUtil.queueNotifyForRole(queueNotifis, roleId, tableID, recordID, mailText);
 		}
 	}
