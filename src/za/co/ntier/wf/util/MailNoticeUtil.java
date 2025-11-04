@@ -89,7 +89,6 @@ public final class MailNoticeUtil {
 						tableID, recordID, 
 						msgHeader, msgBody, trxName);
 				note.setAD_Org_ID(po.getAD_Org_ID());
-
 				note.saveEx();
 			}
 

@@ -79,7 +79,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 		po.set_ValueOfColumn("ZZ_DocAction", step.getSetDocAction());
 		po.saveEx();
 
-		MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step),ctx, trxName);
+		MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),po),ctx, trxName);
 		AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), step.get_ID(),
 				"REQUEST", curStatus, curStatus, oldAction, step.getSetDocAction(), null,Env.getAD_User_ID(ctx));
 	}
@@ -116,22 +116,22 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 			// NEW: Always notify original requester on ANY REJECTION
 			int tmplReject = step.getMMailText_Rejected_ID();
 			if (requesterUserId > 0 && tmplReject > 0) {
-				MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Rejected(),step));
+				MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Rejected(),po));
 			}
 		} else {
 			// On approve: normal “approved step” message (optional)
 			if (responsibleID > 0) {
 				// Optional: send per-step approval notice (keep if you like)
-				MailNoticeUtil.queueNotify(queueNotifis, responsibleID, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step));
+				MailNoticeUtil.queueNotify(queueNotifis, responsibleID, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),po));
 			}
 
 			// NEW: If this approval ends the workflow, notify requester (final-approval template if you have one)
 			if (isFinalTransition(hdr, nextStatus, nextAction)) {
 				int tmplFinal = hdr.getMMailText_FinalApproved_ID(); // optional column on header
 				if (tmplFinal > 0) {
-					MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(hdr.getMMailText_FinalApproved(),step));
+					MailNoticeUtil.queueNotify(queueNotifis, requesterUserId, getTable_ID(), getRecord_ID(), MailNoticeUtil.setPOForMail(hdr.getMMailText_FinalApproved(),po));
 					MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),
-							MailNoticeUtil.setPOForMail(hdr.getMMailText_FinalApproved(),step),
+							MailNoticeUtil.setPOForMail(hdr.getMMailText_FinalApproved(),po),
 							ctx, trxName);
 				}
 			}
@@ -151,7 +151,7 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 						"REQUEST", nextStatus, nextStatus, null, nextAction, "Auto-queued next step",currUserID);
 			}
 			MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),
-					MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),step),ctx, trxName);
+					MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),po),ctx, trxName);
 		}
 
 	}
