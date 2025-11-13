@@ -268,4 +268,27 @@ public class WAutoCompleterCity extends AutoComplete implements EventListener<Ev
 	        Events.postEvent("onCitySelected", this, null);
 		}
 	}
+	
+	/** Programmatically select a city and notify listeners. */
+	public void selectCity(CityVO vo) {
+	    if (vo == null || vo.C_City_ID <= 0) {
+	        return;
+	    }
+	    this.m_city = vo;
+	    this.setText(vo.CityName);
+	    // keep context in sync
+	    Env.setContext(Env.getCtx(), m_windowNo, Env.TAB_INFO, "C_Region_ID", String.valueOf(vo.C_Region_ID));
+	    // fire the same signal you use on manual selection
+	    Events.postEvent("onCitySelected", this, null);
+	}
+
+	/** Optional helper to clear current selection and visible list. */
+	public void clearCityAndList() {
+	    this.m_city = null;
+	    this.setText("");
+	    this.removeAllItems();
+	    this.setDict(null);
+	    this.setDescription(null);
+	}
+
 }

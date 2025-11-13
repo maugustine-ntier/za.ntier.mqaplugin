@@ -50,6 +50,7 @@ import org.adempiere.webui.theme.ThemeManager;
 import org.adempiere.webui.util.ZKUpdateUtil;
 import org.adempiere.webui.window.Dialog;
 import org.adempiere.webui.window.WLocationDialog;
+import org.compiere.grid.ed.CityVO;
 import org.compiere.model.GridField;
 import org.compiere.model.MAddressValidation;
 import org.compiere.model.MCity;
@@ -151,18 +152,19 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 
 	private Button toLink;
 	private Button toRoute;
-	
+
 	private Listbox lstAddressValidation;
 	private Button btnOnline;
 	private Textbox txtResult;
 	private Checkbox cbxValid;
 	private ArrayList<String> enabledCountryList = new ArrayList<String>();
-	
+
 	private GridField m_GridField = null;
 	private boolean onSaveError = false;
 	/* SysConfig USE_ESC_FOR_TAB_CLOSING */
 	private boolean isUseEscForTabClosing = MSysConfig.getBooleanValue(MSysConfig.USE_ESC_FOR_TAB_CLOSING, false, Env.getAD_Client_ID(Env.getCtx()));
-	
+	private CityPickerWindow cityPickerWindow;
+
 	/**
 	 * @param title
 	 * @param location
@@ -300,7 +302,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		txtCity.addEventListener(Events.ON_CHANGING, this);  
 		// 🔔 Custom event listener for when a city is selected
 		txtCity.addEventListener("onCitySelected", this);
-	//	txtCity.addEventListener(Events.ON_CHANGE, this);  // Martin 29/7/2025
+		//	txtCity.addEventListener(Events.ON_CHANGE, this);  // Martin 29/7/2025
 
 		//txtCity
 
@@ -320,7 +322,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		lstCountry.setMold("select");
 		ZKUpdateUtil.setWidth(lstCountry, "154px");
 		lstCountry.setRows(0);
-		
+
 		confirmPanel = new ConfirmPanel(true);
 		confirmPanel.addActionListener(this);
 
@@ -330,27 +332,27 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		toRoute = new Button(Msg.getMsg(Env.getCtx(), "Route"));
 		LayoutUtils.addSclass("txt-btn", toRoute);
 		toRoute.addEventListener(Events.ON_CLICK,this);
-		
+
 		btnOnline = new Button(Msg.getElement(Env.getCtx(), "ValidateAddress"));
 		LayoutUtils.addSclass("txt-btn", btnOnline);
 		btnOnline.addEventListener(Events.ON_CLICK,this);
-		
+
 		txtResult = new Textbox();
 		txtResult.setCols(2);
 		txtResult.setRows(3);
 		txtResult.setReadonly(true);
-		
+
 		cbxValid = new Checkbox();
 		cbxValid.setText(Msg.getElement(Env.getCtx(), "IsValid"));
 		cbxValid.setDisabled(true);
-		
+
 		lstAddressValidation = new Listbox();
 		lstAddressValidation.setMold("select");
 		ZKUpdateUtil.setWidth(lstAddressValidation, "154px");
 		lstAddressValidation.setRows(0);		
 
 		mainPanel = GridFactory.newGridLayout();
-		
+
 		if (ClientInfo.isMobile())
 		{
 			if (ClientInfo.maxWidth(ClientInfo.EXTRA_SMALL_WIDTH) || ClientInfo.maxHeight(ClientInfo.SMALL_HEIGHT))
@@ -358,6 +360,10 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				confirmPanel.addButtonSclass("btn-medium small-image-btn");
 			}
 		}
+		// After txtPostal = new Textbox();
+		txtPostal.addEventListener(Events.ON_CHANGE, this);
+		txtPostal.addEventListener(Events.ON_OK, this); // Enter key
+
 	}
 
 	/**
@@ -367,15 +373,15 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 	{
 		Columns columns = new Columns();
 		mainPanel.appendChild(columns);
-		
+
 		Column column = new Column();
 		columns.appendChild(column);
 		ZKUpdateUtil.setWidth(column, "30%");
-		
+
 		column = new Column();
 		columns.appendChild(column);
 		ZKUpdateUtil.setWidth(column, "70%");
-		
+
 		Row pnlAddress1 = new Row();
 		pnlAddress1.appendChild(lblAddress1);
 		pnlAddress1.appendChild(txtAddress1);
@@ -442,24 +448,24 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		}
 		ZKUpdateUtil.setWidth(pnlLinks, "100%");
 		pnlLinks.setStyle("text-align:right");
-		
+
 		Borderlayout borderlayout = new Borderlayout();
 		this.appendChild(borderlayout);
 		ZKUpdateUtil.setHflex(borderlayout, "1");
 		ZKUpdateUtil.setVflex(borderlayout, "1");
-		
+
 		Center centerPane = new Center();
 		centerPane.setSclass("dialog-content");
 		centerPane.setAutoscroll(true);
 		borderlayout.appendChild(centerPane);
-		
+
 		Vbox vbox = new Vbox();
 		centerPane.appendChild(vbox);
 		vbox.appendChild(mainPanel);
 		if (MLocation.LOCATION_MAPS_URL_PREFIX != null || MLocation.LOCATION_MAPS_ROUTE_PREFIX != null) {
 			vbox.appendChild(pnlLinks);
 		}
-		
+
 		String addressValidation = MSysConfig.getValue(MSysConfig.ADDRESS_VALIDATION, null, Env.getAD_Client_ID(Env.getCtx()));
 		enabledCountryList.clear();
 		if (addressValidation != null && addressValidation.trim().length() > 0)
@@ -471,23 +477,23 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				enabledCountryList.add(token);
 			}
 		}
-			
+
 		if (enabledCountryList.size() > 0)
 		{
 			Grid grid = GridFactory.newGridLayout();
 			vbox.appendChild(grid);
-			
+
 			columns = new Columns();
 			grid.appendChild(columns);
-			
+
 			Rows rows = new Rows();
 			grid.appendChild(rows);
-			
+
 			Row row = new Row();
 			rows.appendChild(row);
 			row.appendCellChild(lstAddressValidation, 2);
 			ZKUpdateUtil.setHflex(lstAddressValidation, "1");			
-			
+
 			MAddressValidation[] validations = MAddressValidation.getAddressValidation(Env.getCtx(), Env.getAD_Client_ID(Env.getCtx()), null);
 			for (MAddressValidation validation : validations)
 			{
@@ -496,17 +502,17 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 					lstAddressValidation.setSelectedItem(li);
 				}
 			}
-			
+
 			if (lstAddressValidation.getSelectedIndex() == -1 && lstAddressValidation.getChildren().size() > 0) {
 				lstAddressValidation.setSelectedIndex(0);
 			}
-						
+
 			row = new Row();
 			rows.appendChild(row);
 			row.appendCellChild(txtResult, 2);
 			ZKUpdateUtil.setHflex(txtResult, "1");
 			txtResult.setText(m_location.getResult());
-			
+
 			row = new Row();
 			rows.appendChild(row);
 			row.appendChild(cbxValid);
@@ -517,7 +523,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			cell.appendChild(btnOnline);
 			cell.setAlign("right");
 			row.appendChild(cell);
-			
+
 			if (!enabledCountryList.isEmpty())
 			{
 				boolean isEnabled = false;
@@ -535,7 +541,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				btnOnline.setEnabled(isEnabled);
 			}
 		}
-		
+
 		ZKUpdateUtil.setVflex(vbox, "1");
 		ZKUpdateUtil.setHflex(vbox, "1");
 
@@ -543,11 +549,11 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		southPane.setSclass("dialog-footer");
 		borderlayout.appendChild(southPane);
 		southPane.appendChild(confirmPanel);
-		
+
 		addEventListener("onSaveError", this);
 		addEventListener(Events.ON_CANCEL, e -> onCancel());
 	}
-	
+
 	/**
 	 * Add a new row of components to {@link #mainPanel}
 	 * @param row Row of components
@@ -573,7 +579,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		MCountry country = m_location.getCountry();
 		if (log.isLoggable(Level.FINE)) {
 			log.fine(country.getName() + ", Region=" + country.isHasRegion() + " " + country.getCaptureSequence()
-					+ ", C_Location_ID=" + m_location.getC_Location_ID());
+			+ ", C_Location_ID=" + m_location.getC_Location_ID());
 		}
 		//  new Country
 		if (m_location.getC_Country_ID() != s_oldCountry_ID)
@@ -594,7 +600,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			}
 			s_oldCountry_ID = m_location.getC_Country_ID();
 		}
-		
+
 		if (m_location.getC_Region_ID() > 0 && m_location.getC_Region().getC_Country_ID() == country.getC_Country_ID()) {
 			setRegion();
 		} else {
@@ -609,9 +615,9 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, "C_Region_ID", "0");
 		}
 		Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, "C_Country_ID", String.valueOf(country.get_ID()));
-		
+
 		txtCity.fillList();
-		
+
 		//      sequence of City Postal Region - @P@ @C@ - @C@, @R@ @P@
 		String ds = country.getCaptureSequence();
 		if (ds == null || ds.length() == 0)
@@ -638,7 +644,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				addComponents((Row)lstCountry.getParent());
 				// TODO: Add Online
 				// if (m_location.getCountry().isPostcodeLookup()) {
-					// addLine(line++, lOnline, fOnline);
+				// addLine(line++, lOnline, fOnline);
 				// }
 			} else if (s.startsWith("Com")) {
 				addComponents((Row)txtComments.getParent());
@@ -700,7 +706,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			setCountry();
 		}
 	}
-	
+
 	/**
 	 * Set selected country from {@link #m_location}
 	 */
@@ -741,7 +747,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			lstRegion.setSelectedItem(null);
 		}        
 	}
-	
+
 	/**
 	 *  @return true if changed
 	 */
@@ -749,7 +755,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 	{
 		return m_change;
 	}   //  isChanged
-	
+
 	/**
 	 *  @return location
 	 */
@@ -764,16 +770,16 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		if (event.getTarget() == confirmPanel.getButton(ConfirmPanel.A_OK)) 
 		{
 			onSaveError = false;
-			
+
 			inOKAction = true;
-			
+
 			if (m_location.getCountry().isHasRegion() && lstRegion.getSelectedItem() == null) {
 				if (txtCity.getC_Region_ID() > 0 && txtCity.getC_Region_ID() != m_location.getC_Region_ID()) {
 					m_location.setRegion(MRegion.get(Env.getCtx(), txtCity.getC_Region_ID()));
 					setRegion();
 				}
 			}
-			
+
 			String msg = validate_OK();
 			if (msg != null) {
 				onSaveError = true;
@@ -786,7 +792,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				inOKAction = false;
 				return;
 			}
-			
+
 			if (action_OK())
 			{
 				m_change = true;
@@ -829,8 +835,8 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				MLocation orgLocation = new MLocation(Env.getCtx(),orgInfo.getC_Location_ID(),null);
 
 				String urlString = MLocation.LOCATION_MAPS_ROUTE_PREFIX +
-						         MLocation.LOCATION_MAPS_SOURCE_ADDRESS + orgLocation.getMapsLocation() + //org
-						         MLocation.LOCATION_MAPS_DESTINATION_ADDRESS + getFullAdress(); //partner
+						MLocation.LOCATION_MAPS_SOURCE_ADDRESS + orgLocation.getMapsLocation() + //org
+						MLocation.LOCATION_MAPS_DESTINATION_ADDRESS + getFullAdress(); //partner
 				String message = null;
 				try {
 					Executions.getCurrent().sendRedirect(urlString, "_blank");
@@ -844,18 +850,18 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		else if (btnOnline.equals(event.getTarget()))
 		{
 			btnOnline.setEnabled(false);
-			
+
 			onSaveError = false;
-			
+
 			inOKAction = true;
-			
+
 			if (m_location.getCountry().isHasRegion() && lstRegion.getSelectedItem() == null) {
 				if (txtCity.getC_Region_ID() > 0 && txtCity.getC_Region_ID() != m_location.getC_Region_ID()) {
 					m_location.setRegion(MRegion.get(Env.getCtx(), txtCity.getC_Region_ID()));
 					setRegion();
 				}
 			}
-			
+
 			String msg = validate_OK();
 			if (msg != null) {
 				onSaveError = true;
@@ -868,7 +874,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				inOKAction = false;
 				return;
 			}
-			
+
 			MLocation_New m_location = new MLocation_New(Env.getCtx(), 0, null);
 			m_location.setAddress1(txtAddress1.getValue());
 			m_location.setAddress2(txtAddress2.getValue());
@@ -891,7 +897,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			{
 				m_location.setC_Region_ID(0);
 			}			
-				
+
 			MAddressValidation validation = lstAddressValidation.getSelectedItem().getValue();
 			if (validation == null && lstAddressValidation.getChildren().size() > 0) {
 				validation = lstAddressValidation.getItemAtIndex(0).getValue();
@@ -899,10 +905,10 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			if (validation != null)
 			{
 				boolean ok = m_location.processOnline(validation.getC_AddressValidation_ID());
-				
+
 				txtResult.setText(m_location.getResult());
 				cbxValid.setChecked(m_location.isValid());
-				
+
 				List<?> list = lstAddressValidation.getChildren();
 				Iterator<?> iter = list.iterator();
 				while (iter.hasNext())
@@ -925,9 +931,9 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 					});
 				}
 			}
-			
+
 			inOKAction = false;
-			
+
 			btnOnline.setEnabled(true);
 		}
 		//  Country Changed - display in new Format
@@ -940,7 +946,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			m_location.setCity(null);
 			//  refresh
 			initLocation();
-			
+
 			if (!enabledCountryList.isEmpty())
 			{
 				boolean isEnabled = false;
@@ -957,7 +963,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				}
 				btnOnline.setEnabled(isEnabled);
 			}
-			
+
 			inCountryAction = false;
 			lstCountry.focus();
 		}
@@ -976,22 +982,248 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 			lstRegion.focus();
 		} if (event.getTarget().equals(txtCity)) {   // Martin 29/7/2025
 			if ("onCitySelected".equals(event.getName())) {
-	            String selectedCity = txtCity.getText();
-	            MRegion r = MRegion.get(txtCity.getC_Region_ID());
-	            m_location.setRegion(r);
-	            setRegion();
-	            MCity mCity = MCity.get(txtCity.getC_City_ID());
-	            m_location.setPostal(mCity.getPostal());
-	            txtPostal.setValue(mCity.getPostal());
-	            System.out.println("City selected: " + selectedCity);
-	        }
-	    }
+				String selectedCity = txtCity.getText();
+				MRegion r = MRegion.get(txtCity.getC_Region_ID());
+				m_location.setRegion(r);
+				setRegion();
+				MCity mCity = MCity.get(txtCity.getC_City_ID());
+				m_location.setPostal(mCity.getPostal());
+				txtPostal.setValue(mCity.getPostal());
+				System.out.println("City selected: " + selectedCity);
+			}
+		} else if (event.getTarget().equals(txtPostal)
+				&& (Events.ON_CHANGE.equals(event.getName()) || Events.ON_OK.equals(event.getName()))) {
+			handlePostalEntered();
+		}
+
 		else if ("onSaveError".equals(event.getName())) {
 			onSaveError = false;
 			doPopup();
 			focus();			
 		}
 	}
+
+	/** Called when user enters a postal code and leaves the field/presses Enter. */
+	private void handlePostalEntered() {
+	    String postal = txtPostal.getValue() != null ? txtPostal.getValue().trim() : "";
+	    if (postal.isEmpty())
+	        return;
+
+	    Integer regionId = null;
+	    if (lstRegion.getSelectedItem() != null && lstRegion.getSelectedItem().getValue() instanceof MRegion) {
+	        regionId = ((MRegion) lstRegion.getSelectedItem().getValue()).getC_Region_ID();
+	    }
+
+	    java.util.List<MCity> cities = findCitiesByPostalAll(postal, regionId);
+	    if (cities.isEmpty()) {
+	        txtCity.setText("");
+	        m_location.setC_City_ID(0);
+	        m_location.setCity(null);
+	        return;
+	    }
+
+	    // If only one -> apply directly
+	    if (cities.size() == 1) {
+	    	applyCityFromModel(cities.get(0));
+	        return;
+	    }
+
+	    // Multiple -> show picker
+	    java.util.List<CityVO> vos = toCityVOs(cities);
+	    openCityPicker(vos, selected -> {
+	        if (selected == null) {
+	            return; // user cancelled
+	        }
+	        // apply selection (similar to applyCityFromPostal)
+	        MRegion r = MRegion.get(Env.getCtx(), selected.C_Region_ID);
+	        m_location.setRegion(r);
+	        setRegion();
+	        txtCity.setText(selected.CityName);
+	        m_location.setCity(selected.CityName);
+	        m_location.setC_City_ID(selected.C_City_ID);
+
+	        // Use postal typed by user; or if you have postal on city, set it
+	        m_location.setPostal(postal);
+	        txtPostal.setValue(postal);
+	    });
+	}
+
+
+
+	/** Query cities by postal, optionally filtered by region and/or country. */
+	private java.util.List<MCity> findCitiesByPostal(String postal, Integer regionId, Integer countryId) {
+		StringBuilder where = new StringBuilder("Postal=? AND IsActive='Y'");
+		java.util.List<Object> params = new java.util.ArrayList<>();
+		params.add(postal);
+
+		if (regionId != null && regionId.intValue() > 0) {
+			where.append(" AND C_Region_ID=?");
+			params.add(regionId);
+		}
+		if (countryId != null && countryId.intValue() > 0) {
+			where.append(" AND C_Country_ID=?");
+			params.add(countryId);
+		}
+
+		return new org.compiere.model.Query(Env.getCtx(), MCity.Table_Name, where.toString(), null)
+				.setParameters(params)
+				.setOrderBy("Name")
+				.list();
+	}
+
+	/** Convert MCity list to CityVO list (with region names). */
+	private java.util.List<org.compiere.grid.ed.CityVO> toCityVOs(java.util.List<MCity> cities) {
+		java.util.ArrayList<org.compiere.grid.ed.CityVO> out = new java.util.ArrayList<>();
+		for (MCity c : cities) {
+			MRegion r = MRegion.get(Env.getCtx(), c.getC_Region_ID());
+			out.add(new org.compiere.grid.ed.CityVO(
+					c.getC_City_ID(),
+					c.getName(),
+					c.getC_Region_ID(),
+					r != null ? r.getName() : ""
+					));
+		}
+		return out;
+	}
+
+	/** Apply a city selected from the DB model. */
+	private void applyCityFromModel(MCity city) {
+		if (city == null || city.get_ID() <= 0) return;
+
+		// region
+		MRegion r = MRegion.get(Env.getCtx(), city.getC_Region_ID());
+		if (r != null) {
+			m_location.setRegion(r);
+			setRegion(); // updates lstRegion
+		} else {
+			m_location.setC_Region_ID(0);
+			lstRegion.setSelectedItem(null);
+		}
+
+		// select in the autocomplete + notify
+		org.compiere.grid.ed.CityVO vo = new org.compiere.grid.ed.CityVO(
+				city.getC_City_ID(), city.getName(), city.getC_Region_ID(), r != null ? r.getName() : "");
+		txtCity.selectCity(vo); // method added below in WAutoCompleterCity
+
+		// keep canonical postal
+		if (city.getPostal() != null) {
+			txtPostal.setValue(city.getPostal());
+			m_location.setPostal(city.getPostal());
+		}
+	}
+
+	
+
+	private void openCityPicker(java.util.List<CityVO> candidateCities, Callback<CityVO> callback) {
+	    if (candidateCities == null || candidateCities.isEmpty()) {
+	        return;
+	    }
+
+	    CityPickerWindow picker = new CityPickerWindow(candidateCities, callback);
+	    picker.setParent(this);
+	    picker.doHighlighted();     // center popup in iDempiere style
+	}
+
+
+	private static class CityPickerWindow extends Window implements EventListener<Event> {
+
+	    private static final long serialVersionUID = 1L;
+
+	    private final Listbox lstCities = new Listbox();
+	    private final Callback<CityVO> callback;
+	    private final ConfirmPanel cp = new ConfirmPanel(true);
+
+	    CityPickerWindow(java.util.List<CityVO> cities, Callback<CityVO> callback) {
+	        this.callback = callback;
+
+	        setTitle("Select City");
+	        setSclass("popup-dialog");
+	        setBorder("normal");
+	        setClosable(true);
+	        setWidth("420px");
+	        setHeight("320px");
+	        setShadow(true);
+
+	        Borderlayout layout = new Borderlayout();
+	        appendChild(layout);
+	        ZKUpdateUtil.setHflex(layout, "1");
+	        ZKUpdateUtil.setVflex(layout, "1");
+
+	        // Center: listbox
+	        Center center = new Center();
+	        center.setAutoscroll(true);
+	        layout.appendChild(center);
+
+	        // Use normal listbox, not "select" mold
+	        // (comment this line out entirely or set to "default")
+	        // lstCities.setMold("select");
+	        lstCities.setMultiple(false);
+	        lstCities.setCheckmark(false);
+	        ZKUpdateUtil.setHflex(lstCities, "1");
+	        ZKUpdateUtil.setVflex(lstCities, "1");
+
+	        // ✅ populate using appendItem so label/value are wired correctly
+	        for (CityVO vo : cities) {
+	            String label = vo.CityName;
+	            if (vo.RegionName != null && vo.RegionName.trim().length() > 0) {
+	                label += " — " + vo.RegionName;
+	            }
+	            lstCities.appendItem(label, vo);
+	        }
+
+	        if (!lstCities.getItems().isEmpty()) {
+	            lstCities.setSelectedIndex(0);
+	        }
+
+	        center.appendChild(lstCities);
+
+	        // South: OK/Cancel
+	        South south = new South();
+	        layout.appendChild(south);
+	        south.setSclass("dialog-footer");
+	        south.appendChild(cp);
+
+	        cp.addActionListener(this);
+	        lstCities.addEventListener(Events.ON_DOUBLE_CLICK, this);
+	    }
+
+	    @Override
+	    public void onEvent(Event event) throws Exception {
+	        // OK button
+	        if (event.getTarget() == cp.getButton(ConfirmPanel.A_OK)) {
+	            fireSelected();
+	        }
+	        // Cancel button or window close
+	        else if (event.getTarget() == cp.getButton(ConfirmPanel.A_CANCEL)) {
+	            detach();
+	        }
+	        // Double-click on list item = OK
+	        else if (Events.ON_DOUBLE_CLICK.equals(event.getName())
+	                && event.getTarget() == lstCities) {
+	            fireSelected();
+	        }
+	    }
+
+
+	    private void fireSelected() {
+	        ListItem sel = lstCities.getSelectedItem();
+	        CityVO vo = (sel != null) ? (CityVO) sel.getValue() : null;
+	        if (callback != null) {
+	            callback.onCallback(vo);
+	        }
+	        detach();
+	    }
+	}
+
+
+
+
+
+
+
+	
+
+
 
 	/**
 	 * Handle onCancel event
@@ -1005,7 +1237,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		m_change = false;
 		this.dispose();
 	}
-	
+
 	/**
 	 * Validate mandatory fields.<br/>
 	 * LCO - address 1, region and city required
@@ -1043,7 +1275,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		if (isPostalAddMandatory && txtPostalAdd.getText().trim().length() == 0) {
 			fields = fields + " " + "@PostalAdd@, ";
 		}
-		
+
 		if (fields.trim().length() > 0) {
 			return fields.substring(0, fields.length() -2);
 		}
@@ -1081,7 +1313,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		{
 			m_location.setC_Region_ID(0);
 		}
-		
+
 		if (lstAddressValidation.getSelectedIndex() != -1)
 		{
 			MAddressValidation validation = (MAddressValidation) lstAddressValidation.getSelectedItem().getValue();
@@ -1095,7 +1327,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		//  Save changes
 		boolean success = m_location.save();
 		if (success) {
-            // IDEMPIERE-417 Force Update BPLocation.Name
+			// IDEMPIERE-417 Force Update BPLocation.Name
 			// just trigger BPLocation name change when the location change affects the name:
 			// START_VALUE_BPLOCATION_NAME
 			// 0 - City
@@ -1108,26 +1340,26 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 				bplocname = 0;
 			}
 			if (   changedCity
-				|| (bplocname >= 1 && changedAddress1)
-				|| (bplocname >= 2 && changedAddress2)
-				|| (bplocname >= 3 && changedRegion)
-				) {
-	        	if (   m_GridField != null && m_GridField.getGridTab() != null && 1 == 2 &&
-	       		 "C_BPartner_Location".equals(m_GridField.getGridTab().getTableName())  //   we want to save with the new name
-	        		&& !m_GridField.getGridTab().getValueAsBoolean("IsPreserveCustomName")
-	        		)
-	    		{
-	        		m_GridField.getGridTab().setValue("Name", ".");
-	    		} else {
-	    			//Update BP_Location name IDEMPIERE 417
-	    			int bplID = DB.getSQLValueEx(trx.getTrxName(), MLocation.updateBPLocName, m_location.getC_Location_ID());
-	    			if (bplID>0)
-	    			{
-	    				MBPartnerLocation_New bpl = new MBPartnerLocation_New(Env.getCtx(), bplID, trx.getTrxName());
-	    				bpl.setName(bpl.getBPLocName(m_location));
-	    				success = bpl.save();
-	    			}
-	    		}
+					|| (bplocname >= 1 && changedAddress1)
+					|| (bplocname >= 2 && changedAddress2)
+					|| (bplocname >= 3 && changedRegion)
+					) {
+				if (   m_GridField != null && m_GridField.getGridTab() != null && 1 == 2 &&
+						"C_BPartner_Location".equals(m_GridField.getGridTab().getTableName())  //   we want to save with the new name
+						&& !m_GridField.getGridTab().getValueAsBoolean("IsPreserveCustomName")
+						)
+				{
+					m_GridField.getGridTab().setValue("Name", ".");
+				} else {
+					//Update BP_Location name IDEMPIERE 417
+					int bplID = DB.getSQLValueEx(trx.getTrxName(), MLocation.updateBPLocName, m_location.getC_Location_ID());
+					if (bplID>0)
+					{
+						MBPartnerLocation_New bpl = new MBPartnerLocation_New(Env.getCtx(), bplID, trx.getTrxName());
+						bpl.setName(bpl.getBPLocName(m_location));
+						success = bpl.save();
+					}
+				}
 			}
 		}
 		if (success) {
@@ -1146,7 +1378,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 	public boolean isOnSaveError() {
 		return onSaveError;
 	}
-	
+
 	@Override
 	public void dispose()
 	{
@@ -1156,7 +1388,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		}	
 		super.dispose();
 	}
-	
+
 	/**
 	 * @return string that contains all fields of current form  
 	 */
@@ -1167,7 +1399,7 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		if (lstRegion.getSelectedItem()!=null) {
 			region = new MRegion(Env.getCtx(), ((MRegion)lstRegion.getSelectedItem().getValue()).getC_Region_ID(), null);
 		}
-		
+
 		MCountry c = (MCountry)lstCountry.getSelectedItem().getValue();
 
 		String address = "";
@@ -1199,4 +1431,28 @@ public class WLocationDialog_Ntier extends Window implements EventListener<Event
 		txtPostalAdd.setPlaceholder(MCountry.get(Env.getCtx(), s_oldCountry_ID).get_Translation("PlaceholderPostal_Add"));
 		// TODO set the placeholder for Region (ATM, lstRegion doesn't handle placeholder)	
 	}
+	
+	// Find all cities with this postal code, optionally restricted to a region
+	private java.util.List<MCity> findCitiesByPostalAll(String postal, Integer regionId) {
+	    String whereClause = "Postal=?";
+	    java.util.List<Object> params = new java.util.ArrayList<>();
+	    params.add(postal);
+
+	    if (regionId != null && regionId.intValue() > 0) {
+	        whereClause += " AND C_Region_ID=?";
+	        params.add(regionId);
+	    }
+
+	    org.compiere.model.Query q = new org.compiere.model.Query(
+	            Env.getCtx(), MCity.Table_Name, whereClause, null)
+	            .setOnlyActiveRecords(true)
+	            .setOrderBy("Name");
+
+	    q.setParameters(params.toArray());
+
+	    return q.list();
+	}
+
+	
+
 }
