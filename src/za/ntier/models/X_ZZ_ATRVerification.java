@@ -32,7 +32,7 @@ public class X_ZZ_ATRVerification extends PO implements I_ZZ_ATRVerification, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251113L;
+	private static final long serialVersionUID = 20251114L;
 
     /** Standard Constructor */
     public X_ZZ_ATRVerification (Properties ctx, int ZZ_ATRVerification_ID, String trxName)

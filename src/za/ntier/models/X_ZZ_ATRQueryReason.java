@@ -31,7 +31,7 @@ public class X_ZZ_ATRQueryReason extends PO implements I_ZZ_ATRQueryReason, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251113L;
+	private static final long serialVersionUID = 20251114L;
 
     /** Standard Constructor */
     public X_ZZ_ATRQueryReason (Properties ctx, int ZZ_ATRQueryReason_ID, String trxName)
