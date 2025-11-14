@@ -30,4 +30,16 @@ public class MZZATRVerification extends X_ZZ_ATRVerification {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+		// TODO Auto-generated method stub
+		return super.beforeSave(newRecord);
+	}
+
+	@Override
+	protected boolean afterSave(boolean newRecord, boolean success) {
+		// TODO Auto-generated method stub
+		return super.afterSave(newRecord, success);
+	}
+
 }
