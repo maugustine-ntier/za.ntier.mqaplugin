@@ -22,6 +22,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public Class<?> getClass(String tableName) {
+		if (tableName.equals(I_ZZ_ATRVerification.Table_Name)) {
+			return MZZATRVerification.class;
+		}
 		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
 			return MZZWFLineRole.class;
 		}
@@ -85,7 +88,10 @@ public class MyModelFactory implements IModelFactory {
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
 		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
-			return new MZZWFLineRole(Env.getCtx(),Record_ID,trxName);
+			return new MZZATRVerification(Env.getCtx(),Record_ID,trxName);
+		}
+		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
+			return new MZZATRVerification(Env.getCtx(),Record_ID,trxName);
 		}
 		if (tableName.equals(I_ZZ_WF_Lines.Table_Name)) {
 			return new MZZWFLines(Env.getCtx(),Record_ID,trxName);
@@ -147,6 +153,9 @@ public class MyModelFactory implements IModelFactory {
 
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
+		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
+			return new MZZATRVerification(Env.getCtx(),rs,trxName);
+		}
 		if (tableName.equals(I_ZZ_WF_Line_Role.Table_Name)) {
 			return new MZZWFLineRole(Env.getCtx(),rs,trxName);
 		}
