@@ -42,7 +42,10 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 		if (IDocApprove.ZZ_DOCACTION_SubmitToRecommender.equals(action)) {
 			// From Draft -> Submitted
-			if (!IDocApprove.ZZ_DOCSTATUS_Draft.equals(status) && !Util.isEmpty(status, true)) {
+			if (!IDocApprove.ZZ_DOCSTATUS_NOT_RECOMMENDED.equals(status) && 
+				!IDocApprove.ZZ_DOCSTATUS_NotApproved.equals(status) && 
+				!IDocApprove.ZZ_DOCSTATUS_Draft.equals(status) 
+					&& !Util.isEmpty(status, true)) {
 				throw wrongState("Submit", status, action);
 			}
 			doSubmitToRecommender();
@@ -101,28 +104,9 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		Timestamp now = now();
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
-
-		// Identify/validate recommender (Snr Mgr SPU)
-		/*
-		int recommenderId = docApprove.getZZ_Recommender_ID();
-		if (recommenderId <= 0) {
-			// fallback: pick any user with ROLE_SNR_MGR_SPU if that’s your pattern
-			recommenderId = findFirstUserInRole(IDocApprove.ROLE_SNR_MGR_SPU);
-			if (recommenderId <= 0)
-				throw new AdempiereException("No Recommender (Snr Mgr SPU) found/configured.");
-			docApprove.setZZ_Recommender_ID(recommenderId);
-		}
-		 */
-
-
-
 		// Notify recommender
 		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
-
-		// Optional: also notify submitter for confirmation
-		//AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(),
-		//		docApprove.getZZ); // reuse if you prefer
 	}
 
 	/** Submitted -> Recommended by Snr Mgr SPU */
@@ -143,6 +127,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NOT_RECOMMENDED);
 			docApprove.setZZ_Date_Not_Recommended(now);
+			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_SubmitToRecommender);// can be submitted again
 			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
@@ -164,6 +149,7 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApproved);
 			docApprove.setZZ_Date_Not_Approved(now);
+			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_SubmitToRecommender);  // Can be submitted again.
 			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
