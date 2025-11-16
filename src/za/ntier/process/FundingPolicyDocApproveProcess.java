@@ -20,8 +20,24 @@ public class FundingPolicyDocApproveProcess extends AbstractDocApproveProcess<X_
 		MMailText mailTemplate = new MMailText(getCtx(), 1000028, get_TrxName());
 		mailTemplate.setPO(x_ZZ_Funding_Policy);
 		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_MANAGER_LP_OPS, getTable_ID(), getRecord_ID(),
+				mailTemplate);		
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_MANAGER_LP_PROJECTS, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_MANAGER_QA, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_MANAGER_SPU, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_MANAGER_SRU, getTable_ID(), getRecord_ID(),
 				mailTemplate);
 		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP_OPS, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_LP_PROJECTS, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_QA, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MANAGER_SRU, getTable_ID(), getRecord_ID(),
+				mailTemplate);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
 				mailTemplate);
 		sentNotify(queueNotifis, docApprove,get_TrxName());
 		return "";
