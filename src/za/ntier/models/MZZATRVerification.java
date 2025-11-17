@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import org.compiere.model.PO;
 
+// Martin Try to get rid of warning if you can.
+// in this case put your cursor of MZZATRVerification (its underlined yellow).  Select the first line
 public class MZZATRVerification extends X_ZZ_ATRVerification {
 
 	public MZZATRVerification(Properties ctx, int ZZ_ATRVerification_ID, String trxName) {
@@ -44,7 +46,7 @@ public class MZZATRVerification extends X_ZZ_ATRVerification {
 	        return super.afterSave(newRecord, success);
 
 	    // Load all checklist template rows
-	    int[] ids = PO.getAllIDs(X_ZZ_ATR_Checklist.Table_Name, null, get_TrxName());
+	    int[] ids = PO.getAllIDs(X_ZZ_ATR_Checklist.Table_Name, null, get_TrxName()); // Martin add a where chause to check if active
 
 	    for (int id : ids) {
 
