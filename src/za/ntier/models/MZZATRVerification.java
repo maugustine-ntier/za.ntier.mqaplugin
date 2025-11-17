@@ -3,6 +3,8 @@ package za.ntier.models;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.compiere.model.PO;
+
 public class MZZATRVerification extends X_ZZ_ATRVerification {
 
 	public MZZATRVerification(Properties ctx, int ZZ_ATRVerification_ID, String trxName) {
@@ -38,7 +40,36 @@ public class MZZATRVerification extends X_ZZ_ATRVerification {
 
 	@Override
 	protected boolean afterSave(boolean newRecord, boolean success) {
-		// TODO Auto-generated method stub
+	    if (!newRecord || !success)
+	        return super.afterSave(newRecord, success);
+
+	    // Load all checklist template rows
+	    int[] ids = PO.getAllIDs(X_ZZ_ATR_Checklist.Table_Name, null, get_TrxName());
+
+	    for (int id : ids) {
+
+	        // Load template definition
+	        X_ZZ_ATR_Checklist checklistDef =
+	                new X_ZZ_ATR_Checklist(getCtx(), id, get_TrxName());
+
+	        // Create verification checklist row
+	        X_ZZ_ATR_Verification_Checklist vCheck =
+	                new X_ZZ_ATR_Verification_Checklist(getCtx(), 0, get_TrxName());
+
+	        // Link to verification header
+	        vCheck.setZZ_ATRVerification_ID(getZZ_ATRVerification_ID());
+
+	        // Copy allowed fields
+	        vCheck.setName(checklistDef.getName());
+	        vCheck.setValue(checklistDef.getValue());
+
+	        // Default Yes/No fields to N
+	        vCheck.setZZ_Information_Completed(false);
+	        vCheck.setZZ_Information_Submitted(false);
+
+	        // Save
+	        vCheck.saveEx();
+	    }
 		return super.afterSave(newRecord, success);
 	}
 
