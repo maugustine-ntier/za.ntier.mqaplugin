@@ -76,7 +76,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_NotApprovedBySnrManager);
 			docApprove.setZZ_DocAction(null);
 			docApprove.setZZ_Date_Not_Approved(now);
-			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getZZ_Submitter_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
 
@@ -95,8 +95,9 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 		// Set state
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
-		if (docApprove.getZZ_Date_Submitted() == null)
-			docApprove.setZZ_Date_Submitted(now());
+	    docApprove.setZZ_Date_Submitted(now());
+	    docApprove.setZZ_Submitter_ID(getAD_User_ID());
+		
 
 		// IDocApprove.ROLE_SNR_MANAGER_LP
 		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, getRoleIDForOrg(docApprove.getAD_Org_ID()), getTable_ID(), getRecord_ID(),
@@ -122,7 +123,7 @@ public class ProgramMaintenanceDocApproveProcess extends AbstractDocApproveProce
 			docApprove.setZZ_DocStatus(X_ZZ_Program_Master_Data.ZZ_DOCSTATUS_NotApprovedBySnrManager);
 			docApprove.setZZ_DocAction(getDocActionForOrg(docApprove.getAD_Org_ID()));
 			docApprove.setZZ_Date_Not_Approved(now);
-			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getZZ_Submitter_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 
 	}

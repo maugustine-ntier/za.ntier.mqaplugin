@@ -521,4 +521,18 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
+	@Override
+	public void setZZ_Submitter_ID(int ZZ_Submitter_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public int getZZ_Submitter_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

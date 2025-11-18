@@ -771,5 +771,17 @@ public class MInventory_New extends MInventory implements I_M_Inventory,IDocAppr
 		return 0;
 	}
 
+	@Override
+	public void setZZ_Submitter_ID(int ZZ_Submitter_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Submitter_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 
 }
