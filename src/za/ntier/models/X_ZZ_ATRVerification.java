@@ -32,7 +32,7 @@ public class X_ZZ_ATRVerification extends PO implements I_ZZ_ATRVerification, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251114L;
+	private static final long serialVersionUID = 20251118L;
 
     /** Standard Constructor */
     public X_ZZ_ATRVerification (Properties ctx, int ZZ_ATRVerification_ID, String trxName)
@@ -366,12 +366,12 @@ public class X_ZZ_ATRVerification extends PO implements I_ZZ_ATRVerification, I_
 		return (String)get_Value(COLUMNNAME_ZZ_Verification_Comment);
 	}
 
-	/** Not Recommended for Evaluation = Not Recommended for Evaluation */
-	public static final String ZZ_VERIFICATION_STATUS_NotRecommendedForEvaluation = "Not Recommended for Evaluation";
-	/** Query = Query */
-	public static final String ZZ_VERIFICATION_STATUS_Query = "Query";
-	/** Recommended for Evaluation = Recommended for Evaluation */
-	public static final String ZZ_VERIFICATION_STATUS_RecommendedForEvaluation = "Recommended for Evaluation";
+	/** Not Recommended for Evaluation = N */
+	public static final String ZZ_VERIFICATION_STATUS_NotRecommendedForEvaluation = "N";
+	/** Query = Q */
+	public static final String ZZ_VERIFICATION_STATUS_Query = "Q";
+	/** Recommended for Evaluation = R */
+	public static final String ZZ_VERIFICATION_STATUS_RecommendedForEvaluation = "R";
 	/** Set Verification Status.
 		@param ZZ_Verification_Status Verification Status
 	*/

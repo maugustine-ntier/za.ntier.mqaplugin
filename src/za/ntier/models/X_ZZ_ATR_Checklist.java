@@ -31,7 +31,7 @@ public class X_ZZ_ATR_Checklist extends PO implements I_ZZ_ATR_Checklist, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251114L;
+	private static final long serialVersionUID = 20251118L;
 
     /** Standard Constructor */
     public X_ZZ_ATR_Checklist (Properties ctx, int ZZ_ATR_Checklist_ID, String trxName)
