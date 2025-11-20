@@ -8,8 +8,10 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MProcessPara;
@@ -30,12 +32,14 @@ import org.compiere.util.Util;
  *   - For each column:
  *       * Resolves table name as "ZZ_<Header>_Ref"
  *       * Finds MTable
+ *       * Clears data in that table (for the current client)
  *       * Imports non-empty cells as lookup rows (Value, Name)
- *       * Avoids duplicates by Name
+ *       * Avoids duplicates during this run (by Name), though it
+ *         should be redundant because we clear first.
  *
  * Value:
  *   - 4 characters, numeric, zero-padded: 0001, 0002, ...
- *   - Sequence is per table, starting from max(Value)+1 if any.
+ *   - Sequence is per table, starting from max(Value)+1 (effectively 0001 after clear).
  */
 @org.adempiere.base.annotation.Process(name = "za.ntier.process.ImportRefLookupsFromSheet")
 public class ImportRefLookupsFromSheet extends SvrProcess {
@@ -70,6 +74,8 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
         if (p_AD_Org_ID <= 0) {
             p_AD_Org_ID = Env.getAD_Org_ID(getCtx()); // fall back to current org
         }
+
+        int adClientId = Env.getAD_Client_ID(getCtx());
 
         // Build export CSV URL from the sheet link
         String csvUrl = buildCsvExportUrl(p_googleSheetUrl);
@@ -106,6 +112,28 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
             }
         }
 
+        // ---- NEW: clear data in each unique target table (for this client) ----
+        Set<Integer> clearedTableIds = new HashSet<>();
+        for (MTable table : tablesByColumn) {
+            if (table == null) {
+                continue;
+            }
+            int tableId = table.getAD_Table_ID();
+            if (clearedTableIds.contains(tableId)) {
+                continue; // already cleared this table
+            }
+
+            String sql = "DELETE FROM " + table.getTableName() + " WHERE AD_Client_ID=?";
+            int no = DB.executeUpdateEx(sql, new Object[]{adClientId}, get_TrxName());
+            addLog("Cleared " + no + " rows from " + table.getTableName() + " (AD_Client_ID=" + adClientId + ")");
+            clearedTableIds.add(tableId);
+
+            // reset sequence cache for that table (so it starts from 0001 again)
+            valueSeqByTableId.remove(tableId);
+        }
+        // ----------------------------------------------------------------------
+
+
         int totalInserted = 0;
         int totalSkippedExisting = 0;
 
@@ -132,9 +160,7 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
                     continue;
                 }
 
-                int adClientId = Env.getAD_Client_ID(getCtx());
-
-                // Check if record already exists (matching Name)
+                // After clear, this duplicate check is mostly defensive
                 boolean exists = new Query(getCtx(), table.getTableName(),
                         "Name=? AND AD_Client_ID=?", get_TrxName())
                         .setParameters(valueText, adClientId)
@@ -175,7 +201,7 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
 
         StringBuilder result = new StringBuilder();
         result.append("Imported ").append(totalInserted).append(" rows");
-        result.append(", skipped existing: ").append(totalSkippedExisting);
+        result.append(", skipped existing (after clear): ").append(totalSkippedExisting);
 
         return result.toString();
     }
@@ -186,13 +212,11 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
      */
     private String buildCsvExportUrl(String sheetUrl) {
         String url = sheetUrl.trim();
-        // Basic heuristic for standard sheet link
         // e.g. https://docs.google.com/spreadsheets/d/<ID>/edit#gid=0
         if (url.contains("/edit")) {
             int pos = url.indexOf("/edit");
             url = url.substring(0, pos) + "/export?format=csv";
         }
-        // If user already gave an export URL, we leave it as is.
         return url;
     }
 
@@ -201,16 +225,12 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
      * E.g. "Learning_Programme" -> "ZZ_Learning_Programme_Ref"
      */
     private String buildTableNameFromHeader(String header) {
-        // Trim and normalise spaces
         String h = header.trim();
 
-        // Replace spaces and illegal chars with underscore, but keep existing underscores
+        // Replace spaces and illegal chars with underscore, keep existing underscores
         h = h.replaceAll("[^A-Za-z0-9_]", "_");
+        h = h.replaceAll("_+", "_"); // collapse multiple underscores
 
-        // Collapse multiple underscores
-        h = h.replaceAll("_+", "_");
-
-        // Ensure it starts with a letter or underscore (for safety)
         if (!h.isEmpty() && Character.isDigit(h.charAt(0))) {
             h = "_" + h;
         }
@@ -221,13 +241,14 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
     /**
      * Get next 4-digit zero-padded Value for a table, per client.
      * Reads current max(Value) once per table and caches it.
+     * NOTE: because we delete first, this will effectively start at 0001.
      */
     private String getNextValueCode(MTable table, int adClientId) {
         int tableId = table.getAD_Table_ID();
         Integer current = valueSeqByTableId.get(tableId);
 
         if (current == null) {
-            // Read max(Value) from DB
+            // Read max(Value) from DB (should be null immediately after delete)
             String sql = "SELECT MAX(Value) FROM " + table.getTableName()
                        + " WHERE AD_Client_ID=?";
             String maxValue = DB.getSQLValueStringEx(get_TrxName(), sql, adClientId);
@@ -236,7 +257,6 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
                 try {
                     start = Integer.parseInt(maxValue);
                 } catch (NumberFormatException e) {
-                    // If existing values are not numeric, we just restart from 0
                     start = 0;
                 }
             }
@@ -246,7 +266,6 @@ public class ImportRefLookupsFromSheet extends SvrProcess {
         current = current + 1;
         valueSeqByTableId.put(tableId, current);
 
-        // 4-digit zero-padded, e.g. 0001
         return String.format("%04d", current);
     }
 
