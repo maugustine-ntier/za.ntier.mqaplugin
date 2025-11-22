@@ -7,8 +7,14 @@ import java.util.Locale;
 
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.compiere.model.MProcessPara;
 import org.compiere.model.MTable;
 import org.compiere.model.Query;
@@ -75,6 +81,25 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
 
         // Loop all sheets
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            boolean isHidden = false;
+            if (workbook instanceof XSSFWorkbook) {
+                XSSFWorkbook xwb = (XSSFWorkbook) workbook;
+                if (xwb.isSheetHidden(i) || xwb.isSheetVeryHidden(i)) {
+                    isHidden = true;
+                }
+            } else if (workbook instanceof HSSFWorkbook) {
+                HSSFWorkbook hwb = (HSSFWorkbook) workbook;
+                if (hwb.isSheetHidden(i) || hwb.isSheetVeryHidden(i)) {
+                    isHidden = true;
+                }
+            }
+            if (isHidden) {
+                Sheet hiddenSheet = workbook.getSheetAt(i);
+                addLog("Skipping hidden sheet: " + hiddenSheet.getSheetName());
+                continue;
+            }
+            // --------------------------------
+
             Sheet sheet = workbook.getSheetAt(i);
             if (sheet == null) {
                 continue;
@@ -86,11 +111,12 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
             }
 
             String sNameLower = sheetName.toLowerCase(Locale.ROOT).trim();
-            // Exclude "Welcome" and "Lookup" tabs (Lookup / Lookups etc.)
+            // Exclude "Welcome" and "Lookup" tabs
             if ("welcome".equals(sNameLower) || sNameLower.startsWith("lookup")) {
                 addLog("Skipping sheet: " + sheetName);
                 continue;
             }
+           
 
             // Header record in ZZ_WSP_ATR_Lookup_Mapping
             X_ZZ_WSP_ATR_Lookup_Mapping header = (X_ZZ_WSP_ATR_Lookup_Mapping) new Query(
@@ -115,13 +141,17 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
 
             addLog("Processing sheet '" + sheetName + "' ("
                     + (isNewHeader ? "new" : "existing") + " header ID=" + header.get_ID() + ")");
+            
+            int headerRowIndex = findHeaderRow(sheet);
+            Row headerRow = sheet.getRow(headerRowIndex);
 
-            // Header row (first row)
-            Row headerRow = sheet.getRow(0);
             if (headerRow == null) {
-                addLog("Sheet '" + sheetName + "' has no header row, skipping details");
+                addLog("Sheet '" + sheetName + "' has no detectable header row, skipping details");
                 continue;
             }
+
+
+           
 
             int lastCellNum = headerRow.getLastCellNum();
             if (lastCellNum <= 0) {
@@ -237,4 +267,63 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
 
         return "ZZ_" + h + "_Ref";
     }
+    
+    private int countNonEmptyCells(Row row) {
+        if (row == null)
+            return 0;
+        int lastCell = row.getLastCellNum();
+        if (lastCell < 0)
+            return 0;
+
+        int count = 0;
+        for (int c = 0; c < lastCell; c++) {
+            Cell cell = row.getCell(c);
+            if (cell == null)
+                continue;
+            switch (cell.getCellType()) {
+                case STRING:
+                    if (!Util.isEmpty(cell.getStringCellValue(), true))
+                        count++;
+                    break;
+                case NUMERIC:
+                case BOOLEAN:
+                case FORMULA:
+                    count++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Find the “user” header row.
+     * - Row 0 is the technical header.
+     * - Header row is the first later row with enough non-empty cells.
+     */
+    private int findHeaderRow(Sheet sheet) {
+        if (sheet == null)
+            return 0;
+
+        Row row0 = sheet.getRow(0);
+        int baseCount = countNonEmptyCells(row0);
+        if (baseCount <= 0)
+            return 0;
+
+        int threshold = Math.max(1, baseCount / 2);
+        int maxRowToCheck = Math.min(sheet.getLastRowNum(), 10); // look only near the top
+
+        for (int r = 1; r <= maxRowToCheck; r++) {
+            Row row = sheet.getRow(r);
+            int cnt = countNonEmptyCells(row);
+            if (cnt >= threshold) {
+                return r;   // this is the user header row
+            }
+        }
+
+        // Fallback if nothing matched
+        return 0;
+    }
+
 }
