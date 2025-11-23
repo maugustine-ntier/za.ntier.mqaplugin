@@ -4,16 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellUtil;
 import org.compiere.model.MProcessPara;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
@@ -28,246 +25,371 @@ import org.compiere.util.Util;
  *
  * - User selects an XLSM template via FileName parameter.
  * - Process reads the sheet named "Biodata" (or first sheet if not found).
- * - For each column:
- *     * If there is a lookup table ZZ_<Header>_Ref in AD_Table, treat it as lookup column.
- * - For each row:
- *     * If a value is not found in the lookup table (by Name), add a message in column U.
- * - At the end, sets an export file so ZK shows a download link.
+ * - Uses lookup mapping tables:
+ *      ZZ_WSP_ATR_Lookup_Mapping (header: tab name)
+ *      ZZ_WSP_ATR_Lookup_Mapping_Detail (detail: header name, AD_Table_ID, ZZ_Use_Value)
+ * - For each mapped column:
+ *      * If ZZ_Use_Value = Y: treat spreadsheet values as "Value" from ref table.
+ *      * If ZZ_Use_Value = N: treat spreadsheet values as "Name" from ref table.
+ * - For each data row:
+ *      * If a value is not found in the corresponding ref table, the cell is coloured red.
+ * - Any column with at least one invalid cell has its header coloured red.
+ * - At the end, a modified XLSM/XLSX file is written to a temp file and
+ *   processUI.download(exportFile) is called so ZK shows a download link.
  */
-@org.adempiere.base.annotation.Process(name = "za.co.ntier.wsp_atr.process.ValidateBiodataLookups")
+@org.adempiere.base.annotation.Process(
+        name = "za.co.ntier.wsp_atr.process.ValidateBiodataLookups"
+)
 public class ValidateBiodataLookups extends SvrProcess {
 
-	// Column U is index 20 (0-based) -> 21st column
-	private static final int MESSAGE_COL_INDEX = 20;
+    @Parameter(name = "FileName")
+    private String filePath;   // Path to the uploaded file on the server
 
-	@Parameter(name = "FileName")
-	private String filePath;   // Path to the uploaded file on the server
+    @Override
+    protected void prepare() {
+        // Just validate unknown parameters; filePath is injected by @Parameter
+        for (ProcessInfoParameter para : getParameter()) {
+            MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para);
+        }
+    }
 
-	@Override
-	protected void prepare() {
-		// Just validate unknown parameters; filePath is injected by @Parameter
-		for (ProcessInfoParameter para : getParameter()) {
-			MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para);
-		}
-	}
+    @Override
+    protected String doIt() throws Exception {
 
-	@Override
-	protected String doIt() throws Exception {
+        if (Util.isEmpty(filePath, true)) {
+            throw new AdempiereException("FileName parameter is empty. Please select the spreadsheet file.");
+        }
 
-		if (Util.isEmpty(filePath, true)) {
-			throw new AdempiereException("FileName parameter is empty. Please select the spreadsheet file.");
-		}
+        File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
+            throw new AdempiereException("File not found or not a regular file: " + filePath);
+        }
 
-		File file = new File(filePath);
-		if (!file.exists() || !file.isFile()) {
-			throw new AdempiereException("File not found or not a regular file: " + filePath);
-		}
+        String originalFileName = file.getName();
+        int adClientId = Env.getAD_Client_ID(getCtx());
 
-		String originalFileName = file.getName();
-		int adClientId = Env.getAD_Client_ID(getCtx());
+        // Open workbook (xlsm/xlsx) via POI from file path
+        Workbook workbook;
+        try (InputStream is = new FileInputStream(file)) {
+            workbook = WorkbookFactory.create(is);
+        }
 
-		// Open workbook (xlsm/xlsx) via POI from file path
-		Workbook workbook;
-		try (InputStream is = new FileInputStream(file)) {
-			workbook = WorkbookFactory.create(is);
-		}
+        // Get "Biodata" sheet, or first sheet if not found
+        Sheet sheet = workbook.getSheet("Biodata");
+        if (sheet == null) {
+            sheet = workbook.getSheetAt(0);
+            addLog("Sheet 'Biodata' not found, using first sheet: " + sheet.getSheetName());
+        }
 
-		// Get "Biodata" sheet, or first sheet if not found
-		Sheet sheet = workbook.getSheet("Biodata");
-		if (sheet == null) {
-			sheet = workbook.getSheetAt(0);
-			addLog("Sheet 'Biodata' not found, using first sheet: " + sheet.getSheetName());
-		}
+        if (sheet == null) {
+            workbook.close();
+            throw new AdempiereException("No sheet found in workbook.");
+        }
 
-		if (sheet == null) {
-			throw new AdempiereException("No sheet found in workbook.");
-		}
+        DataFormatter formatter = new DataFormatter();
 
-		// Header row (row 0)
-		Row headerRow = sheet.getRow(0);
-		if (headerRow == null) {
-			throw new AdempiereException("Header row (row 1) not found in sheet.");
-		}
+        // --- Find header row heuristically (row 3 or 4 usually) ---
+        Row headerRow = findHeaderRow(sheet, formatter);
+        if (headerRow == null) {
+            workbook.close();
+            throw new AdempiereException("Could not locate header row in sheet " + sheet.getSheetName());
+        }
+        int headerRowIndex = headerRow.getRowNum();
+        int dataStartRowIndex = headerRowIndex + 1;
 
-		int lastCellNum = headerRow.getLastCellNum(); // short -> int
-		if (lastCellNum <= 0) {
-			throw new AdempiereException("No header columns found in sheet.");
-		}
+        int lastCellNum = headerRow.getLastCellNum(); // short -> int
+        if (lastCellNum <= 0) {
+            workbook.close();
+            throw new AdempiereException("No header columns found in sheet.");
+        }
 
-		// Ensure message column header at column U
-		Cell messageHeaderCell = headerRow.getCell(MESSAGE_COL_INDEX);
-		if (messageHeaderCell == null) {
-			messageHeaderCell = headerRow.createCell(MESSAGE_COL_INDEX);
-		}
-		if (Util.isEmpty(messageHeaderCell.getStringCellValue(), true)) {
-			messageHeaderCell.setCellValue("Validation Messages");
-		}
+        // --- Load mapping header for this tab (sheet name) ---
+        String tabName = sheet.getSheetName();
 
-		// For each column, decide if it is lookup and which table it maps to
-		// We map: header "X" -> table "ZZ_X_Ref" (normalized)
-		String[] lookupTableNamesByColumn = new String[lastCellNum];
-		Map<String, Set<String>> tableNameToAllowedNames = new HashMap<>();
+        PO mappingHeader = new Query(getCtx(), "ZZ_WSP_ATR_Lookup_Mapping",
+                "UPPER(ZZ_Tab_Name)=UPPER(?)", get_TrxName())
+                .setParameters(tabName)
+                .setOnlyActiveRecords(true)
+                .first();
 
-		DataFormatter formatter = new DataFormatter();
+        if (mappingHeader == null) {
+            workbook.close();
+            throw new AdempiereException("No lookup mapping header found for tab '" + tabName + "'.");
+        }
 
-		for (int col = 0; col < lastCellNum; col++) {
-			Cell headerCell = headerRow.getCell(col);
-			if (headerCell == null) {
-				continue;
-			}
+        int mappingId = mappingHeader.get_ID();
 
-			String headerText = formatter.formatCellValue(headerCell).trim();
-			if (Util.isEmpty(headerText, true)) {
-				continue;
-			}
+        // --- Load mapping details for this tab ---
+        List<PO> detailList = new Query(getCtx(), "ZZ_WSP_ATR_Lookup_Mapping_Detail",
+                "ZZ_WSP_ATR_Lookup_Mapping_ID=?", get_TrxName())
+                .setParameters(mappingId)
+                .setOnlyActiveRecords(true)
+                .list();
 
-			String tableName = buildTableNameFromHeader(headerText);
-			MTable table = MTable.get(getCtx(), tableName);
+        if (detailList == null || detailList.isEmpty()) {
+            workbook.close();
+            throw new AdempiereException("No lookup mapping details found for tab '" + tabName + "'.");
+        }
 
-			if (table != null && table.getAD_Table_ID() > 0) {
-				// We have a lookup table
-				lookupTableNamesByColumn[col] = tableName;
+        // Map normalized header name -> detail row
+        Map<String, PO> headerToDetail = new HashMap<>();
+        for (PO d : detailList) {
+            Object hdrObj = d.get_Value("ZZ_Header_Name");
+            if (hdrObj == null)
+                continue;
+            String hdr = hdrObj.toString().trim();
+            if (hdr.isEmpty())
+                continue;
+            headerToDetail.put(hdr.toUpperCase(), d);
+        }
 
-				// Pre-load allowed names for this table (per client)
-				if (!tableNameToAllowedNames.containsKey(tableName)) {
-					Set<String> allowed = loadAllowedNames(tableName, adClientId);
-					tableNameToAllowedNames.put(tableName, allowed);
-					addLog("Column '" + headerText + "' uses lookup table " + tableName
-							+ " (" + allowed.size() + " values)");
-				}
-			} else {
-				// No lookup for this column
-				lookupTableNamesByColumn[col] = null;
-			}
-		}
+        // For caching allowed values:
+        // key = tableName + "|" + (useValue ? "V" : "N")
+        Map<String, Set<String>> allowedCache = new HashMap<>();
 
-		int lastRowNum = sheet.getLastRowNum();
-		int errorCount = 0;
+        // Per-column mapping config
+        class ColumnConfig {
+            String headerText;
+            String tableName;
+            boolean useValue;
+            Set<String> allowedValues;
+        }
 
-		// For each data row
-		for (int r = 1; r <= lastRowNum; r++) {
-			Row row = sheet.getRow(r);
-			if (row == null) {
-				continue;
-			}
+        ColumnConfig[] columnConfigs = new ColumnConfig[lastCellNum];
 
-			StringBuilder rowErrors = new StringBuilder();
+        // --- Resolve each header column to a mapping detail / ref table ---
+        for (int col = 0; col < lastCellNum; col++) {
+        	
+            Cell headerCell = headerRow.getCell(col);
+            if (headerCell == null)
+                continue;
 
-			for (int col = 0; col < lastCellNum; col++) {
-				String tableName = lookupTableNamesByColumn[col];
-				if (tableName == null) {
-					continue; // not a lookup column
-				}
+            String headerText = formatter.formatCellValue(headerCell).trim();
+            if (Util.isEmpty(headerText, true))
+                continue;
 
-				Cell cell = row.getCell(col);
-				String cellValue = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
-				if (Util.isEmpty(cellValue, true)) {
-					continue; // empty -> no validation error
-				}
+            PO detail = headerToDetail.get(headerText.toUpperCase());
+            if (detail == null) {
+                // No mapping for this header
+                continue;
+            }
 
-				Set<String> allowedNames = tableNameToAllowedNames.get(tableName);
-				if (allowedNames == null) {
-					continue; // should not happen
-				}
+            int adTableId = detail.get_ValueAsInt("AD_Table_ID");
+            if (adTableId <= 0) {
+                // Mapped, but no reference table set -> can't validate
+                addLog("Header '" + headerText + "' has no AD_Table_ID set in mapping detail - skipping.");
+                continue;
+            }
 
-				if (!allowedNames.contains(cellValue)) {
-					// Build error message
-					String headerText = formatter.formatCellValue(headerRow.getCell(col)).trim();
-					if (rowErrors.length() > 0) {
-						rowErrors.append("; ");
-					}
-					rowErrors.append(headerText)
-					.append(": '")
-					.append(cellValue)
-					.append("' not found in ")
-					.append(tableName);
-				}
-			}
+            MTable refTable = MTable.get(getCtx(), adTableId);
+            if (refTable == null || refTable.getAD_Table_ID() <= 0) {
+                addLog("Header '" + headerText + "' references AD_Table_ID=" + adTableId + " which is invalid - skipping.");
+                continue;
+            }
 
-			if (rowErrors.length() > 0) {
-				Cell errorCell = row.getCell(MESSAGE_COL_INDEX);
-				if (errorCell == null) {
-					errorCell = row.createCell(MESSAGE_COL_INDEX);
-				}
-				errorCell.setCellValue(rowErrors.toString());
-				errorCount++;
-			}
-		}
+            Object useValObj = detail.get_Value("ZZ_Use_Value");
+            boolean useValue = false;
+            if (useValObj instanceof Boolean) {
+                useValue = ((Boolean) useValObj).booleanValue();
+            } else if (useValObj != null) {
+                useValue = "Y".equalsIgnoreCase(useValObj.toString());
+            }
 
-		
-		// ----- EXPORT FOR ZK DOWNLOAD -----
+            String tableName = refTable.getTableName();
+            String cacheKey = tableName + "|" + (useValue ? "V" : "N");
+            Set<String> allowed = allowedCache.get(cacheKey);
+            if (allowed == null) {
+                allowed = loadAllowedValues(tableName, useValue, adClientId);
+                allowedCache.put(cacheKey, allowed);
+                String colType = useValue ? "Value" : "Name";
+                addLog("Column '" + headerText + "' uses table " + tableName
+                        + " (" + allowed.size() + " " + colType + " values)");
+            }
 
-		// Work out extension from original file
-		String ext = "xlsm";
-		int dot = originalFileName.lastIndexOf('.');
-		if (dot > 0 && dot < originalFileName.length() - 1) {
-			String origExt = originalFileName.substring(dot + 1);
-			if (!Util.isEmpty(origExt)) {
-				ext = origExt;
-			}
-		}
+            ColumnConfig cfg = new ColumnConfig();
+            cfg.headerText = headerText;
+            cfg.tableName = tableName;
+            cfg.useValue = useValue;
+            cfg.allowedValues = allowed;
+            columnConfigs[col] = cfg;
+        }
 
-		// Create a temp file for export
-		File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-		File exportFile = File.createTempFile("Validated_", "." + ext, tmpDir);
+        // If nothing mapped, warn and exit
+        boolean anyMapped = false;
+        for (ColumnConfig cfg : columnConfigs) {
+            if (cfg != null) {
+                anyMapped = true;
+                break;
+            }
+        }
+        if (!anyMapped) {
+            workbook.close();
+            throw new AdempiereException("No columns in sheet '" + tabName + "' match lookup mapping details.");
+        }
 
-		try (FileOutputStream fos = new FileOutputStream(exportFile)) {
-			workbook.write(fos);
-		}
-		workbook.close();
+        int lastRowNum = sheet.getLastRowNum();
+        int errorRowCount = 0;
 
-		// Show download link in ZK using the same pattern as ExportInvoiceBatchToCsv
-		if (getProcessInfo().getProcessUI() != null) {
-			getProcessInfo().getProcessUI().download(exportFile);
-		}
+        // Styles for errors
+        CellStyle errorCellStyle = workbook.createCellStyle();
+        errorCellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+        errorCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-		String msg = "Validation complete. Rows with errors: " + errorCount
-				+ ". File generated: " + exportFile.getName();
-		addLog(msg);
-		return msg;
-		
-	}
+        CellStyle headerErrorStyle = workbook.createCellStyle();
+        headerErrorStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+        headerErrorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-	/**
-	 * Builds the AD table name from a column header.
-	 * Example: "Province"  -> "ZZ_Province_Ref"
-	 *          "NQF Level" -> "ZZ_NQF_Level_Ref"
-	 */
-	private String buildTableNameFromHeader(String header) {
-		String h = header.trim();
+        boolean[] columnHasErrors = new boolean[lastCellNum];
 
-		// Replace spaces and illegal chars with underscore, keep existing underscores
-		h = h.replaceAll("[^A-Za-z0-9_]", "_");
-		h = h.replaceAll("_+", "_"); // collapse multiple underscores
-		if (!h.isEmpty() && Character.isDigit(h.charAt(0))) {
-			h = "_" + h;
-		}
+        // --- Validate data rows ---
+        for (int r = dataStartRowIndex; r <= lastRowNum; r++) {
+        	// IGNORE Excel rows 5 and 6 (0-based 4 and 5)
+            if (r == 4 || r == 5) {
+                continue;
+            }
+            Row row = sheet.getRow(r);
+            if (row == null)
+                continue;
 
-		return "ZZ_" + h + "_Ref";
-	}
+            boolean rowHasError = false;
 
-	/**
-	 * Load all allowed Name values from the reference table for a client.
-	 */
-	private Set<String> loadAllowedNames(String tableName, int adClientId) {
-		Set<String> set = new HashSet<>();
+            for (int col = 0; col < lastCellNum; col++) {
+                ColumnConfig cfg = columnConfigs[col];
+                if (cfg == null)
+                    continue; // no mapping for this column
 
-		List<PO> list = new Query(getCtx(), tableName, "AD_Client_ID=?", get_TrxName())
-				.setParameters(adClientId)
-				.setOnlyActiveRecords(true)
-				.list();
+                Cell cell = row.getCell(col);
+                String cellValue = (cell == null) ? "" : formatter.formatCellValue(cell).trim();
+                if (Util.isEmpty(cellValue, true))
+                    continue; // empty is allowed
 
-		for (PO po : list) {
-			Object val = po.get_Value("Name");
-			if (val != null) {
-				String s = val.toString().trim();
-				if (!s.isEmpty()) {
-					set.add(s);
-				}
-			}
-		}
+                if (!cfg.allowedValues.contains(cellValue)) {
+                    // mark cell as error
+                    if (cell == null) {
+                        cell = row.createCell(col);
+                    }
+                    CellUtil.setCellStyleProperty(cell, CellUtil.FILL_FOREGROUND_COLOR, IndexedColors.RED.getIndex());
+                    CellUtil.setCellStyleProperty(cell, CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+                    cell.setCellStyle(errorCellStyle);
 
-		return set;
-	}
+                    columnHasErrors[col] = true;
+                    rowHasError = true;
+                }
+            }
+
+            if (rowHasError) {
+                errorRowCount++;
+            }
+        }
+
+        // --- Colour headers for columns that had errors ---
+        for (int col = 0; col < lastCellNum; col++) {
+            if (!columnHasErrors[col])
+                continue;
+            Cell headerCell = headerRow.getCell(col);
+            if (headerCell == null)
+                continue;
+            CellUtil.setCellStyleProperty(headerCell, CellUtil.FILL_FOREGROUND_COLOR, IndexedColors.RED.getIndex());
+            CellUtil.setCellStyleProperty(headerCell, CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+            headerCell.setCellStyle(headerErrorStyle);
+        }
+
+        // ----- EXPORT FOR ZK DOWNLOAD -----
+
+        // Work out extension from original file
+        String ext = "xlsm";
+        int dot = originalFileName.lastIndexOf('.');
+        if (dot > 0 && dot < originalFileName.length() - 1) {
+            String origExt = originalFileName.substring(dot + 1);
+            if (!Util.isEmpty(origExt)) {
+                ext = origExt;
+            }
+        }
+
+        // Create a temp file for export
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        File exportFile = File.createTempFile("Validated_", "." + ext, tmpDir);
+
+        try (FileOutputStream fos = new FileOutputStream(exportFile)) {
+            workbook.write(fos);
+        }
+        workbook.close();
+
+        // Show download link in ZK using the same pattern as ExportInvoiceBatchToCsv
+        if (getProcessInfo().getProcessUI() != null) {
+            getProcessInfo().getProcessUI().download(exportFile);
+        }
+
+        String msg = "Validation complete. Rows with errors: " + errorRowCount
+                + ". File generated: " + exportFile.getName();
+        addLog(msg);
+        return msg;
+    }
+
+    /**
+     * Heuristically find the header row:
+     * - scan first few rows (0..6)
+     * - choose the row with the highest number of non-empty cells.
+     */
+    private Row findHeaderRow(Sheet sheet, DataFormatter formatter) {
+        Row best = null;
+        int bestCount = 0;
+
+        int maxRowToScan = Math.min(6, sheet.getLastRowNum());
+        for (int i = 0; i <= maxRowToScan; i++) {
+        	 // IGNORE Excel rows 5 and 6 (0-based 4 and 5)
+            if (i == 4 || i == 5) {
+                continue;
+            }
+            Row r = sheet.getRow(i);
+            if (r == null)
+                continue;
+
+            int nonEmpty = 0;
+            short lastCell = r.getLastCellNum();
+            for (int c = 0; c < lastCell; c++) {
+                Cell cell = r.getCell(c);
+                if (cell == null)
+                    continue;
+                String val = formatter.formatCellValue(cell).trim();
+                if (!val.isEmpty())
+                    nonEmpty++;
+            }
+
+            if (nonEmpty > bestCount) {
+                bestCount = nonEmpty;
+                best = r;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Load all allowed values from the reference table for a client.
+     * If useValue = true -> read "Value" column, else -> read "Name" column.
+     */
+    private Set<String> loadAllowedValues(String tableName, boolean useValue, int adClientId) {
+        Set<String> set = new HashSet<>();
+
+        String column = useValue ? "Value" : "Name";
+
+        List<PO> list = new Query(getCtx(), tableName, "AD_Client_ID=?", get_TrxName())
+                .setParameters(adClientId)
+                .setOnlyActiveRecords(true)
+                .list();
+
+        for (PO po : list) {
+            Object val = po.get_Value(column);
+            if (val != null) {
+                String s = val.toString().trim();
+                if (!s.isEmpty()) {
+                    set.add(s);
+                }
+            }
+        }
+
+        return set;
+    }
 }
+
 

@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251122L;
+	private static final long serialVersionUID = 20251123L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Lookup_Mapping_Detail (Properties ctx, int ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, String trxName)
@@ -39,6 +39,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setZZ_Use_Value (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
         } */
     }
@@ -49,6 +51,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setZZ_Use_Value (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
         } */
     }
@@ -59,6 +63,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setZZ_Use_Value (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
         } */
     }
@@ -69,6 +75,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setZZ_Use_Value (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
         } */
     }
@@ -142,6 +150,28 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	public String getZZ_Header_Name()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Header_Name);
+	}
+
+	/** Set Use Value for Validation.
+		@param ZZ_Use_Value Use Value for Validation
+	*/
+	public void setZZ_Use_Value (boolean ZZ_Use_Value)
+	{
+		set_Value (COLUMNNAME_ZZ_Use_Value, Boolean.valueOf(ZZ_Use_Value));
+	}
+
+	/** Get Use Value for Validation.
+		@return Use Value for Validation	  */
+	public boolean isZZ_Use_Value()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Use_Value);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set ZZ WSP ATR Lookup Mapping Detail.

@@ -21,25 +21,25 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_WSP_ATR_Lookup_Mapping_Detail
+/** Generated Interface for ZZ_Occupations_Ref
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail 
+public interface I_ZZ_Occupations_Ref 
 {
 
-    /** TableName=ZZ_WSP_ATR_Lookup_Mapping_Detail */
-    public static final String Table_Name = "ZZ_WSP_ATR_Lookup_Mapping_Detail";
+    /** TableName=ZZ_Occupations_Ref */
+    public static final String Table_Name = "ZZ_Occupations_Ref";
 
-    /** AD_Table_ID=1000149 */
+    /** AD_Table_ID=1000155 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 4 - System 
+    /** AccessLevel = 3 - Client - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(4);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -63,21 +63,6 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
-
-    /** Column name AD_Table_ID */
-    public static final String COLUMNNAME_AD_Table_ID = "AD_Table_ID";
-
-	/** Set Table.
-	  * Database Table information
-	  */
-	public void setAD_Table_ID (int AD_Table_ID);
-
-	/** Get Table.
-	  * Database Table information
-	  */
-	public int getAD_Table_ID();
-
-	public org.compiere.model.I_AD_Table getAD_Table() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -108,6 +93,19 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  */
 	public boolean isActive();
 
+    /** Column name Name */
+    public static final String COLUMNNAME_Name = "Name";
+
+	/** Set Name.
+	  * Alphanumeric identifier of the entity
+	  */
+	public void setName (String Name);
+
+	/** Get Name.
+	  * Alphanumeric identifier of the entity
+	  */
+	public String getName();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -124,50 +122,38 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Header_Name */
-    public static final String COLUMNNAME_ZZ_Header_Name = "ZZ_Header_Name";
+    /** Column name Value */
+    public static final String COLUMNNAME_Value = "Value";
 
-	/** Set Header Name	  */
-	public void setZZ_Header_Name (String ZZ_Header_Name);
+	/** Set Search Key.
+	  * Search key for the record in the format required - must be unique
+	  */
+	public void setValue (String Value);
 
-	/** Get Header Name	  */
-	public String getZZ_Header_Name();
+	/** Get Search Key.
+	  * Search key for the record in the format required - must be unique
+	  */
+	public String getValue();
 
-    /** Column name ZZ_Use_Value */
-    public static final String COLUMNNAME_ZZ_Use_Value = "ZZ_Use_Value";
+    /** Column name ZZ_Occupations_Ref_ID */
+    public static final String COLUMNNAME_ZZ_Occupations_Ref_ID = "ZZ_Occupations_Ref_ID";
 
-	/** Set Use Value for Validation	  */
-	public void setZZ_Use_Value (boolean ZZ_Use_Value);
+	/** Set ZZ_Occupations_Ref.
+	  * ZZ_Occupations_Ref reference table
+	  */
+	public void setZZ_Occupations_Ref_ID (int ZZ_Occupations_Ref_ID);
 
-	/** Get Use Value for Validation	  */
-	public boolean isZZ_Use_Value();
+	/** Get ZZ_Occupations_Ref.
+	  * ZZ_Occupations_Ref reference table
+	  */
+	public int getZZ_Occupations_Ref_ID();
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_Detail_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_Detail_ID = "ZZ_WSP_ATR_Lookup_Mapping_Detail_ID";
+    /** Column name ZZ_Occupations_Ref_UU */
+    public static final String COLUMNNAME_ZZ_Occupations_Ref_UU = "ZZ_Occupations_Ref_UU";
 
-	/** Set ZZ WSP ATR Lookup Mapping Detail	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (int ZZ_WSP_ATR_Lookup_Mapping_Detail_ID);
+	/** Set ZZ_Occupations_Ref_UU	  */
+	public void setZZ_Occupations_Ref_UU (String ZZ_Occupations_Ref_UU);
 
-	/** Get ZZ WSP ATR Lookup Mapping Detail	  */
-	public int getZZ_WSP_ATR_Lookup_Mapping_Detail_ID();
-
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_Detail_UU */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_Detail_UU = "ZZ_WSP_ATR_Lookup_Mapping_Detail_UU";
-
-	/** Set ZZ_WSP_ATR_Lookup_Mapping_Detail_UU	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_Detail_UU (String ZZ_WSP_ATR_Lookup_Mapping_Detail_UU);
-
-	/** Get ZZ_WSP_ATR_Lookup_Mapping_Detail_UU	  */
-	public String getZZ_WSP_ATR_Lookup_Mapping_Detail_UU();
-
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_ID = "ZZ_WSP_ATR_Lookup_Mapping_ID";
-
-	/** Set WSP ATR Lookup Mapping	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_ID (int ZZ_WSP_ATR_Lookup_Mapping_ID);
-
-	/** Get WSP ATR Lookup Mapping	  */
-	public int getZZ_WSP_ATR_Lookup_Mapping_ID();
-
-	public I_ZZ_WSP_ATR_Lookup_Mapping getZZ_WSP_ATR_Lookup_Mapping() throws RuntimeException;
+	/** Get ZZ_Occupations_Ref_UU	  */
+	public String getZZ_Occupations_Ref_UU();
 }
