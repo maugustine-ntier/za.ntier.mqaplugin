@@ -51,6 +51,21 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  */
 	public int getAD_Client_ID();
 
+    /** Column name AD_Column_ID */
+    public static final String COLUMNNAME_AD_Column_ID = "AD_Column_ID";
+
+	/** Set Column.
+	  * Column in the table
+	  */
+	public void setAD_Column_ID (int AD_Column_ID);
+
+	/** Get Column.
+	  * Column in the table
+	  */
+	public int getAD_Column_ID();
+
+	public org.compiere.model.I_AD_Column getAD_Column() throws RuntimeException;
+
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
@@ -123,6 +138,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
+
+    /** Column name ZZ_Column_Letter */
+    public static final String COLUMNNAME_ZZ_Column_Letter = "ZZ_Column_Letter";
+
+	/** Set Column Letter	  */
+	public void setZZ_Column_Letter (String ZZ_Column_Letter);
+
+	/** Get Column Letter	  */
+	public String getZZ_Column_Letter();
 
     /** Column name ZZ_Header_Name */
     public static final String COLUMNNAME_ZZ_Header_Name = "ZZ_Header_Name";
