@@ -195,6 +195,24 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 		return (String)get_Value(COLUMNNAME_ZZ_Header_Name);
 	}
 
+	/** Set Row No.
+		@param ZZ_Row_No Row No
+	*/
+	public void setZZ_Row_No (int ZZ_Row_No)
+	{
+		set_Value (COLUMNNAME_ZZ_Row_No, Integer.valueOf(ZZ_Row_No));
+	}
+
+	/** Get Row No.
+		@return Row No	  */
+	public int getZZ_Row_No()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Row_No);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Use Value for Validation.
 		@param ZZ_Use_Value Use Value for Validation
 	*/

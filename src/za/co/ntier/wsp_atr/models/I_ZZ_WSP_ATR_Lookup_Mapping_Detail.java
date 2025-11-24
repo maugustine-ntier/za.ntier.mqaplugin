@@ -157,6 +157,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	/** Get Header Name	  */
 	public String getZZ_Header_Name();
 
+    /** Column name ZZ_Row_No */
+    public static final String COLUMNNAME_ZZ_Row_No = "ZZ_Row_No";
+
+	/** Set Row No	  */
+	public void setZZ_Row_No (int ZZ_Row_No);
+
+	/** Get Row No	  */
+	public int getZZ_Row_No();
+
     /** Column name ZZ_Use_Value */
     public static final String COLUMNNAME_ZZ_Use_Value = "ZZ_Use_Value";
 

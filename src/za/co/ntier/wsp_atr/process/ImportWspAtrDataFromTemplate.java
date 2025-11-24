@@ -4,9 +4,12 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.compiere.model.MAttachment;
+import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.Query;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
@@ -74,19 +77,45 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
     private Workbook loadWorkbook(X_ZZ_WSP_ATR_Submitted submitted) throws Exception {
         String fileName = submitted.getFileName();
         if (Util.isEmpty(fileName, true)) {
-            throw new org.adempiere.exceptions.AdempiereException(
-                    "No file attached / FileName is empty");
+            throw new AdempiereException("No file name specified on WSP/ATR Submitted record.");
         }
 
-        // Adjust this to however you retrieve the file stream in your installation
-        InputStream is = /* your attachment retrieval logic */ null;
-        // e.g. MAttachment att = ...; att.getEntryAsStream(0);
+        // Get attachment for this record
+        MAttachment attachment = MAttachment.get(
+                Env.getCtx(),
+                X_ZZ_WSP_ATR_Submitted.Table_ID,
+                submitted.getZZ_WSP_ATR_Submitted_ID());
 
-        if (is == null) {
-            throw new org.adempiere.exceptions.AdempiereException(
-                    "Cannot open workbook for " + fileName);
+        if (attachment == null || attachment.getEntryCount() <= 0) {
+            throw new AdempiereException("No attachment found for WSP/ATR Submitted record.");
         }
 
-        return WorkbookFactory.create(is);
+        // Try to find an entry whose name matches FileName (case-insensitive)
+        MAttachmentEntry[] entries = attachment.getEntries();
+        MAttachmentEntry selectedEntry = null;
+
+        for (MAttachmentEntry entry : entries) {
+            if (entry != null && fileName.equalsIgnoreCase(entry.getName())) {
+                selectedEntry = entry;
+                break;
+            }
+        }
+
+        // If not found by name, fall back to the first entry
+        if (selectedEntry == null) {
+            selectedEntry = entries[0];
+        }
+
+        if (selectedEntry == null) {
+            throw new AdempiereException("Attachment has no valid entries.");
+        }
+
+        try (InputStream is = selectedEntry.getInputStream()) {
+            if (is == null) {
+                throw new AdempiereException(
+                        "Could not open attachment stream for file " + selectedEntry.getName());
+            }
+            return WorkbookFactory.create(is);
+        }
     }
 }
