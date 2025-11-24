@@ -993,209 +993,238 @@ public class GenerateWspAtrTablesFromTemplate extends SvrProcess {
 	}
 
 	private void createOrUpdateColumn(MTable table, ColumnDef c, int seqNo, boolean isHeader) {
-		// Find existing column
-		MColumn column = new Query(getCtx(), MColumn.Table_Name,
-				"AD_Table_ID=? AND ColumnName=?", trxName)
-				.setParameters(table.getAD_Table_ID(), c.columnName)
-				.first();
-		boolean isNew = false;
-		if (column == null) {
-			column = new MColumn(getCtx(), 0, trxName);
-			column.setAD_Table_ID(table.getAD_Table_ID());
-			column.setColumnName(c.columnName);
-			isNew = true;
-		}
+	    // Find existing column
+	    MColumn column = new Query(getCtx(), MColumn.Table_Name,
+	            "AD_Table_ID=? AND ColumnName=?", trxName)
+	            .setParameters(table.getAD_Table_ID(), c.columnName)
+	            .first();
+	    boolean isNew = false;
+	    if (column == null) {
+	        column = new MColumn(getCtx(), 0, trxName);
+	        column.setAD_Table_ID(table.getAD_Table_ID());
+	        column.setColumnName(c.columnName);
+	        isNew = true;
+	    }
 
-		// Friendly element / name
-		String elementName = c.headerText;
-		if (Util.isEmpty(elementName, true)) {
-			elementName = c.columnName.replace('_', ' ');
-		}
-		elementName = elementName.trim();
-		if (elementName.length() > 60)
-			elementName = elementName.substring(0, 60);
+	    // Friendly element / name
+	    String elementName = c.headerText;
+	    if (Util.isEmpty(elementName, true)) {
+	        elementName = c.columnName.replace('_', ' ');
+	    }
+	    elementName = elementName.trim();
+	    if (elementName.length() > 60)
+	        elementName = elementName.substring(0, 60);
 
-		// Element: key by ColumnName
-		M_Element element = M_Element.get(getCtx(), c.columnName);
-		if (element == null || element.getAD_Element_ID() <= 0) {
-			element = new M_Element(getCtx(), 0, trxName);
-			element.setColumnName(c.columnName);
-			element.setName(elementName);
-			element.setPrintName(elementName);
-			element.setEntityType(ENTITY_TYPE);
-			element.saveEx();
-		}
+	    // Element: key by ColumnName
+	    M_Element element = M_Element.get(getCtx(), c.columnName);
+	    if (element == null || element.getAD_Element_ID() <= 0) {
+	        element = new M_Element(getCtx(), 0, trxName);
+	        element.setColumnName(c.columnName);
+	        element.setName(elementName);
+	        element.setPrintName(elementName);
+	        element.setEntityType(ENTITY_TYPE);
+	        element.saveEx();
+	    }
 
-		column.setAD_Element_ID(element.getAD_Element_ID());
-		column.setName(elementName);
-		column.setDescription(c.headerText);
-		column.setHelp(null);
-		column.setAD_Reference_ID(c.displayType);
-		if (c.fieldLength > 0)
-			column.setFieldLength(c.fieldLength);
+	    column.setAD_Element_ID(element.getAD_Element_ID());
+	    column.setName(elementName);
+	    column.setDescription(c.headerText);
+	    column.setHelp(null);
 
-		column.setSeqNo(seqNo);
-		column.setIsTranslated(false);
-		column.setIsEncrypted(false);
-		column.setIsAlwaysUpdateable(true);
-		column.setIsUpdateable(true);
-		column.setIsIdentifier(false);
-		column.setIsParent(false);
-		column.setIsMandatory(false);
+	    // For non-reference columns we just use c.displayType,
+	    // for reference columns we'll override to Table below.
+	    column.setAD_Reference_ID(c.displayType);
+	    if (c.fieldLength > 0)
+	        column.setFieldLength(c.fieldLength);
 
-		// PK column: <tableName>_ID
-		String pkName = table.getTableName() + "_ID";
-		if (c.columnName.equalsIgnoreCase(pkName)) {
-			column.setAD_Reference_ID(DisplayType.ID);
-			column.setIsKey(true);
-			column.setIsMandatory(true);
-			column.setIsUpdateable(false);
-		}
+	    column.setSeqNo(seqNo);
+	    column.setIsTranslated(false);
+	    column.setIsEncrypted(false);
+	    column.setIsAlwaysUpdateable(true);
+	    column.setIsUpdateable(true);
+	    column.setIsIdentifier(false);
+	    column.setIsParent(false);
+	    column.setIsMandatory(false);
 
-		// Standard client/org
-		if ("AD_Client_ID".equalsIgnoreCase(c.columnName) ||
-				"AD_Org_ID".equalsIgnoreCase(c.columnName)) {
-			column.setIsMandatory(true);
-			column.setIsUpdateable(false);
-		}
+	    // PK column: <tableName>_ID
+	    String pkName = table.getTableName() + "_ID";
+	    if (c.columnName.equalsIgnoreCase(pkName)) {
+	        column.setAD_Reference_ID(DisplayType.ID);
+	        column.setIsKey(true);
+	        column.setIsMandatory(true);
+	        column.setIsUpdateable(false);
+	    }
 
-		// File column (if you added one in header TabDef)
-		if ("FileData".equalsIgnoreCase(c.columnName)) {
-			column.setAD_Reference_ID(DisplayType.Binary);
-		}
+	    // Standard client/org
+	    if ("AD_Client_ID".equalsIgnoreCase(c.columnName) ||
+	        "AD_Org_ID".equalsIgnoreCase(c.columnName)) {
+	        column.setIsMandatory(true);
+	        column.setIsUpdateable(false);
+	    }
 
-		// --- Reference columns: link to AD_Reference (TableValidation) ---
-		if (c.kind == ColumnKind.REF_ID && c.lookup != null && c.lookup.adTableId > 0) {
-			int refId = ensureTableReferenceForLookup(c);
-			if (refId > 0) {
-				// Use TABLE reference and link to this AD_Reference
-				column.setAD_Reference_ID(DisplayType.Table);
-				column.setAD_Reference_Value_ID(refId);
+	    // File column (if you added one in header TabDef)
+	    if ("FileData".equalsIgnoreCase(c.columnName)) {
+	        column.setAD_Reference_ID(DisplayType.Binary);
+	    }
 
-				addLog("Linked column " + table.getTableName() + "." + c.columnName
-						+ " to AD_Reference_ID=" + refId
-						+ " (TableValidation for " + c.lookup.refTableName + ")");
-			} else if (previewOnly) {
-				addLog("  [PREVIEW] Column " + table.getTableName() + "." + c.columnName
-						+ " would be linked to AD_Reference(Name="
-						+ c.lookup.refTableName + "_ID)");
-			}
-		}
+	    // ---- IMPORTANT: REF_ID columns need AD_Reference_Value_ID before save ----
+	    if (c.kind == ColumnKind.REF_ID && c.lookup != null && c.lookup.adTableId > 0) {
+	        // Make sure it is TABLE (18) and max length 10
+	        column.setAD_Reference_ID(DisplayType.Table);
+	        column.setFieldLength(10);
 
-
-		column.saveEx();
-		addLog((isNew ? "Created" : "Updated") + " column "
-				+ table.getTableName() + "." + c.columnName);
+	        // This will create/find AD_Reference + AD_Ref_Table and
+	        // set AD_Reference_Value_ID on the column, then save it.
+	        ensureTableReferenceForLookup(column, c, isNew, table.getTableName());
+	    } else {
+	        // Normal column: we can save directly
+	        column.saveEx();
+	        addLog((isNew ? "Created" : "Updated") + " column "
+	                + table.getTableName() + "." + c.columnName);
+	    }
 	}
+	
 	/**
-	 * Ensure a Table-Validation AD_Reference + AD_Ref_Table exist for this REF_ID column.
+	 * For a REF_ID column:
+	 *  - Ensure there is an AD_Reference (ValidationType = 'T') with Name = <refTableName>_ID
+	 *  - Ensure there is an AD_Ref_Table row for that reference, pointing to the lookup table
+	 *  - Link the column: AD_Reference_ID = Table (18), AD_Reference_Value_ID = that reference
 	 *
-	 * - Reference name convention: <refTableName>_ID  (e.g. ZZ_Gender_Ref_ID)
-	 * - ValidationType: TableValidation ('T')
-	 * - AD_Ref_Table points to lookup.adTableId, with Key = <table>_ID, Display = Name
-	 *
-	 * @return AD_Reference_ID (0 if not created in preview-only mode or no lookup)
+	 * In previewOnly mode:
+	 *  - DO NOT create anything, just log what would happen.
 	 */
-	private int ensureTableReferenceForLookup(ColumnDef c) {
-		if (c == null || c.lookup == null || c.lookup.adTableId <= 0
-				|| Util.isEmpty(c.lookup.refTableName, true)) {
-			return 0;
-		}
+	private void ensureTableReferenceForLookup(MColumn column, ColumnDef c, boolean isNewColumn, String tableName) {
 
-		// Reference name: ZZ_Gender_Ref_ID, ZZ_Equity_Ref_ID, etc.
-		String refName = c.lookup.refTableName + "_ID";
+	    if (c.lookup == null || c.lookup.adTableId <= 0 || Util.isEmpty(c.lookup.refTableName, true)) {
+	        return;
+	    }
 
-		// 1) Find existing AD_Reference with this name + TableValidation
-		int refId = new Query(getCtx(), MReference.Table_Name,
-				"Name=? AND ValidationType=?", trxName)
-				.setParameters(refName, MReference.VALIDATIONTYPE_TableValidation)
-				.firstId();
+	    // Reference name: use lookup table name + "_ID"
+	    final String refName = c.lookup.refTableName + "_ID";
 
-		if (refId <= 0) {
-			// Not found
-			if (previewOnly) {
-				addLog("  [PREVIEW] Would create AD_Reference(Name=" + refName
-						+ ", ValidationType=TableValidation) for table " + c.lookup.refTableName);
-				return 0; // do not actually create in preview
-			}
+	    // ------------------------------------------------------------------
+	    // 1) Find existing AD_Reference (Table Validation) by name
+	    // ------------------------------------------------------------------
+	    MReference ref = new Query(getCtx(), MReference.Table_Name,
+	                    "Name=? AND ValidationType=?", trxName)
+	            .setParameters(refName, MReference.VALIDATIONTYPE_TableValidation)
+	            .first();
 
-			// Create new AD_Reference
-			MReference ref = new MReference(getCtx(), 0, trxName);
-			ref.setName(refName);
-			ref.setDescription(c.lookup.refTableName + " Table Validation");
-			ref.setValidationType(MReference.VALIDATIONTYPE_TableValidation);
-			ref.setEntityType(ENTITY_TYPE);
-			ref.saveEx();
-			refId = ref.getAD_Reference_ID();
+	    int refId = (ref != null) ? ref.getAD_Reference_ID() : 0;
 
-			addLog("Created AD_Reference (TableValidation): " + refName + " (ID=" + refId + ")");
-		} else {
-			addLog("Found AD_Reference (TableValidation): " + refName + " (ID=" + refId + ")");
-		}
+	    if (previewOnly) {
+	        if (refId > 0) {
+	            addLog("  [REF] Column " + tableName + "." + column.getColumnName()
+	                    + " will use existing AD_Reference '" + refName
+	                    + "' (ID=" + refId + ") for table " + c.lookup.refTableName);
+	        } else {
+	            addLog("  [REF] Column " + tableName + "." + column.getColumnName()
+	                    + " would create AD_Reference '" + refName
+	                    + "' (Table=" + c.lookup.refTableName + ")");
+	        }
+	        return; // no DB changes in preview
+	    }
 
-		// 2) Ensure AD_Ref_Table row for this reference
-		if (!previewOnly) {
+	    // ------------------------------------------------------------------
+	    // 2) Create AD_Reference if missing
+	    // ------------------------------------------------------------------
+	    if (refId <= 0) {
+	        ref = new MReference(getCtx(), 0, trxName);
+	        ref.setName(refName);
+	        ref.setValidationType(MReference.VALIDATIONTYPE_TableValidation); // 'T' - Table Validation
+	        ref.setEntityType(ENTITY_TYPE);
+	        ref.saveEx();
+	        refId = ref.getAD_Reference_ID();
 
+	        addLog("Created AD_Reference '" + refName
+	                + "' (ID=" + refId + ") for table " + c.lookup.refTableName);
+	    }
 
-			// Load existing AD_Ref_Table
-			MRefTable refTableCfg = MRefTable.get(getCtx(), refId, trxName);
+	    // Safety
+	    if (refId <= 0) {
+	        throw new AdempiereException(
+	                "Failed to create or load AD_Reference for " + refName);
+	    }
 
-			// Create new if missing
-			if (refTableCfg == null || refTableCfg.getAD_Reference_ID() != refId) {
-				refTableCfg = new MRefTable(getCtx(), 0, trxName);
-				refTableCfg.setAD_Reference_ID(refId);    // IMPORTANT: set PK!
-				addLog("Created new AD_Ref_Table for refId=" + refId);
-			}
+	    // ------------------------------------------------------------------
+	    // 3) Ensure AD_Ref_Table row exists and is linked to lookup table
+	    //     IMPORTANT: don't modify immutable cache object
+	    // ------------------------------------------------------------------
+	    MRefTable refTableCfg = MRefTable.get(getCtx(), refId, trxName);
 
-			// Link to lookup table
-			refTableCfg.setAD_Table_ID(c.lookup.adTableId);
+	    if (refTableCfg != null) {
+	        // MRefTable.get() returns an immutable instance from cache.
+	        // Wrap it in a mutable copy before changing.
+	        refTableCfg = new MRefTable(getCtx(), refTableCfg, trxName);
+	    } else {
+	        // No AD_Ref_Table yet for this reference -> create new
+	        refTableCfg = new MRefTable(getCtx(), 0, trxName);
+	        refTableCfg.setAD_Reference_ID(refId);
+	    }
 
-			// Determine key & display columns
-			MTable refTable = MTable.get(getCtx(), c.lookup.adTableId);
-			if (refTable != null && refTable.getAD_Table_ID() > 0) {
+	    // Link to lookup table
+	    refTableCfg.setAD_Table_ID(c.lookup.adTableId);
 
-				int keyColId = new Query(getCtx(), MColumn.Table_Name,
-						"AD_Table_ID=? AND IsKey='Y'", trxName)
-						.setParameters(refTable.getAD_Table_ID())
-						.firstId();
+	    // Determine key & display columns on the lookup table
+	    MTable refTable = MTable.get(getCtx(), c.lookup.adTableId);
+	    if (refTable != null && refTable.getAD_Table_ID() > 0) {
 
-				if (keyColId <= 0) {
-					keyColId = new Query(getCtx(), MColumn.Table_Name,
-							"AD_Table_ID=? AND ColumnName=?", trxName)
-							.setParameters(refTable.getAD_Table_ID(),
-									refTable.getTableName() + "_ID")
-							.firstId();
-				}
+	        // Key column: IsKey='Y' or <TableName>_ID
+	        int keyColId = new Query(getCtx(), MColumn.Table_Name,
+	                "AD_Table_ID=? AND IsKey='Y'", trxName)
+	                .setParameters(refTable.getAD_Table_ID())
+	                .firstId();
 
-				int displayColId = new Query(getCtx(), MColumn.Table_Name,
-						"AD_Table_ID=? AND IsIdentifier='Y'", trxName)
-						.setParameters(refTable.getAD_Table_ID())
-						.firstId();
+	        if (keyColId <= 0) {
+	            keyColId = new Query(getCtx(), MColumn.Table_Name,
+	                    "AD_Table_ID=? AND ColumnName=?", trxName)
+	                    .setParameters(refTable.getAD_Table_ID(),
+	                            refTable.getTableName() + "_ID")
+	                    .firstId();
+	        }
 
-				if (displayColId <= 0) {
-					displayColId = new Query(getCtx(), MColumn.Table_Name,
-							"AD_Table_ID=? AND ColumnName='Name'", trxName)
-							.setParameters(refTable.getAD_Table_ID())
-							.firstId();
-				}
+	        // Display column: IsIdentifier='Y' or Name
+	        int displayColId = new Query(getCtx(), MColumn.Table_Name,
+	                "AD_Table_ID=? AND IsIdentifier='Y'", trxName)
+	                .setParameters(refTable.getAD_Table_ID())
+	                .firstId();
 
-				if (keyColId > 0) refTableCfg.setAD_Key(keyColId);
-				if (displayColId > 0) refTableCfg.setAD_Display(displayColId);
-			}
+	        if (displayColId <= 0) {
+	            displayColId = new Query(getCtx(), MColumn.Table_Name,
+	                    "AD_Table_ID=? AND ColumnName='Name'", trxName)
+	                    .setParameters(refTable.getAD_Table_ID())
+	                    .firstId();
+	        }
 
-			refTableCfg.setEntityType(ENTITY_TYPE);
-			refTableCfg.saveEx();
+	        if (keyColId > 0) {
+	            refTableCfg.setAD_Key(keyColId);
+	        }
+	        if (displayColId > 0) {
+	            refTableCfg.setAD_Display(displayColId);
+	        }
+	    }
 
-			addLog("Ensured AD_Ref_Table for reference " + refName
-					+ " (Table=" + c.lookup.refTableName + ")");
-		} else {
-			addLog("  [PREVIEW] Would ensure AD_Ref_Table for " + refName
-					+ " (Table=" + c.lookup.refTableName + ")");
-		}
+	    refTableCfg.setEntityType(ENTITY_TYPE);
+	    refTableCfg.saveEx();
 
-		return refId;
+	    addLog("Ensured AD_Ref_Table for AD_Reference '" + refName
+	            + "' (ID=" + refId + "), lookup table=" + c.lookup.refTableName + ")");
+
+	    // ------------------------------------------------------------------
+	    // 4) Link the column to this reference and save the column
+	    // ------------------------------------------------------------------
+	    column.setAD_Reference_ID(DisplayType.Table);   // 18 - Table
+	    column.setAD_Reference_Value_ID(refId);
+	    column.saveEx();
+
+	    addLog((isNewColumn ? "Created" : "Updated") + " column "
+	            + tableName + "." + column.getColumnName()
+	            + " with AD_Reference_ID=" + refId
+	            + " (Table=" + c.lookup.refTableName + ")");
 	}
 
+
+	
 
 
 }

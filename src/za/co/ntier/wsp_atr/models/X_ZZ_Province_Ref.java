@@ -21,11 +21,11 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 
-/** Generated Model for ZZ_Specializations_Ref
+/** Generated Model for ZZ_Province_Ref
  *  @author iDempiere (generated)
  *  @version Release 12 - $Id$ */
-@org.adempiere.base.Model(table="ZZ_Specializations_Ref")
-public class X_ZZ_Specializations_Ref extends PO implements I_ZZ_Specializations_Ref, I_Persistent
+@org.adempiere.base.Model(table="ZZ_Province_Ref")
+public class X_ZZ_Province_Ref extends PO implements I_ZZ_Province_Ref, I_Persistent
 {
 
 	/**
@@ -34,51 +34,51 @@ public class X_ZZ_Specializations_Ref extends PO implements I_ZZ_Specializations
 	private static final long serialVersionUID = 20251124L;
 
     /** Standard Constructor */
-    public X_ZZ_Specializations_Ref (Properties ctx, int ZZ_Specializations_Ref_ID, String trxName)
+    public X_ZZ_Province_Ref (Properties ctx, int ZZ_Province_Ref_ID, String trxName)
     {
-      super (ctx, ZZ_Specializations_Ref_ID, trxName);
-      /** if (ZZ_Specializations_Ref_ID == 0)
+      super (ctx, ZZ_Province_Ref_ID, trxName);
+      /** if (ZZ_Province_Ref_ID == 0)
         {
 			setName (null);
-			setZZ_Specializations_Ref_ID (0);
+			setZZ_Province_Ref_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Specializations_Ref (Properties ctx, int ZZ_Specializations_Ref_ID, String trxName, String ... virtualColumns)
+    public X_ZZ_Province_Ref (Properties ctx, int ZZ_Province_Ref_ID, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_Specializations_Ref_ID, trxName, virtualColumns);
-      /** if (ZZ_Specializations_Ref_ID == 0)
+      super (ctx, ZZ_Province_Ref_ID, trxName, virtualColumns);
+      /** if (ZZ_Province_Ref_ID == 0)
         {
 			setName (null);
-			setZZ_Specializations_Ref_ID (0);
+			setZZ_Province_Ref_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Specializations_Ref (Properties ctx, String ZZ_Specializations_Ref_UU, String trxName)
+    public X_ZZ_Province_Ref (Properties ctx, String ZZ_Province_Ref_UU, String trxName)
     {
-      super (ctx, ZZ_Specializations_Ref_UU, trxName);
-      /** if (ZZ_Specializations_Ref_UU == null)
+      super (ctx, ZZ_Province_Ref_UU, trxName);
+      /** if (ZZ_Province_Ref_UU == null)
         {
 			setName (null);
-			setZZ_Specializations_Ref_ID (0);
+			setZZ_Province_Ref_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_Specializations_Ref (Properties ctx, String ZZ_Specializations_Ref_UU, String trxName, String ... virtualColumns)
+    public X_ZZ_Province_Ref (Properties ctx, String ZZ_Province_Ref_UU, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_Specializations_Ref_UU, trxName, virtualColumns);
-      /** if (ZZ_Specializations_Ref_UU == null)
+      super (ctx, ZZ_Province_Ref_UU, trxName, virtualColumns);
+      /** if (ZZ_Province_Ref_UU == null)
         {
 			setName (null);
-			setZZ_Specializations_Ref_ID (0);
+			setZZ_Province_Ref_ID (0);
         } */
     }
 
     /** Load Constructor */
-    public X_ZZ_Specializations_Ref (Properties ctx, ResultSet rs, String trxName)
+    public X_ZZ_Province_Ref (Properties ctx, ResultSet rs, String trxName)
     {
       super (ctx, rs, trxName);
     }
@@ -100,7 +100,7 @@ public class X_ZZ_Specializations_Ref extends PO implements I_ZZ_Specializations
 
     public String toString()
     {
-      StringBuilder sb = new StringBuilder ("X_ZZ_Specializations_Ref[")
+      StringBuilder sb = new StringBuilder ("X_ZZ_Province_Ref[")
         .append(get_ID()).append(",Name=").append(getName()).append("]");
       return sb.toString();
     }
@@ -137,40 +137,40 @@ public class X_ZZ_Specializations_Ref extends PO implements I_ZZ_Specializations
 		return (String)get_Value(COLUMNNAME_Value);
 	}
 
-	/** Set ZZ_Specializations_Ref.
-		@param ZZ_Specializations_Ref_ID ZZ_Specializations_Ref reference table
+	/** Set ZZ_Province_Ref.
+		@param ZZ_Province_Ref_ID ZZ_Province_Ref reference table
 	*/
-	public void setZZ_Specializations_Ref_ID (int ZZ_Specializations_Ref_ID)
+	public void setZZ_Province_Ref_ID (int ZZ_Province_Ref_ID)
 	{
-		if (ZZ_Specializations_Ref_ID < 1)
-			set_ValueNoCheck (COLUMNNAME_ZZ_Specializations_Ref_ID, null);
+		if (ZZ_Province_Ref_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_Province_Ref_ID, null);
 		else
-			set_ValueNoCheck (COLUMNNAME_ZZ_Specializations_Ref_ID, Integer.valueOf(ZZ_Specializations_Ref_ID));
+			set_ValueNoCheck (COLUMNNAME_ZZ_Province_Ref_ID, Integer.valueOf(ZZ_Province_Ref_ID));
 	}
 
-	/** Get ZZ_Specializations_Ref.
-		@return ZZ_Specializations_Ref reference table
+	/** Get ZZ_Province_Ref.
+		@return ZZ_Province_Ref reference table
 	  */
-	public int getZZ_Specializations_Ref_ID()
+	public int getZZ_Province_Ref_ID()
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Specializations_Ref_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Province_Ref_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
-	/** Set ZZ_Specializations_Ref_UU.
-		@param ZZ_Specializations_Ref_UU ZZ_Specializations_Ref_UU
+	/** Set ZZ_Province_Ref_UU.
+		@param ZZ_Province_Ref_UU ZZ_Province_Ref_UU
 	*/
-	public void setZZ_Specializations_Ref_UU (String ZZ_Specializations_Ref_UU)
+	public void setZZ_Province_Ref_UU (String ZZ_Province_Ref_UU)
 	{
-		set_Value (COLUMNNAME_ZZ_Specializations_Ref_UU, ZZ_Specializations_Ref_UU);
+		set_Value (COLUMNNAME_ZZ_Province_Ref_UU, ZZ_Province_Ref_UU);
 	}
 
-	/** Get ZZ_Specializations_Ref_UU.
-		@return ZZ_Specializations_Ref_UU	  */
-	public String getZZ_Specializations_Ref_UU()
+	/** Get ZZ_Province_Ref_UU.
+		@return ZZ_Province_Ref_UU	  */
+	public String getZZ_Province_Ref_UU()
 	{
-		return (String)get_Value(COLUMNNAME_ZZ_Specializations_Ref_UU);
+		return (String)get_Value(COLUMNNAME_ZZ_Province_Ref_UU);
 	}
 }
