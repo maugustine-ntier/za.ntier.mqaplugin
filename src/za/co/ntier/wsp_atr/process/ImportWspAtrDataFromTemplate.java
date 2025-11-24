@@ -1,195 +1,92 @@
 package za.co.ntier.wsp_atr.process;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Properties;
 
-import org.adempiere.base.annotation.Parameter;
-import org.adempiere.exceptions.AdempiereException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.compiere.model.MAttachment;
-import org.compiere.model.MAttachmentEntry;
-import org.compiere.model.MTable;
 import org.compiere.model.Query;
-import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
 
-import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Biodata_Detail;
+import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
-/**
- * ImportWspAtrDataFromTemplate
- *
- * - Run from ZZ_WSP_ATR_Submitted header record.
- * - Reads the attached XLSX/XLSM file.
- * - Uses per-sheet importers (factory pattern) to populate detail tables.
- *
- * Currently implemented:
- *   - Biodata sheet -> ZZ_WSP_ATR_Biodata_Detail
- *
- * Extension points:
- *   - Add more IWspAtrSheetImporter implementations for the other 7 tabs
- *     and wire them into the factory.
- */
-@org.adempiere.base.annotation.Process(
-        name = "za.co.ntier.wsp_atr.process.ImportWspAtrDataFromTemplate")
 public class ImportWspAtrDataFromTemplate extends SvrProcess {
 
-    private static final CLogger log = CLogger.getCLogger(ImportWspAtrDataFromTemplate.class);
+    private int p_ZZ_WSP_ATR_Submitted_ID;
 
-    // Same tab booleans as your table-generator process, so you can choose which to import
-    @Parameter(name = "Tab_Biodata")
-    private boolean pBiodata;
-
-    @Parameter(name = "Tab_ATR")
-    private boolean pATR;
-
-    @Parameter(name = "Tab_WSP")
-    private boolean pWSP;
-
-    @Parameter(name = "Tab_HTFV")
-    private boolean pHTFV;
-
-    @Parameter(name = "Tab_Topup_Skills_Survey")
-    private boolean pTopupSkills;
-
-    @Parameter(name = "Tab_NonEmployees_CommunityTraining")
-    private boolean pNonEmployees;
-
-    @Parameter(name = "Tab_Contractors")
-    private boolean pContractors;
-
-    @Parameter(name = "Tab_Finance_Training_Comparison")
-    private boolean pFinanceTraining;
-
-    private DataFormatter formatter;
-    private Workbook workbook;
-    private String trxName;
+    private final ReferenceLookupService refService = new ReferenceLookupService();
 
     @Override
     protected void prepare() {
-        trxName = get_TrxName();
-        for (ProcessInfoParameter p : getParameter()) {
-            // All parameters are injected by @Parameter; this just validates unknowns
-            // (same pattern as your table generator)
-            // If you don't have MProcessPara.validateUnknownParameter available,
-            // you can safely remove this block.
-            // MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), p);
-        }
+        p_ZZ_WSP_ATR_Submitted_ID = getRecord_ID();
     }
 
     @Override
     protected String doIt() throws Exception {
-
-        int headerId = getRecord_ID();
-        if (headerId <= 0) {
-            throw new AdempiereException("This process must be run from WSP/ATR Submitted File (header) record.");
+        if (p_ZZ_WSP_ATR_Submitted_ID <= 0) {
+            throw new org.adempiere.exceptions.AdempiereException(
+                    "No WSP/ATR Submitted record selected");
         }
 
-        X_ZZ_WSP_ATR_Submitted header = new X_ZZ_WSP_ATR_Submitted(getCtx(), headerId, trxName);
-        if (header.get_ID() <= 0) {
-            throw new AdempiereException("Header record not found: ZZ_WSP_ATR_Submitted_ID=" + headerId);
-        }
+        Properties ctx = Env.getCtx();
+        String trxName = get_TrxName();
 
-        // Get attachment with template
-        MAttachment attachment = MAttachment.get(getCtx(), header.get_Table_ID(), header.get_ID());
-        if (attachment == null || attachment.getEntryCount() == 0) {
-            throw new AdempiereException("No attachment found on the header record. Please attach the WSP/ATR template file.");
-        }
+        X_ZZ_WSP_ATR_Submitted submitted =
+                new X_ZZ_WSP_ATR_Submitted(ctx, p_ZZ_WSP_ATR_Submitted_ID, trxName);
 
-        // Use first attachment entry
-        MAttachmentEntry entry = attachment.getEntry(0);
-        byte[] data = entry.getData();
-        if (data == null || data.length == 0) {
-            throw new AdempiereException("Attachment is empty. Please attach a valid XLSX/XLSM template file.");
-        }
+        Workbook wb = loadWorkbook(submitted);
+        DataFormatter formatter = new DataFormatter();
 
-        try (InputStream is = new ByteArrayInputStream(data)) {
-            workbook = WorkbookFactory.create(is);
-        }
+        // Load all mapping headers for this process (you can filter by TabName if needed)
+        List<X_ZZ_WSP_ATR_Lookup_Mapping> headers = new Query(
+                ctx,
+                X_ZZ_WSP_ATR_Lookup_Mapping.Table_Name,
+                null,
+                trxName)
+                .setOnlyActiveRecords(true)
+                .list();
 
-        formatter = new DataFormatter();
-
-        // Build list of active importers via factory
-        pBiodata = true;
-        List<IWspAtrSheetImporter> importers = WspAtrSheetImporterFactory.buildImporters(
-                pBiodata, pATR, pWSP, pHTFV, pTopupSkills, pNonEmployees, pContractors, pFinanceTraining);
-
-        if (importers.isEmpty()) {
-            throw new AdempiereException("No tabs selected for import (Biodata, ATR, WSP, etc.).");
+        if (headers == null || headers.isEmpty()) {
+            throw new org.adempiere.exceptions.AdempiereException(
+                    "No WSP/ATR mapping header records defined");
         }
 
         int totalImported = 0;
-        for (IWspAtrSheetImporter importer : importers) {
-            int count = importer.importData(workbook, header, trxName, this, formatter);
-            addLog("Imported " + count + " rows from sheet '" + importer.getSheetName() + "'");
+        for (X_ZZ_WSP_ATR_Lookup_Mapping mapHeader : headers) {
+            boolean isColumns = mapHeader.get_ValueAsBoolean("ZZ_Is_Columns");  // Y=column mode, N=row mode
+
+            IWspAtrSheetImporter importer = isColumns
+                    ? new ColumnModeSheetImporter(refService)
+                    : new RowModeSheetImporter(refService);
+
+            int count = importer.importData(ctx, wb, submitted, mapHeader, trxName, this, formatter);
             totalImported += count;
         }
 
-        String msg = "Imported total " + totalImported + " rows from " + importers.size() + " sheet(s).";
-        addLog(msg);
-        return msg;
+        return "Imported " + totalImported + " records from all mapped tabs";
     }
 
-    // -------------------------------------------------------------------------
-    // Factory pattern
-    // -------------------------------------------------------------------------
-
-    public interface IWspAtrSheetImporter {
-        /** Name of the Excel sheet this importer expects (e.g. "Biodata") */
-        String getSheetName();
-
-        /**
-         * Import data from workbook for this sheet.
-         *
-         * @return number of detail rows created
-         */
-        int importData(Workbook wb,
-                       X_ZZ_WSP_ATR_Submitted header,
-                       String trxName,
-                       SvrProcess process,
-                       DataFormatter formatter);
-    }
-
-    public static class WspAtrSheetImporterFactory {
-
-        public static List<IWspAtrSheetImporter> buildImporters(
-                boolean biodata,
-                boolean atr,
-                boolean wsp,
-                boolean htfv,
-                boolean topup,
-                boolean nonEmployees,
-                boolean contractors,
-                boolean financeComparison) {
-
-            List<IWspAtrSheetImporter> list = new ArrayList<>();
-
-            if (biodata) {
-                list.add(new BiodataSheetImporter());
-            }
-            // TODO: add implementations for the other 7 sheets:
-            // if (atr) list.add(new AtrSheetImporter());
-            // ...
-
-            return list;
+    private Workbook loadWorkbook(X_ZZ_WSP_ATR_Submitted submitted) throws Exception {
+        String fileName = submitted.getFileName();
+        if (Util.isEmpty(fileName, true)) {
+            throw new org.adempiere.exceptions.AdempiereException(
+                    "No file attached / FileName is empty");
         }
+
+        // Adjust this to however you retrieve the file stream in your installation
+        InputStream is = /* your attachment retrieval logic */ null;
+        // e.g. MAttachment att = ...; att.getEntryAsStream(0);
+
+        if (is == null) {
+            throw new org.adempiere.exceptions.AdempiereException(
+                    "Cannot open workbook for " + fileName);
+        }
+
+        return WorkbookFactory.create(is);
     }
-
-   
 }
-
