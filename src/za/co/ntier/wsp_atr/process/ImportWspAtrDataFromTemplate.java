@@ -18,6 +18,8 @@ import org.compiere.util.Util;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
+@org.adempiere.base.annotation.Process(
+		name = "za.co.ntier.wsp_atr.process.ImportWspAtrDataFromTemplate")
 public class ImportWspAtrDataFromTemplate extends SvrProcess {
 
     private int p_ZZ_WSP_ATR_Submitted_ID;
@@ -75,10 +77,10 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
     }
 
     private Workbook loadWorkbook(X_ZZ_WSP_ATR_Submitted submitted) throws Exception {
-        String fileName = submitted.getFileName();
-        if (Util.isEmpty(fileName, true)) {
-            throw new AdempiereException("No file name specified on WSP/ATR Submitted record.");
-        }
+       // String fileName = submitted.getFileName();
+      //  if (Util.isEmpty(fileName, true)) {
+      //      throw new AdempiereException("No file name specified on WSP/ATR Submitted record.");
+      //  }
 
         // Get attachment for this record
         MAttachment attachment = MAttachment.get(
@@ -94,12 +96,14 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
         MAttachmentEntry[] entries = attachment.getEntries();
         MAttachmentEntry selectedEntry = null;
 
+        /*
         for (MAttachmentEntry entry : entries) {
             if (entry != null && fileName.equalsIgnoreCase(entry.getName())) {
                 selectedEntry = entry;
                 break;
             }
         }
+        */
 
         // If not found by name, fall back to the first entry
         if (selectedEntry == null) {
