@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20251126L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Lookup_Mapping_Detail (Properties ctx, int ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, String trxName)
@@ -39,6 +39,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setZZ_Create_If_Not_Exists (false);
+// N
 			setZZ_Use_Value (false);
 // N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
@@ -51,6 +53,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setZZ_Create_If_Not_Exists (false);
+// N
 			setZZ_Use_Value (false);
 // N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
@@ -63,6 +67,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setZZ_Create_If_Not_Exists (false);
+// N
 			setZZ_Use_Value (false);
 // N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
@@ -75,6 +81,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setZZ_Create_If_Not_Exists (false);
+// N
 			setZZ_Use_Value (false);
 // N
 			setZZ_WSP_ATR_Lookup_Mapping_Detail_ID (0);
@@ -180,6 +188,28 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 		return (String)get_Value(COLUMNNAME_ZZ_Column_Letter);
 	}
 
+	/** Set Create If Not Exists.
+		@param ZZ_Create_If_Not_Exists Create If Not Exists
+	*/
+	public void setZZ_Create_If_Not_Exists (boolean ZZ_Create_If_Not_Exists)
+	{
+		set_Value (COLUMNNAME_ZZ_Create_If_Not_Exists, Boolean.valueOf(ZZ_Create_If_Not_Exists));
+	}
+
+	/** Get Create If Not Exists.
+		@return Create If Not Exists	  */
+	public boolean isZZ_Create_If_Not_Exists()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Create_If_Not_Exists);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Header Name.
 		@param ZZ_Header_Name Header Name
 	*/
@@ -193,6 +223,21 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	public String getZZ_Header_Name()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Header_Name);
+	}
+
+	/** Set Name Column Letter.
+		@param ZZ_Name_Column_Letter Name Column Letter
+	*/
+	public void setZZ_Name_Column_Letter (String ZZ_Name_Column_Letter)
+	{
+		set_Value (COLUMNNAME_ZZ_Name_Column_Letter, ZZ_Name_Column_Letter);
+	}
+
+	/** Get Name Column Letter.
+		@return Name Column Letter	  */
+	public String getZZ_Name_Column_Letter()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Name_Column_Letter);
 	}
 
 	/** Set Row No.
@@ -233,6 +278,21 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	/** Set Value Column Letter.
+		@param ZZ_Value_Column_Letter Value Column Letter
+	*/
+	public void setZZ_Value_Column_Letter (String ZZ_Value_Column_Letter)
+	{
+		set_Value (COLUMNNAME_ZZ_Value_Column_Letter, ZZ_Value_Column_Letter);
+	}
+
+	/** Get Value Column Letter.
+		@return Value Column Letter	  */
+	public String getZZ_Value_Column_Letter()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Value_Column_Letter);
 	}
 
 	/** Set ZZ WSP ATR Lookup Mapping Detail.

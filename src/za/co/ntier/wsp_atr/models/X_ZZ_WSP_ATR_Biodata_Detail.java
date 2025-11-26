@@ -17,11 +17,9 @@
 /** Generated Model - DO NOT CHANGE */
 package za.co.ntier.wsp_atr.models;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
-import org.compiere.util.Env;
 
 /** Generated Model for ZZ_WSP_ATR_Biodata_Detail
  *  @author iDempiere (generated)
@@ -33,7 +31,7 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20251126L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, int ZZ_WSP_ATR_Biodata_Detail_ID, String trxName)
@@ -106,19 +104,16 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 	/** Set Birth Year - TRUE.
 		@param Birth_Year_TRUE Birth Year - TRUE
 	*/
-	public void setBirth_Year_TRUE (BigDecimal Birth_Year_TRUE)
+	public void setBirth_Year_TRUE (String Birth_Year_TRUE)
 	{
 		set_Value (COLUMNNAME_Birth_Year_TRUE, Birth_Year_TRUE);
 	}
 
 	/** Get Birth Year - TRUE.
 		@return Birth Year - TRUE	  */
-	public BigDecimal getBirth_Year_TRUE()
+	public String getBirth_Year_TRUE()
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_Birth_Year_TRUE);
-		if (bd == null)
-			 return Env.ZERO;
-		return bd;
+		return (String)get_Value(COLUMNNAME_Birth_Year_TRUE);
 	}
 
 	public I_ZZ_No_Yes_Ref getDisabled() throws RuntimeException
@@ -259,19 +254,16 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 	/** Set ID / Passport No / Employee Number.
 		@param ID_Passport_No_Employee_Number ID / Passport No / Employee Number
 	*/
-	public void setID_Passport_No_Employee_Number (BigDecimal ID_Passport_No_Employee_Number)
+	public void setID_Passport_No_Employee_Number (String ID_Passport_No_Employee_Number)
 	{
 		set_Value (COLUMNNAME_ID_Passport_No_Employee_Number, ID_Passport_No_Employee_Number);
 	}
 
 	/** Get ID / Passport No / Employee Number.
 		@return ID / Passport No / Employee Number	  */
-	public BigDecimal getID_Passport_No_Employee_Number()
+	public String getID_Passport_No_Employee_Number()
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ID_Passport_No_Employee_Number);
-		if (bd == null)
-			 return Env.ZERO;
-		return bd;
+		return (String)get_Value(COLUMNNAME_ID_Passport_No_Employee_Number);
 	}
 
 	/** Set Job Title.

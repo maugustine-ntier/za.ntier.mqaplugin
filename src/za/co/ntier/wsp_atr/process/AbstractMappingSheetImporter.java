@@ -55,9 +55,10 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
 
         int adTableId = mappingHeader.getAD_Table_ID();
         if (adTableId <= 0) {
-            throw new org.adempiere.exceptions.AdempiereException(
-                    "Mapping header " + mappingHeader.get_ID()
-                            + " has no AD_Table_ID");
+        	return null;
+           //// throw new org.adempiere.exceptions.AdempiereException(
+            //        "Mapping header " + mappingHeader.get_ID()
+             //               + " has no AD_Table_ID");
         }
 
         MTable table = MTable.get(ctx, adTableId);

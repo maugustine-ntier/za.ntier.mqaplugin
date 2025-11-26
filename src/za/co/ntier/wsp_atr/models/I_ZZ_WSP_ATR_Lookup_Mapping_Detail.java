@@ -148,6 +148,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	/** Get Column Letter	  */
 	public String getZZ_Column_Letter();
 
+    /** Column name ZZ_Create_If_Not_Exists */
+    public static final String COLUMNNAME_ZZ_Create_If_Not_Exists = "ZZ_Create_If_Not_Exists";
+
+	/** Set Create If Not Exists	  */
+	public void setZZ_Create_If_Not_Exists (boolean ZZ_Create_If_Not_Exists);
+
+	/** Get Create If Not Exists	  */
+	public boolean isZZ_Create_If_Not_Exists();
+
     /** Column name ZZ_Header_Name */
     public static final String COLUMNNAME_ZZ_Header_Name = "ZZ_Header_Name";
 
@@ -156,6 +165,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 
 	/** Get Header Name	  */
 	public String getZZ_Header_Name();
+
+    /** Column name ZZ_Name_Column_Letter */
+    public static final String COLUMNNAME_ZZ_Name_Column_Letter = "ZZ_Name_Column_Letter";
+
+	/** Set Name Column Letter	  */
+	public void setZZ_Name_Column_Letter (String ZZ_Name_Column_Letter);
+
+	/** Get Name Column Letter	  */
+	public String getZZ_Name_Column_Letter();
 
     /** Column name ZZ_Row_No */
     public static final String COLUMNNAME_ZZ_Row_No = "ZZ_Row_No";
@@ -174,6 +192,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 
 	/** Get Use Value for Validation	  */
 	public boolean isZZ_Use_Value();
+
+    /** Column name ZZ_Value_Column_Letter */
+    public static final String COLUMNNAME_ZZ_Value_Column_Letter = "ZZ_Value_Column_Letter";
+
+	/** Set Value Column Letter	  */
+	public void setZZ_Value_Column_Letter (String ZZ_Value_Column_Letter);
+
+	/** Get Value Column Letter	  */
+	public String getZZ_Value_Column_Letter();
 
     /** Column name ZZ_WSP_ATR_Lookup_Mapping_Detail_ID */
     public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_Detail_ID = "ZZ_WSP_ATR_Lookup_Mapping_Detail_ID";

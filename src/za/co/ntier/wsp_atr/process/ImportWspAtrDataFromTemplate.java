@@ -63,18 +63,19 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 
 		int totalImported = 0;
 		for (X_ZZ_WSP_ATR_Lookup_Mapping mapHeader : headers) {
+			if (mapHeader.getAD_Table_ID() <= 0) {
+				continue;
+			}
 			boolean isColumns = mapHeader.get_ValueAsBoolean("ZZ_Is_Columns");  // Y=column mode, N=row mode
 
-			try {
-				IWspAtrSheetImporter importer = isColumns
-						? new ColumnModeSheetImporter(refService)
-								: new RowModeSheetImporter(refService);
 
-				int count = importer.importData(ctx, wb, submitted, mapHeader, trxName, this, formatter);
-				totalImported += count;
-			} catch (Exception e) {
+			IWspAtrSheetImporter importer = isColumns
+					? new ColumnModeSheetImporter(refService)
+							: new RowModeSheetImporter(refService);
 
-			}
+			int count = importer.importData(ctx, wb, submitted, mapHeader, trxName, this, formatter);
+			totalImported += count;
+
 		}
 
 		return "Imported " + totalImported + " records from all mapped tabs";

@@ -68,10 +68,10 @@ public interface I_ZZ_WSP_ATR_Biodata_Detail
     public static final String COLUMNNAME_Birth_Year_TRUE = "Birth_Year_TRUE";
 
 	/** Set Birth Year - TRUE	  */
-	public void setBirth_Year_TRUE (BigDecimal Birth_Year_TRUE);
+	public void setBirth_Year_TRUE (String Birth_Year_TRUE);
 
 	/** Get Birth Year - TRUE	  */
-	public BigDecimal getBirth_Year_TRUE();
+	public String getBirth_Year_TRUE();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -148,10 +148,10 @@ public interface I_ZZ_WSP_ATR_Biodata_Detail
     public static final String COLUMNNAME_ID_Passport_No_Employee_Number = "ID_Passport_No_Employee_Number";
 
 	/** Set ID / Passport No / Employee Number	  */
-	public void setID_Passport_No_Employee_Number (BigDecimal ID_Passport_No_Employee_Number);
+	public void setID_Passport_No_Employee_Number (String ID_Passport_No_Employee_Number);
 
 	/** Get ID / Passport No / Employee Number	  */
-	public BigDecimal getID_Passport_No_Employee_Number();
+	public String getID_Passport_No_Employee_Number();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";

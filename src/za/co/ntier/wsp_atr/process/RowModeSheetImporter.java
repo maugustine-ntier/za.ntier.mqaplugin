@@ -37,8 +37,9 @@ public class RowModeSheetImporter extends AbstractMappingSheetImporter {
                 loadDetails(mappingHeader, trxName);
 
         if (details == null || details.isEmpty()) {
-            throw new org.adempiere.exceptions.AdempiereException(
-                    "No mapping details for tab " + mappingHeader.getZZ_Tab_Name());
+        	return 0;
+           // throw new org.adempiere.exceptions.AdempiereException(
+          //          "No mapping details for tab " + mappingHeader.getZZ_Tab_Name());
         }
 
         // One row in DB (header-like record)
@@ -47,21 +48,24 @@ public class RowModeSheetImporter extends AbstractMappingSheetImporter {
         for (X_ZZ_WSP_ATR_Lookup_Mapping_Detail det : details) {
             int adColId = det.getAD_Column_ID();
             if (adColId <= 0) {
-                throw new org.adempiere.exceptions.AdempiereException(
-                        "Mapping detail " + det.get_ID() + " has no AD_Column_ID");
+            	return 0;
+               // throw new org.adempiere.exceptions.AdempiereException(
+                  //      "Mapping detail " + det.get_ID() + " has no AD_Column_ID");
             }
 
             int rowNo = det.get_ValueAsInt("ZZ_Row_No");
             if (rowNo <= 0) {
-                throw new org.adempiere.exceptions.AdempiereException(
-                        "Mapping detail " + det.get_ID() + " has no ZZ_Row_No");
+            	return 0;
+              //  throw new org.adempiere.exceptions.AdempiereException(
+                //        "Mapping detail " + det.get_ID() + " has no ZZ_Row_No");
             }
 
             // Excel row index is 0-based
             Row row = sheet.getRow(rowNo - 1);
             if (row == null) {
-                throw new org.adempiere.exceptions.AdempiereException(
-                        "Row " + rowNo + " not found in sheet " + mappingHeader.getZZ_Tab_Name());
+            	return 0;
+              // throw new org.adempiere.exceptions.AdempiereException(
+               //         "Row " + rowNo + " not found in sheet " + mappingHeader.getZZ_Tab_Name());
             }
 
             String letter = det.getZZ_Column_Letter();

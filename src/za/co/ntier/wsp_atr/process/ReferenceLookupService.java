@@ -59,8 +59,8 @@ public class ReferenceLookupService {
 
         String tableName = refMTable.getTableName();
         String where = useValue
-                ? "UPPER(Value)=UPPER(?)"
-                : "UPPER(Name)=UPPER(?)";
+                ? "UPPER(TRIM(Value))=UPPER(?)"
+                : "UPPER(TRIM(Name))=UPPER(?)";
 
         int id = new Query(ctx, tableName, where, trxName)
                 .setParameters(text)
