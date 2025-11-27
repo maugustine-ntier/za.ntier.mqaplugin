@@ -274,9 +274,9 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
         }
 
         // If not found and we have a Name, try Name
-        if ((foundId == null || foundId <= 0) && !Util.isEmpty(nameToUse, true)) {
-            foundId = findIdByColumn(ctx, refTableName, "Name", nameToUse, trxName);
-        }
+        //if ((foundId == null || foundId <= 0) && !Util.isEmpty(nameToUse, true)) {
+       //     foundId = findIdByColumn(ctx, refTableName, "Name", nameToUse, trxName);
+      //  }
 
         // If not found and we still have mainText, try Name=mainText
         if ((foundId == null || foundId <= 0) && mainText != null) {
@@ -346,7 +346,7 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
         if (Util.isEmpty(text, true))
             return null;
 
-        String where = "UPPER(" + columnName + ")=UPPER(?)";
+        String where = "UPPER(TRIM(" + columnName + "))=UPPER(?)";
         int id = new Query(ctx, tableName, where, trxName)
                 .setParameters(text.trim())
                 .firstId();

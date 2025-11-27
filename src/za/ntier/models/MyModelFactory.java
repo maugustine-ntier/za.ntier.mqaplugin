@@ -11,14 +11,19 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.osgi.service.component.annotations.Component;
+
 import za.co.ntier.api.model.I_ZZ_Program_Master_Data;
 import za.co.ntier.wf.model.MZZWFHeader;
 import za.co.ntier.wf.model.MZZWFLineRole;
 import za.co.ntier.wf.model.MZZWFLines;
+import za.co.ntier.wsp_atr.models.I_ZZ_WSP_ATR_Biodata_Detail;
 import za.co.ntier.wsp_atr.models.I_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.I_ZZ_WSP_ATR_Lookup_Mapping_Detail;
+import za.co.ntier.wsp_atr.models.I_ZZ_WSP_Employees;
+import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Biodata_Detail;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping_Detail;
+import za.co.ntier.wsp_atr.models.X_ZZ_WSP_Employees;
 
 @Component(
 
@@ -66,7 +71,9 @@ public class MyModelFactory implements IModelFactory {
         register(I_C_InvoiceBatch.Table_Name,           MInvoiceBatch_New.class);
         register(I_C_BP_BankAccount.Table_Name,         MBPBankAccount_New.class);
         register(I_ZZ_WSP_ATR_Lookup_Mapping.Table_Name,     X_ZZ_WSP_ATR_Lookup_Mapping.class);
-        register(I_ZZ_WSP_ATR_Lookup_Mapping_Detail.Table_Name,X_ZZ_WSP_ATR_Lookup_Mapping_Detail.class);
+        register(I_ZZ_WSP_ATR_Lookup_Mapping_Detail.Table_Name,     X_ZZ_WSP_ATR_Lookup_Mapping_Detail.class);
+        register(I_ZZ_WSP_ATR_Biodata_Detail.Table_Name,X_ZZ_WSP_ATR_Biodata_Detail.class);
+        register(I_ZZ_WSP_Employees.Table_Name,X_ZZ_WSP_Employees.class);
     }
 
     private static void register(String tableName, Class<? extends PO> modelClass) {
