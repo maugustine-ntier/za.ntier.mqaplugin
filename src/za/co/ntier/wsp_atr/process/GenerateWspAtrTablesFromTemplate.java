@@ -840,8 +840,8 @@ public class GenerateWspAtrTablesFromTemplate extends SvrProcess {
 	// ----------------------------------------------------------------------
 
 	private void previewTables(TabDef headerTab, List<TabDef> details) {
-		addLog("=== PREVIEW: Header table ===");
-		logTabDefinition(headerTab);
+		//addLog("=== PREVIEW: Header table ===");
+		//logTabDefinition(headerTab);
 
 		// NEW: fill reference existence info for REF_ID columns
 		fillReferencePreviewInfo(details);
@@ -941,7 +941,7 @@ public class GenerateWspAtrTablesFromTemplate extends SvrProcess {
 	private static final String ENTITY_TYPE = "U"; // adjust if you use custom ET
 
 	private void createHeaderTableIfNeeded(TabDef headerTab) {
-		createTableAndColumns(headerTab, true);
+	//	createTableAndColumns(headerTab, true);
 	}
 
 	private void createDetailTableIfNeeded(TabDef detailTab) {
