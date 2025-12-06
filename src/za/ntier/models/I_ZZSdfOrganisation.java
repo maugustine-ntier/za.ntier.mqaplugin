@@ -276,6 +276,68 @@ public interface I_ZZSdfOrganisation
 	  */
 	public boolean isZZSecondarySdf();
 
+    /** Column name ZZ_Approved_TS_COL_ID */
+    public static final String COLUMNNAME_ZZ_Approved_TS_COL_ID = "ZZ_Approved_TS_COL_ID";
+
+	/** Set Zz Approved Ts Col Id	  */
+	public void setZZ_Approved_TS_COL_ID (int ZZ_Approved_TS_COL_ID);
+
+	/** Get Zz Approved Ts Col Id	  */
+	public int getZZ_Approved_TS_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_TS_COL() throws RuntimeException;
+
+    /** Column name ZZ_Approved_User_COL_ID */
+    public static final String COLUMNNAME_ZZ_Approved_User_COL_ID = "ZZ_Approved_User_COL_ID";
+
+	/** Set Approved User Col Id	  */
+	public void setZZ_Approved_User_COL_ID (int ZZ_Approved_User_COL_ID);
+
+	/** Get Approved User Col Id	  */
+	public int getZZ_Approved_User_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Approved_User_COL() throws RuntimeException;
+
+    /** Column name ZZ_DocAction */
+    public static final String COLUMNNAME_ZZ_DocAction = "ZZ_DocAction";
+
+	/** Set Document Action	  */
+	public void setZZ_DocAction (String ZZ_DocAction);
+
+	/** Get Document Action	  */
+	public String getZZ_DocAction();
+
+    /** Column name ZZ_DocStatus */
+    public static final String COLUMNNAME_ZZ_DocStatus = "ZZ_DocStatus";
+
+	/** Set Document Status	  */
+	public void setZZ_DocStatus (String ZZ_DocStatus);
+
+	/** Get Document Status	  */
+	public String getZZ_DocStatus();
+
+    /** Column name ZZ_Rejected_TS_COL_ID */
+    public static final String COLUMNNAME_ZZ_Rejected_TS_COL_ID = "ZZ_Rejected_TS_COL_ID";
+
+	/** Set Zz Rejected Ts Col Id	  */
+	public void setZZ_Rejected_TS_COL_ID (int ZZ_Rejected_TS_COL_ID);
+
+	/** Get Zz Rejected Ts Col Id	  */
+	public int getZZ_Rejected_TS_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_TS_COL() throws RuntimeException;
+
+    /** Column name ZZ_Rejected_User_COL_ID */
+    public static final String COLUMNNAME_ZZ_Rejected_User_COL_ID = "ZZ_Rejected_User_COL_ID";
+
+	/** Set Zz Rejected User Col Id	  */
+	public void setZZ_Rejected_User_COL_ID (int ZZ_Rejected_User_COL_ID);
+
+	/** Get Zz Rejected User Col Id	  */
+	public int getZZ_Rejected_User_COL_ID();
+
+	public org.compiere.model.I_AD_Column getZZ_Rejected_User_COL() throws RuntimeException;
+
     /** Column name ZZ_Status */
     public static final String COLUMNNAME_ZZ_Status = "ZZ_Status";
 
@@ -284,4 +346,24 @@ public interface I_ZZSdfOrganisation
 
 	/** Get Status	  */
 	public String getZZ_Status();
+
+    /** Column name ZZ_Submission_Date */
+    public static final String COLUMNNAME_ZZ_Submission_Date = "ZZ_Submission_Date";
+
+	/** Set Submission Date	  */
+	public void setZZ_Submission_Date (Timestamp ZZ_Submission_Date);
+
+	/** Get Submission Date	  */
+	public Timestamp getZZ_Submission_Date();
+
+    /** Column name ZZ_Submitter_ID */
+    public static final String COLUMNNAME_ZZ_Submitter_ID = "ZZ_Submitter_ID";
+
+	/** Set Submitted By	  */
+	public void setZZ_Submitter_ID (int ZZ_Submitter_ID);
+
+	/** Get Submitted By	  */
+	public int getZZ_Submitter_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Submitter() throws RuntimeException;
 }

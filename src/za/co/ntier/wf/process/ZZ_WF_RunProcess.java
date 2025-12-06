@@ -16,6 +16,7 @@ import za.co.ntier.wf.model.MZZWFLines;
 import za.co.ntier.wf.util.ADColumnUtil;
 import za.co.ntier.wf.util.MailNoticeUtil;
 import za.co.ntier.wf.util.MailNoticeUtil.NotificationFields;
+import za.ntier.models.X_ZZSdfOrganisation;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.wf.process.ZZ_WF_RunProcess")
 public class ZZ_WF_RunProcess extends SvrProcess {
@@ -38,7 +39,14 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 		trxName = get_TrxName();
 		now = new Timestamp(System.currentTimeMillis());
 		MTable t = MTable.get(ctx, getTable_ID());
-		po = t.getPO(getRecord_ID(), trxName);
+		if (t.isView()) {
+			t = MTable.get(ctx, X_ZZSdfOrganisation.Table_Name);
+			int recordID = Env.getContextAsInt(ctx, X_ZZSdfOrganisation.COLUMNNAME_ZZSdfOrganisation_ID);
+			recordID = 1000001;
+			po = t.getPO(recordID, trxName);
+		} else {
+			po = t.getPO(getRecord_ID(), trxName);
+		}
 	}
 
 	@Override
