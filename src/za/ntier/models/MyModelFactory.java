@@ -51,7 +51,7 @@ public class MyModelFactory implements IModelFactory {
     static {
         // Register all your tables + model classes here
     	register(I_ZZ_SDR_Temp_Org.Table_Name,          MZZSDR_Temp_Org.class);
-    	register(I_ZZSdfOrganisation.Table_Name,          X_ZZSdfOrganisation.class);
+    	register(I_ZZSdfOrganisation.Table_Name,          MZZSdfOrganisation.class);
         register(I_ZZ_ATRVerification.Table_Name,          MZZATRVerification.class);
         register(I_ZZ_WF_Line_Role.Table_Name,          MZZWFLineRole.class);
         register(I_ZZ_WF_Lines.Table_Name,              MZZWFLines.class);
