@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MMailText;
 import org.compiere.model.MUser;
@@ -102,6 +103,13 @@ public class MZZSdfOrganisation extends X_ZZSdfOrganisation {
         if (subject == null || subject.trim().isEmpty()) {
             subject = "SDF Organisation Approved";
         }
+        
+        String sdlNo = getSdlNumber();
+        if (sdlNo == null) {
+            sdlNo = "";
+        }
+        message = message.replace("@ZZ_SDL_No@", sdlNo);
+        subject = subject.replace("@ZZ_SDL_No@", sdlNo);   
 
         // 3) Send via client
         boolean sent = client.sendEMail(to, subject, message, null, true);
@@ -143,5 +151,23 @@ public class MZZSdfOrganisation extends X_ZZSdfOrganisation {
         }
         return 0;
     }
+    
+    /**
+     * Get SDL number from linked Business Partner (C_BPartner.Value)
+     */
+    private String getSdlNumber() {
+        int bpId = getC_BPartner_ID();
+        if (bpId <= 0) {
+            return null;
+        }
+        MBPartner bp = MBPartner.get(getCtx(), bpId);
+        if (bp == null) {
+            return null;
+        }
+        return bp.getValue();   // this is your zz_sdl_no
+    }
+
 }
+
+
 
