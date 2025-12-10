@@ -5,12 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MPInstance;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
+import org.compiere.model.X_AD_PInstance;
+import org.compiere.process.ProcessInfo;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+
 import za.co.ntier.wf.model.MZZWFHeader;
 import za.co.ntier.wf.model.MZZWFLines;
 import za.co.ntier.wf.util.ADColumnUtil;
@@ -40,9 +45,16 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 		now = new Timestamp(System.currentTimeMillis());
 		MTable t = MTable.get(ctx, getTable_ID());
 		if (t.isView()) {
-			t = MTable.get(ctx, X_ZZSdfOrganisation.Table_Name);
-			int recordID = Env.getContextAsInt(ctx, X_ZZSdfOrganisation.COLUMNNAME_ZZSdfOrganisation_ID);
-			recordID = 1000001;
+			String s = t.getTableName();
+			if (s != null && s.length() > 2) {
+			    s = s.substring(0, s.length() - 2);
+			}
+
+			t = MTable.get(ctx, s);
+			if (t == null) {
+				return;
+			}
+			int recordID = getRecord_ID();
 			po = t.getPO(recordID, trxName);
 		} else {
 			po = t.getPO(getRecord_ID(), trxName);
