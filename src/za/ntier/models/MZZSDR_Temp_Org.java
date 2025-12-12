@@ -1,98 +1,187 @@
 package za.ntier.models;
 
 import java.sql.ResultSet;
-import org.compiere.util.DB;
 import java.util.Properties;
+
+import org.compiere.model.MBPartner;
+import org.compiere.model.MClient;
+import org.compiere.model.MMailText;
+import org.compiere.model.MUser;
+import org.compiere.util.DB;
 
 public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
 
-	public MZZSDR_Temp_Org(Properties ctx, int ZZ_SDR_Temp_Org_ID, String trxName) {
-		super(ctx, ZZ_SDR_Temp_Org_ID, trxName);
-		// TODO Auto-generated constructor stub
-	}
+    // Replace with the actual UU of your mail template
+    private static final String TEMP_ORG_MAILTEXT_UU = "4ace9d73-8349-44a6-8d2d-5a0838c79362";
 
-	public MZZSDR_Temp_Org(Properties ctx, int ZZ_SDR_Temp_Org_ID, String trxName, String... virtualColumns) {
-		super(ctx, ZZ_SDR_Temp_Org_ID, trxName, virtualColumns);
-		// TODO Auto-generated constructor stub
-	}
+    public MZZSDR_Temp_Org(Properties ctx, int ZZ_SDR_Temp_Org_ID, String trxName) {
+        super(ctx, ZZ_SDR_Temp_Org_ID, trxName);
+    }
 
-	public MZZSDR_Temp_Org(Properties ctx, String ZZ_SDR_Temp_Org_UU, String trxName) {
-		super(ctx, ZZ_SDR_Temp_Org_UU, trxName);
-		// TODO Auto-generated constructor stub
-	}
+    public MZZSDR_Temp_Org(Properties ctx, ResultSet rs, String trxName) {
+        super(ctx, rs, trxName);
+    }
 
-	public MZZSDR_Temp_Org(Properties ctx, String ZZ_SDR_Temp_Org_UU, String trxName, String... virtualColumns) {
-		super(ctx, ZZ_SDR_Temp_Org_UU, trxName, virtualColumns);
-		// TODO Auto-generated constructor stub
-	}
+    @Override
+    protected boolean beforeSave(boolean newRecord) {
+        if (newRecord) {
 
-	public MZZSDR_Temp_Org(Properties ctx, ResultSet rs, String trxName) {
-		super(ctx, rs, trxName);
-		// TODO Auto-generated constructor stub
-	}
+            // Check 1: Organisation Registration No
+            String orgRegNo = getZZ_Organisation_Reg_No();
+            if (orgRegNo != null && !orgRegNo.trim().isEmpty()) {
+                String sqlOrg = "SELECT COUNT(*) FROM adempiere.c_bpartner WHERE referenceno = ?";
+                int cntOrg = DB.getSQLValueEx(get_TrxName(), sqlOrg, orgRegNo);
+                if (cntOrg > 0) {
+                    log.saveError("Error", "Organisation Registration No already exists for another Business Partner.");
+                    return false;
+                }
+            }
 
-	@Override
-	protected boolean beforeSave(boolean newRecord) {
+            // Check 2: SDL No
+            String sdlNo = getZZ_SDL_No();
+            if (sdlNo != null && !sdlNo.trim().isEmpty()) {
+                String sqlSDL = "SELECT COUNT(*) FROM adempiere.c_bpartner WHERE value = ?";
+                int cntSDL = DB.getSQLValueEx(get_TrxName(), sqlSDL, sdlNo);
+                if (cntSDL > 0) {
+                    log.saveError("Error", "SDL Number already exists for another Business Partner.");
+                    return false;
+                }
+            }
+        }
 
-	    // === 1. Validate Organisation Registration No ===
-	    Object orgRegObj = get_Value("ZZ_Organisation_Reg_No");
-	    if (orgRegObj != null) {
-	        String orgRegNo = orgRegObj.toString().trim();
-	        if (!orgRegNo.isEmpty()) {
-	            // 1.1 Check temp table
-	            String sqlTemp = "SELECT COUNT(*) FROM ZZ_SDR_Temp_Org "
-	                    + "WHERE ZZ_Organisation_Reg_No = ? "
-	                    + "AND ZZ_SDR_Temp_Org_ID <> ?";
-	            int cntTemp = DB.getSQLValueEx(get_TrxName(), sqlTemp,
-	                    orgRegNo,
-	                    getZZ_SDR_Temp_Org_ID());
-	            if (cntTemp > 0) {
-	                log.saveError("Error", "Organisation Registration No already exists in temporary registrations.");
-	                return false;
-	            }
-	            // 1.2 Check in BP.ReferenceNo
-	            String sqlBP = "SELECT COUNT(*) FROM C_BPartner WHERE ReferenceNo = ?";
-	            int cntBP = DB.getSQLValueEx(get_TrxName(), sqlBP, orgRegNo);
-	            if (cntBP > 0) {
-	                log.saveError("Error", "Organisation Registration No already exists for an existing Business Partner.");
-	                return false;
-	            }
-	        }
-	    }
+        return true;
+    }
 
-	    // === 2. Validate SDL No ===
-	    Object sdlObj = get_Value("ZZ_SDL_No");
-	    if (sdlObj != null) {
-	        String sdl = sdlObj.toString().trim();
-	        if (!sdl.isEmpty()) {
-	            // 2.1 Check temp table
-	            String sqlTempSDL = "SELECT COUNT(*) FROM ZZ_SDR_Temp_Org "
-	                    + "WHERE ZZ_SDL_No = ? "
-	                    + "AND ZZ_SDR_Temp_Org_ID <> ?";
-	            int cntTempSDL = DB.getSQLValueEx(get_TrxName(), sqlTempSDL,
-	                    sdl,
-	                    getZZ_SDR_Temp_Org_ID());
-	            if (cntTempSDL > 0) {
-	                log.saveError("Error", "SDL No already exists in temporary registrations.");
-	                return false;
-	            }
-	            // 2.2 Check C_BPartner.Value
-	            String sqlBPValue = "SELECT COUNT(*) FROM C_BPartner WHERE Value = ?";
-	            int cntBPValue = DB.getSQLValueEx(get_TrxName(), sqlBPValue, sdl);
-	            if (cntBPValue > 0) {
-	                log.saveError("Error", "SDL No already exists as a Business Partner Search Key.");
-	                return false;
-	            }
-	        }
-	    }
+    @Override
+    protected boolean afterSave(boolean newRecord, boolean success) {
+        if (!success)
+            return false;
 
-	    return true;
-	}
+        if (newRecord) {
+            // 1) Create Business Partner and Contact
+            int bpID = createBusinessPartner();
+            if (bpID <= 0) {
+                log.severe("Failed to create Business Partner for ZZ_SDR_Temp_Org_ID=" + getZZ_SDR_Temp_Org_ID());
+                return false;
+            }
 
-	@Override
-	protected boolean afterSave(boolean newRecord, boolean success) {
-		// TODO Auto-generated method stub
-		return success;
-	}
+            // Store BP ID without triggering another save
+            set_ValueNoCheck("C_BPartner_ID", bpID);
 
+            // 2) Send confirmation email
+            MClient client = MClient.get(getCtx());
+            sendTempOrgEmail(client, bpID);
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates Business Partner and Contact for this Temp Org
+     */
+    private int createBusinessPartner() {
+
+        // Use pre-generated SDL number
+        String sdlNo = getZZ_SDL_No();
+        if (sdlNo == null || sdlNo.trim().isEmpty()) {
+            log.severe("SDL Number not set on Temp Org record.");
+            return 0;
+        }
+
+        // Create BP
+        MBPartner bp = new MBPartner(getCtx(), 0, get_TrxName());
+        bp.setValue(sdlNo); // SDL No as search key
+        bp.setName(getZZ_Organisation_Name());
+        bp.setName2(getZZ_TradingAs());
+        bp.setReferenceNo(getZZ_Organisation_Reg_No());
+        bp.setIsCustomer(true);
+        bp.setIsVendor(false);
+
+        if (!bp.save()) {
+            log.severe("Failed to save Business Partner.");
+            return 0;
+        }
+
+        // Create Contact
+        MUser contact = new MUser(getCtx(), 0, get_TrxName());
+        contact.setC_BPartner_ID(bp.getC_BPartner_ID());
+        contact.setName(getContactName());
+        contact.setEMail(getContactEmail());
+        contact.setPhone(getCellphoneNo());
+        contact.setPhone2(getLandlineNo());
+        if (!contact.save()) {
+            log.severe("Failed to save BP Contact for BP=" + bp.getC_BPartner_ID());
+        }
+
+        return bp.getC_BPartner_ID();
+    }
+
+    /**
+     * Sends email to the contact after temporary organisation registration
+     */
+    private void sendTempOrgEmail(MClient client, int bpID) {
+
+        // Get contact email
+        String sql = "SELECT email FROM adempiere.ad_user WHERE c_bpartner_id = ? LIMIT 1";
+        String to = DB.getSQLValueStringEx(get_TrxName(), sql, bpID);
+
+        if (to == null || to.trim().isEmpty()) {
+            log.warning("No contact email found for BP=" + bpID);
+            return;
+        }
+
+        // Load mail text
+        MMailText mText = new MMailText(getCtx(), TEMP_ORG_MAILTEXT_UU, get_TrxName());
+        if (mText.get_ID() <= 0) {
+            log.warning("Temp Org mail text not found. UU=" + TEMP_ORG_MAILTEXT_UU);
+            return;
+        }
+
+        try {
+            mText.setPO(this, true); // Set context
+        } catch (Throwable t) {
+            mText.setPO(this);
+        }
+
+        // -------------------------------
+        // Replace tokens in message body
+        // -------------------------------
+        String message = mText.getMailText(true); // HTML
+        message = message.replace("@ContactName@", getContactName())
+                         .replace("@OrganisationName@", getZZ_Organisation_Name())
+                         .replace("@SDLNo@", getZZ_SDL_No());
+
+        // -------------------------------
+        // NEW: Dynamic email subject
+        // -------------------------------
+        String subject = "Temporary Registration Complete: @OrganisationName@ - SDL No: @SDLNo@";
+        subject = subject.replace("@OrganisationName@", getZZ_Organisation_Name())
+                         .replace("@SDLNo@", getZZ_SDL_No());
+
+        // Send email
+        boolean sent = client.sendEMail(to, subject, message, null, true);
+        if (!sent)
+            log.warning("Failed to send Temporary Org Registration email to " + to);
+        else
+            log.info("Temporary Org Registration email sent to " + to);
+    }
+
+    /***********************
+     * Helper getters for contact info
+     ***********************/
+    public String getContactName() {
+        return (String) get_Value("contactname");
+    }
+
+    public String getContactEmail() {
+        return (String) get_Value("email");
+    }
+
+    public String getCellphoneNo() {
+        return (String) get_Value("cellphonenumber");
+    }
+
+    public String getLandlineNo() {
+        return (String) get_Value("zz_landline_no");
+    }
 }
