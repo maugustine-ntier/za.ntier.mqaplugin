@@ -111,7 +111,8 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 
 		String nextStatus = approve ? step.getNextStatusOnApprove() : step.getNextStatusOnReject();
 		String nextAction = approve ? step.getNextActionOnApprove() : step.getNextActionOnReject();
-
+		// reset values after a rejection and user starts first step
+		resetDecisionStampsIfFirstNode(hdr, step, po);
 		// Persist new state (both fields, as requested)
 		po.set_ValueOfColumn("ZZ_DocStatus", nextStatus);
 		po.set_ValueOfColumn("ZZ_DocAction", nextAction);
@@ -188,5 +189,48 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 		// Otherwise, treat no next action as final
 		return nextAction == null || nextAction.trim().isEmpty();
 	}
+	
+	private void resetDecisionStampsIfFirstNode(MZZWFHeader hdr, MZZWFLines step, PO po) {
+	    if (hdr == null || step == null || po == null) return;
+
+	    int minSeq = MZZWFHeader.getMinSeqNo(ctx,hdr.get_ID(),trxName);
+	    if (step.getSeqNo() != minSeq) return; // only clear on the very first node
+
+	    // Load all active workflow lines for this header
+	    List<MZZWFLines> lines = new org.compiere.model.Query(ctx, MZZWFLines.Table_Name,
+	            "ZZ_WF_Header_ID=? AND IsActive='Y'", trxName)
+	            .setParameters(hdr.get_ID())
+	            .setOrderBy("SeqNo ASC")
+	            .list();
+
+	    java.util.Set<String> colsToClear = new java.util.HashSet<>();
+
+	    for (MZZWFLines l : lines) {
+	        addColName(colsToClear, l.getZZ_Approved_User_COL_ID());
+	        addColName(colsToClear, l.getZZ_Approved_TS_COL_ID());
+	        addColName(colsToClear, l.getZZ_Rejected_User_COL_ID());
+	        addColName(colsToClear, l.getZZ_Rejected_TS_COL_ID());
+	    }
+
+	    // Clear them if they exist on the PO's table
+	    for (String colName : colsToClear) {
+	        if (colName != null && po.get_ColumnIndex(colName) >= 0) {
+	            po.set_ValueOfColumn(colName, null);
+	        }
+	    }
+
+	   
+	}
+
+	private void addColName(java.util.Set<String> set, int adColumnId) {
+	    if (adColumnId <= 0) return;
+	    String colName = ADColumnUtil.getColumnName(ctx, adColumnId, trxName);
+	    if (colName != null && !colName.isBlank()) {
+	        set.add(colName);
+	    }
+	}
+
+	
+
 
 }
