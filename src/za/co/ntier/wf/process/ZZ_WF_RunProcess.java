@@ -8,11 +8,9 @@ import java.util.Properties;
 
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.MPInstance;
+import org.compiere.model.I_R_MailText;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
-import org.compiere.model.X_AD_PInstance;
-import org.compiere.process.ProcessInfo;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
@@ -21,7 +19,6 @@ import za.co.ntier.wf.model.MZZWFLines;
 import za.co.ntier.wf.util.ADColumnUtil;
 import za.co.ntier.wf.util.MailNoticeUtil;
 import za.co.ntier.wf.util.MailNoticeUtil.NotificationFields;
-import za.ntier.models.X_ZZSdfOrganisation;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.wf.process.ZZ_WF_RunProcess")
 public class ZZ_WF_RunProcess extends SvrProcess {
@@ -170,8 +167,9 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 				AuditUtil.createAudit(ctx, trxName, po.get_Table_ID(), po.get_ID(), nxt.get_ID(),
 						"REQUEST", nextStatus, nextStatus, null, nextAction, "Auto-queued next step",currUserID);
 			}
+			I_R_MailText mailText = (approve) ? step.getMMailText_Approved() : step.getMMailText_Rejected();
 			MailNoticeUtil.requestStepNotifyAll(queueNotifis,step, po, hdr, getTable_ID(),getRecord_ID(),
-					MailNoticeUtil.setPOForMail(step.getMMailText_Approved(),po),ctx, trxName);
+					MailNoticeUtil.setPOForMail(mailText,po),ctx, trxName);
 		}
 
 	}
