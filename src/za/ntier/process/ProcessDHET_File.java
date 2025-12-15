@@ -32,7 +32,7 @@ public class ProcessDHET_File extends SvrProcess {
 	    // STEP 1: Reset MQA_Sector to 'N' for all BPs currently marked 'Y'
 	    String resetSQL = "UPDATE C_BPartner SET ZZ_Is_MQA_Sector = 'N' WHERE ZZ_Is_MQA_Sector = 'Y' and AD_Client_ID = 1000000";
 	    int resetCount = DB.executeUpdateEx(resetSQL, get_TrxName());
-	    addLog("Reset MQA_Sector to 'N' for " + resetCount + " BPs");
+	 //   addLog("Reset MQA_Sector to 'N' for " + resetCount + " BPs");
 
 
 	    int cntBPsAdded = 0;
