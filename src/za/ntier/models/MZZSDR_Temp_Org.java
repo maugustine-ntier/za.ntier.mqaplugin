@@ -130,26 +130,39 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
             return;
         }
 
-        // Load mail text
-        MMailText mText = new MMailText(getCtx(), TEMP_ORG_MAILTEXT_UU, get_TrxName());
+
+     // Look up MailText_ID from its UU
+        int mailTextID = DB.getSQLValueEx(
+            get_TrxName(),
+            "SELECT r_mailtext_id FROM adempiere.r_mailtext WHERE r_mailtext_uu = ?",
+            TEMP_ORG_MAILTEXT_UU
+        );
+
+        // Load mail text correctly
+        MMailText mText = new MMailText(getCtx(), mailTextID, get_TrxName());
+
         if (mText.get_ID() <= 0) {
             log.warning("Temp Org mail text not found. UU=" + TEMP_ORG_MAILTEXT_UU);
             return;
         }
 
-        try {
-            mText.setPO(this, true); // Set context
-        } catch (Throwable t) {
-            mText.setPO(this);
-        }
+       // try {
+       //     mText.setPO(this, true); // Set context
+       // } catch (Throwable t) {
+       //     mText.setPO(this);
+       // }
+        
+        String message = mText.getMailText(true);
 
-        // -------------------------------
-        // Replace tokens in message body
-        // -------------------------------
-        String message = mText.getMailText(true); // HTML
-        message = message.replace("@ContactName@", getContactName())
-                         .replace("@OrganisationName@", getZZ_Organisation_Name())
-                         .replace("@SDLNo@", getZZ_SDL_No());
+        // Safe values (no nulls)
+        String contactName = getContactName() != null ? getContactName() : "";
+        String orgName     = getZZ_Organisation_Name() != null ? getZZ_Organisation_Name() : "";
+        String sdlNo       = getZZ_SDL_No() != null ? getZZ_SDL_No() : "";
+
+        // Replace tokens
+        message = message.replace("@ContactName@", contactName)
+                      .replace("@OrganisationName@", orgName)
+                      .replace("@SDLNo@", sdlNo);
 
         // -------------------------------
         // NEW: Dynamic email subject
