@@ -76,8 +76,17 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 						: null;
 
 		if (currentStep != null) {
-			if ((pApprove == null || pApprove.isBlank()) && (pRecommend == null || pRecommend.isBlank()))
-				throw new AdempiereException("Please indicate Approve=Y or Approve=N.");
+			if ((pApprove == null || pApprove.isBlank()) && (pRecommend == null || pRecommend.isBlank())) {
+				if (curAction != null && curAction.equals("S1")) {
+					pApprove = "Y";  // no option for submit
+				} else {
+					throw new AdempiereException("Please indicate Approve=Y or Approve=N.");
+				}
+			} else {
+				if (curAction != null && curAction.equals("S1")) {
+					pApprove = "Y";  // no option for submit
+				} 
+			}
 			boolean approve = ("Y".equalsIgnoreCase(pApprove.trim())) || ("Y".equalsIgnoreCase(pRecommend.trim()));
 			doApproveReject(hdr, currentStep, approve, pComment);
 		} else {
@@ -126,7 +135,12 @@ public class ZZ_WF_RunProcess extends SvrProcess {
 		po.saveEx();
 
 		// --- Notifications ---
-		int requesterUserId = po.getCreatedBy();
+		Integer requesterUserId = po.getCreatedBy();
+		MZZWFLines submitStep = MZZWFHeader.getFirstLine(ctx,hdr.get_ID(),trxName);
+		if (submitStep != null) {
+			requesterUserId = (Integer) po.get_Value(ADColumnUtil.getColumnName(ctx, step.getZZ_Approved_User_COL_ID(), trxName));
+		}
+		
 		String respColumn = step.getResponsibleColumnName(step.getCtx(), step.get_TrxName());
 		int responsibleID = (respColumn != null) ? step.get_ValueAsInt(respColumn) : -1;
 

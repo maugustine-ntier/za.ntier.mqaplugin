@@ -35,6 +35,15 @@ public class MZZWFHeader extends X_ZZ_WF_Header {
 
         return (min != null) ? min.intValue() : Integer.MAX_VALUE;
     }
+    
+    public static MZZWFLines getFirstLine(Properties ctx, int wfHeaderId, String trxName) {
+        return new org.compiere.model.Query(ctx, MZZWFLines.Table_Name,
+                "ZZ_WF_Header_ID=? AND IsActive='Y' AND SeqNo IS NOT NULL AND SetDocAction = 'S1'", trxName)
+                .setParameters(wfHeaderId)
+                .setOrderBy("SeqNo ASC, ZZ_WF_Lines_ID ASC")
+                .first();
+    }
+
 
 
 }

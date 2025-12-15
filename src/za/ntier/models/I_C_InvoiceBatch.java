@@ -294,6 +294,39 @@ public interface I_C_InvoiceBatch
 	/** Get Authorized Purchase Order/SLA Attached	  */
 	public boolean isZZ_Auth_PO_Order();
 
+    /** Column name ZZ_CEO_ID */
+    public static final String COLUMNNAME_ZZ_CEO_ID = "ZZ_CEO_ID";
+
+	/** Set CEO	  */
+	public void setZZ_CEO_ID (int ZZ_CEO_ID);
+
+	/** Get CEO	  */
+	public int getZZ_CEO_ID();
+
+	public org.compiere.model.I_AD_User getZZ_CEO() throws RuntimeException;
+
+    /** Column name ZZ_CFO_ID */
+    public static final String COLUMNNAME_ZZ_CFO_ID = "ZZ_CFO_ID";
+
+	/** Set CFO	  */
+	public void setZZ_CFO_ID (int ZZ_CFO_ID);
+
+	/** Get CFO	  */
+	public int getZZ_CFO_ID();
+
+	public org.compiere.model.I_AD_User getZZ_CFO() throws RuntimeException;
+
+    /** Column name ZZ_COO_ID */
+    public static final String COLUMNNAME_ZZ_COO_ID = "ZZ_COO_ID";
+
+	/** Set COO	  */
+	public void setZZ_COO_ID (int ZZ_COO_ID);
+
+	/** Get COO	  */
+	public int getZZ_COO_ID();
+
+	public org.compiere.model.I_AD_User getZZ_COO() throws RuntimeException;
+
     /** Column name ZZ_Calcs_Checked */
     public static final String COLUMNNAME_ZZ_Calcs_Checked = "ZZ_Calcs_Checked";
 
@@ -313,6 +346,33 @@ public interface I_C_InvoiceBatch
 	/** Get Creditor ID &amp;
  Banking Details Verified	  */
 	public boolean isZZ_Cred_Bank_Dets_Verified();
+
+    /** Column name ZZ_Date_Not_Recom_CEO */
+    public static final String COLUMNNAME_ZZ_Date_Not_Recom_CEO = "ZZ_Date_Not_Recom_CEO";
+
+	/** Set Date Not Approved By CEO	  */
+	public void setZZ_Date_Not_Recom_CEO (Timestamp ZZ_Date_Not_Recom_CEO);
+
+	/** Get Date Not Approved By CEO	  */
+	public Timestamp getZZ_Date_Not_Recom_CEO();
+
+    /** Column name ZZ_Date_Not_Recom_CFO */
+    public static final String COLUMNNAME_ZZ_Date_Not_Recom_CFO = "ZZ_Date_Not_Recom_CFO";
+
+	/** Set Date Not Recommended By CFO	  */
+	public void setZZ_Date_Not_Recom_CFO (Timestamp ZZ_Date_Not_Recom_CFO);
+
+	/** Get Date Not Recommended By CFO	  */
+	public Timestamp getZZ_Date_Not_Recom_CFO();
+
+    /** Column name ZZ_Date_Not_Recom_COO */
+    public static final String COLUMNNAME_ZZ_Date_Not_Recom_COO = "ZZ_Date_Not_Recom_COO";
+
+	/** Set Date Not Recommended By COO	  */
+	public void setZZ_Date_Not_Recom_COO (Timestamp ZZ_Date_Not_Recom_COO);
+
+	/** Get Date Not Recommended By COO	  */
+	public Timestamp getZZ_Date_Not_Recom_COO();
 
     /** Column name ZZ_Date_Not_Recom_Snr_Mgr_SDR */
     public static final String COLUMNNAME_ZZ_Date_Not_Recom_Snr_Mgr_SDR = "ZZ_Date_Not_Recom_Snr_Mgr_SDR";
@@ -340,6 +400,33 @@ public interface I_C_InvoiceBatch
 
 	/** Get Date Recommended By Snr Mgr SDR	  */
 	public Timestamp getZZ_Date_Recom_Snr_Mgr_SDR();
+
+    /** Column name ZZ_Date_Recomm_CEO */
+    public static final String COLUMNNAME_ZZ_Date_Recomm_CEO = "ZZ_Date_Recomm_CEO";
+
+	/** Set Date Recommended By CEO	  */
+	public void setZZ_Date_Recomm_CEO (Timestamp ZZ_Date_Recomm_CEO);
+
+	/** Get Date Recommended By CEO	  */
+	public Timestamp getZZ_Date_Recomm_CEO();
+
+    /** Column name ZZ_Date_Recomm_CFO */
+    public static final String COLUMNNAME_ZZ_Date_Recomm_CFO = "ZZ_Date_Recomm_CFO";
+
+	/** Set Date Recommended By CFO	  */
+	public void setZZ_Date_Recomm_CFO (Timestamp ZZ_Date_Recomm_CFO);
+
+	/** Get Date Recommended By CFO	  */
+	public Timestamp getZZ_Date_Recomm_CFO();
+
+    /** Column name ZZ_Date_Recomm_COO */
+    public static final String COLUMNNAME_ZZ_Date_Recomm_COO = "ZZ_Date_Recomm_COO";
+
+	/** Set Date Recommended By COO	  */
+	public void setZZ_Date_Recomm_COO (Timestamp ZZ_Date_Recomm_COO);
+
+	/** Get Date Recommended By COO	  */
+	public Timestamp getZZ_Date_Recomm_COO();
 
     /** Column name ZZ_Date_Recomm_Snr_Mgr_Fin */
     public static final String COLUMNNAME_ZZ_Date_Recomm_Snr_Mgr_Fin = "ZZ_Date_Recomm_Snr_Mgr_Fin";
@@ -454,4 +541,15 @@ public interface I_C_InvoiceBatch
 
 	/** Get Status	  */
 	public String getZZ_Status();
+
+    /** Column name ZZ_Submitter_ID */
+    public static final String COLUMNNAME_ZZ_Submitter_ID = "ZZ_Submitter_ID";
+
+	/** Set Submitted By	  */
+	public void setZZ_Submitter_ID (int ZZ_Submitter_ID);
+
+	/** Get Submitted By	  */
+	public int getZZ_Submitter_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Submitter() throws RuntimeException;
 }

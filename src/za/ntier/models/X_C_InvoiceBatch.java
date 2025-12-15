@@ -35,7 +35,7 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251029L;
+	private static final long serialVersionUID = 20251215L;
 
     /** Standard Constructor */
     public X_C_InvoiceBatch (Properties ctx, int C_InvoiceBatch_ID, String trxName)
@@ -528,6 +528,87 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 		return false;
 	}
 
+	public org.compiere.model.I_AD_User getZZ_CEO() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_CEO_ID(), get_TrxName());
+	}
+
+	/** Set CEO.
+		@param ZZ_CEO_ID CEO
+	*/
+	public void setZZ_CEO_ID (int ZZ_CEO_ID)
+	{
+		if (ZZ_CEO_ID < 1)
+			set_Value (COLUMNNAME_ZZ_CEO_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_CEO_ID, Integer.valueOf(ZZ_CEO_ID));
+	}
+
+	/** Get CEO.
+		@return CEO	  */
+	public int getZZ_CEO_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_CEO_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_User getZZ_CFO() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_CFO_ID(), get_TrxName());
+	}
+
+	/** Set CFO.
+		@param ZZ_CFO_ID CFO
+	*/
+	public void setZZ_CFO_ID (int ZZ_CFO_ID)
+	{
+		if (ZZ_CFO_ID < 1)
+			set_Value (COLUMNNAME_ZZ_CFO_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_CFO_ID, Integer.valueOf(ZZ_CFO_ID));
+	}
+
+	/** Get CFO.
+		@return CFO	  */
+	public int getZZ_CFO_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_CFO_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_AD_User getZZ_COO() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_COO_ID(), get_TrxName());
+	}
+
+	/** Set COO.
+		@param ZZ_COO_ID COO
+	*/
+	public void setZZ_COO_ID (int ZZ_COO_ID)
+	{
+		if (ZZ_COO_ID < 1)
+			set_Value (COLUMNNAME_ZZ_COO_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_COO_ID, Integer.valueOf(ZZ_COO_ID));
+	}
+
+	/** Get COO.
+		@return COO	  */
+	public int getZZ_COO_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_COO_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Calculation Checked.
 		@param ZZ_Calcs_Checked Calculation Checked
 	*/
@@ -570,6 +651,51 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	/** Set Date Not Approved By CEO.
+		@param ZZ_Date_Not_Recom_CEO Date Not Approved By CEO
+	*/
+	public void setZZ_Date_Not_Recom_CEO (Timestamp ZZ_Date_Not_Recom_CEO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recom_CEO, ZZ_Date_Not_Recom_CEO);
+	}
+
+	/** Get Date Not Approved By CEO.
+		@return Date Not Approved By CEO	  */
+	public Timestamp getZZ_Date_Not_Recom_CEO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recom_CEO);
+	}
+
+	/** Set Date Not Recommended By CFO.
+		@param ZZ_Date_Not_Recom_CFO Date Not Recommended By CFO
+	*/
+	public void setZZ_Date_Not_Recom_CFO (Timestamp ZZ_Date_Not_Recom_CFO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recom_CFO, ZZ_Date_Not_Recom_CFO);
+	}
+
+	/** Get Date Not Recommended By CFO.
+		@return Date Not Recommended By CFO	  */
+	public Timestamp getZZ_Date_Not_Recom_CFO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recom_CFO);
+	}
+
+	/** Set Date Not Recommended By COO.
+		@param ZZ_Date_Not_Recom_COO Date Not Recommended By COO
+	*/
+	public void setZZ_Date_Not_Recom_COO (Timestamp ZZ_Date_Not_Recom_COO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Not_Recom_COO, ZZ_Date_Not_Recom_COO);
+	}
+
+	/** Get Date Not Recommended By COO.
+		@return Date Not Recommended By COO	  */
+	public Timestamp getZZ_Date_Not_Recom_COO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Not_Recom_COO);
 	}
 
 	/** Set Date Not Recommended By Snr Mgr SDR.
@@ -617,6 +743,51 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recom_Snr_Mgr_SDR);
 	}
 
+	/** Set Date Recommended By CEO.
+		@param ZZ_Date_Recomm_CEO Date Recommended By CEO
+	*/
+	public void setZZ_Date_Recomm_CEO (Timestamp ZZ_Date_Recomm_CEO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recomm_CEO, ZZ_Date_Recomm_CEO);
+	}
+
+	/** Get Date Recommended By CEO.
+		@return Date Recommended By CEO	  */
+	public Timestamp getZZ_Date_Recomm_CEO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recomm_CEO);
+	}
+
+	/** Set Date Recommended By CFO.
+		@param ZZ_Date_Recomm_CFO Date Recommended By CFO
+	*/
+	public void setZZ_Date_Recomm_CFO (Timestamp ZZ_Date_Recomm_CFO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recomm_CFO, ZZ_Date_Recomm_CFO);
+	}
+
+	/** Get Date Recommended By CFO.
+		@return Date Recommended By CFO	  */
+	public Timestamp getZZ_Date_Recomm_CFO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recomm_CFO);
+	}
+
+	/** Set Date Recommended By COO.
+		@param ZZ_Date_Recomm_COO Date Recommended By COO
+	*/
+	public void setZZ_Date_Recomm_COO (Timestamp ZZ_Date_Recomm_COO)
+	{
+		set_Value (COLUMNNAME_ZZ_Date_Recomm_COO, ZZ_Date_Recomm_COO);
+	}
+
+	/** Get Date Recommended By COO.
+		@return Date Recommended By COO	  */
+	public Timestamp getZZ_Date_Recomm_COO()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Recomm_COO);
+	}
+
 	/** Set Date Recommended By Snr Mgr Finance.
 		@param ZZ_Date_Recomm_Snr_Mgr_Fin Date Recommended By Snr Mgr Finance
 	*/
@@ -657,6 +828,8 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
 	/** Recommend = RE */
 	public static final String ZZ_DOCACTION_Recommend = "RE";
+	/** Submit = S1 */
+	public static final String ZZ_DOCACTION_Submit = "S1";
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to SDL Finance Mgr = SD */
@@ -703,6 +876,14 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
 	/** Not Recommended By Senior Mgr SDR = N1 */
 	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCEO = "N5";
 	/** Not Approved by Snr Manager = NA */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
@@ -717,6 +898,14 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	public static final String ZZ_DOCSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Pending = PE */
+	public static final String ZZ_DOCSTATUS_Pending = "PE";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_DOCSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCFO = "R3";
 	/** Recommended = RC */
 	public static final String ZZ_DOCSTATUS_Recommended = "RC";
 	/** Recommended By Senior Mgr SDR = RD */
@@ -933,5 +1122,32 @@ public class X_C_InvoiceBatch extends PO implements I_C_InvoiceBatch, I_Persiste
 	public String getZZ_Status()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_Status);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_Submitter() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_Submitter_ID(), get_TrxName());
+	}
+
+	/** Set Submitted By.
+		@param ZZ_Submitter_ID Submitted By
+	*/
+	public void setZZ_Submitter_ID (int ZZ_Submitter_ID)
+	{
+		if (ZZ_Submitter_ID < 1)
+			set_Value (COLUMNNAME_ZZ_Submitter_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_Submitter_ID, Integer.valueOf(ZZ_Submitter_ID));
+	}
+
+	/** Get Submitted By.
+		@return Submitted By	  */
+	public int getZZ_Submitter_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_Submitter_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }
