@@ -6,6 +6,8 @@ import java.util.Properties;
 
 import org.compiere.model.I_AD_User;
 import org.compiere.model.MTable;
+import org.compiere.model.MUser;
+import org.compiere.util.Msg;
 
 import za.co.ntier.fa.process.api.IDocApprove;
 
@@ -41,6 +43,72 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 		super(ctx, ZZ_Open_Application_UU, trxName);
 		// TODO Auto-generated constructor stub
 	}
+	
+	@Override
+	protected boolean beforeSave(boolean newRecord) {
+
+	    if (getC_Year_ID() <= 0)
+	        return super.beforeSave(newRecord);
+
+	    if (getStartDate() == null || getEndDate() == null)
+	        return super.beforeSave(newRecord);
+
+	    if (getStartDate().after(getEndDate())) {
+	        log.saveError("Error", Msg.getMsg(getCtx(), "STARTDATEBEFORENDDATE")); 
+			return false;
+	    }
+
+	    String programs = getZZ_Programs();
+	    if (programs == null || programs.trim().isEmpty())
+	        return super.beforeSave(newRecord);
+
+	    String[] ids = programs.split("\\s*,\\s*");
+
+	    String sql =
+	        "SELECT COUNT(1) " +
+	        "FROM ZZ_Open_Application oa " +
+	        "WHERE oa.IsActive='Y' " +
+	        "  AND oa.C_Year_ID=? " +
+	        "  AND oa.ZZ_Open_Application_ID<>? " +
+	        "  AND (',' || COALESCE(oa.ZZ_Programs,'') || ',') LIKE ? " +
+	        "  AND oa.StartDate <= ? " +   // other.start <= this.end
+	        "  AND oa.EndDate >= ?";       // other.end   >= this.start
+
+	    for (String idStr : ids) {
+	        if (idStr == null || idStr.trim().isEmpty())
+	            continue;
+
+	        int progId;
+	        try {
+	            progId = Integer.parseInt(idStr.trim());
+	        } catch (NumberFormatException nfe) {
+	            Object[] args = new Object[] {idStr};
+	            log.saveError("Error", Msg.getMsg(getCtx(), "INVALIDPROGRAMID",args)); 
+				return false;
+	        }
+
+	        String like = "%," + progId + ",%";
+
+	        int cnt = org.compiere.util.DB.getSQLValueEx(
+	            get_TrxName(),
+	            sql,
+	            getC_Year_ID(),
+	            getZZ_Open_Application_ID(),
+	            like,
+	            getEndDate(),
+	            getStartDate()
+	        );
+
+	        if (cnt > 0) {
+	            Object[] args = new Object[] {progId};
+	            log.saveError("Error", Msg.getMsg(getCtx(), "OVERLAPPINGOPENAPP")); 
+				return false;
+	        }
+	    }
+
+	    return super.beforeSave(newRecord);
+	}
+
 
 
 	/** Set Start Date.
