@@ -54,16 +54,32 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        return super.beforeSave(newRecord);
 
 	    if (getStartDate().after(getEndDate())) {
-	        log.saveError("Error", Msg.getMsg(getCtx(), "STARTDATEBEFORENDDATE")); 
-			return false;
+	        log.saveError("Error", Msg.getMsg(getCtx(), "STARTDATEBEFORENDDATE"));
+	        return false;
 	    }
 
 	    String programs = getZZ_Programs();
 	    if (programs == null || programs.trim().isEmpty())
 	        return super.beforeSave(newRecord);
 
-	    String[] ids = programs.split("\\s*,\\s*");
+	    // Parse + dedupe IDs
+	    java.util.LinkedHashSet<Integer> programIds = new java.util.LinkedHashSet<>();
+	    for (String s : programs.split("\\s*,\\s*")) {
+	        if (s == null || s.trim().isEmpty())
+	            continue;
+	        try {
+	            programIds.add(Integer.parseInt(s.trim()));
+	        } catch (NumberFormatException nfe) {
+	            Object[] args = new Object[] { s.trim() };
+	            log.saveError("Error", Msg.getMsg(getCtx(), "INVALIDPROGRAMID", args));
+	            return false;
+	        }
+	    }
 
+	    if (programIds.isEmpty())
+	        return super.beforeSave(newRecord);
+
+	    // Overlap check per program
 	    String sql =
 	        "SELECT COUNT(1) " +
 	        "FROM ZZ_Open_Application oa " +
@@ -74,19 +90,9 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        "  AND oa.StartDate <= ? " +   // other.start <= this.end
 	        "  AND oa.EndDate >= ?";       // other.end   >= this.start
 
-	    for (String idStr : ids) {
-	        if (idStr == null || idStr.trim().isEmpty())
-	            continue;
+	    java.util.List<Integer> overlappingIds = new java.util.ArrayList<>();
 
-	        int progId;
-	        try {
-	            progId = Integer.parseInt(idStr.trim());
-	        } catch (NumberFormatException nfe) {
-	            Object[] args = new Object[] {idStr};
-	            log.saveError("Error", Msg.getMsg(getCtx(), "INVALIDPROGRAMID",args)); 
-				return false;
-	        }
-
+	    for (Integer progId : programIds) {
 	        String like = "%," + progId + ",%";
 
 	        int cnt = org.compiere.util.DB.getSQLValueEx(
@@ -100,14 +106,77 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        );
 
 	        if (cnt > 0) {
-	            Object[] args = new Object[] {progId};
-	            log.saveError("Error", Msg.getMsg(getCtx(), "OVERLAPPINGOPENAPP")); 
-				return false;
+	            overlappingIds.add(progId);
 	        }
+	    }
+
+	    if (!overlappingIds.isEmpty()) {
+	        String programNamesCsv = getProgramNamesCsv(overlappingIds);
+
+	        Object[] args = new Object[] { programNamesCsv };
+	        // Your AD_Message "OVERLAPPINGOPENAPP" should have a token like: "@1@" where you want the names to appear
+	        log.saveError("Error", Msg.getMsg(getCtx(), "OVERLAPPINGOPENAPP", args));
+	        return false;
 	    }
 
 	    return super.beforeSave(newRecord);
 	}
+
+	
+	private String getProgramNamesCsv(java.util.List<Integer> programIds) {
+
+	    // Fallback if something is odd
+	    if (programIds == null || programIds.isEmpty())
+	        return "";
+
+	    // Build (?, ?, ?) placeholders
+	    StringBuilder in = new StringBuilder();
+	    for (int i = 0; i < programIds.size(); i++) {
+	        if (i > 0) in.append(",");
+	        in.append("?");
+	    }
+
+	    String sql =
+	        "SELECT Description " +
+	        "FROM ZZ_Program_Master_Data " +
+	        "WHERE ZZ_Program_Master_Data_ID IN (" + in + ") " +
+	        "ORDER BY Name";
+
+	    java.util.List<Object> params = new java.util.ArrayList<>();
+	    params.addAll(programIds);
+
+	    java.util.List<String> names = new java.util.ArrayList<>();
+
+	    java.sql.PreparedStatement pstmt = null;
+	    java.sql.ResultSet rs = null;
+
+	    try {
+	        pstmt = org.compiere.util.DB.prepareStatement(sql, get_TrxName());
+	        for (int i = 0; i < params.size(); i++) {
+	            pstmt.setObject(i + 1, params.get(i));
+	        }
+
+	        rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            String n = rs.getString(1);
+	            if (n != null && !n.trim().isEmpty())
+	                names.add(n.trim());
+	        }
+	    } catch (Exception e) {
+	        // If name lookup fails, return IDs as fallback (still useful)
+	        return programIds.toString();
+	    } finally {
+	        org.compiere.util.DB.close(rs, pstmt);
+	        rs = null;
+	        pstmt = null;
+	    }
+
+	    if (names.isEmpty())
+	        return programIds.toString();
+
+	    return String.join(", ", names);
+	}
+
 
 
 
