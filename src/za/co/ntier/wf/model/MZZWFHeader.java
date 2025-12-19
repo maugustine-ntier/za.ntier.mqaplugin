@@ -26,4 +26,24 @@ public class MZZWFHeader extends X_ZZ_WF_Header {
     public static MZZWFHeader getById(Properties ctx, int headerId, String trxName) {
         return new MZZWFHeader(ctx, headerId, trxName);
     }
+    
+    public static int getMinSeqNo(Properties ctx, int wfHeaderId, String trxName) {
+        Integer min = new org.compiere.model.Query(ctx, MZZWFLines.Table_Name,
+                "ZZ_WF_Header_ID=? AND IsActive='Y' AND SeqNo IS NOT NULL", trxName)
+                .setParameters(wfHeaderId)
+                .aggregate("SeqNo", org.compiere.model.Query.AGGREGATE_MIN, Integer.class);
+
+        return (min != null) ? min.intValue() : Integer.MAX_VALUE;
+    }
+    
+    public static MZZWFLines getFirstLine(Properties ctx, int wfHeaderId, String trxName) {
+        return new org.compiere.model.Query(ctx, MZZWFLines.Table_Name,
+                "ZZ_WF_Header_ID=? AND IsActive='Y' AND SeqNo IS NOT NULL AND SetDocAction = 'S1'", trxName)
+                .setParameters(wfHeaderId)
+                .setOrderBy("SeqNo ASC, ZZ_WF_Lines_ID ASC")
+                .first();
+    }
+
+
+
 }

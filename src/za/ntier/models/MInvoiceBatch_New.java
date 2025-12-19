@@ -454,6 +454,150 @@ public class MInvoiceBatch_New extends MInvoiceBatch implements I_C_InvoiceBatch
 		return null;
 	}
 
+	@Override
+	public void setZZ_CEO_ID(int ZZ_CEO_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_CEO_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_CEO() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_CFO_ID(int ZZ_CFO_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_CFO_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_CFO() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_COO_ID(int ZZ_COO_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_COO_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_COO() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Not_Recom_CEO(Timestamp ZZ_Date_Not_Recom_CEO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Not_Recom_CEO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Not_Recom_CFO(Timestamp ZZ_Date_Not_Recom_CFO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Not_Recom_CFO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Not_Recom_COO(Timestamp ZZ_Date_Not_Recom_COO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Not_Recom_COO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Recomm_CEO(Timestamp ZZ_Date_Recomm_CEO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Recomm_CEO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Recomm_CFO(Timestamp ZZ_Date_Recomm_CFO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Recomm_CFO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Recomm_COO(Timestamp ZZ_Date_Recomm_COO) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Recomm_COO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Submitter_ID(int ZZ_Submitter_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Submitter_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_Submitter() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 
