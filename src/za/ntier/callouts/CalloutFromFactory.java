@@ -1,26 +1,58 @@
 package za.ntier.callouts;
 
+import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.X_M_InventoryLine;
 import org.compiere.util.DB;
+import org.compiere.util.Msg;
 
+import za.ntier.models.MZZOpenApplication;
+import za.ntier.models.OpenAppOverlapInput;
+import za.ntier.models.X_ZZ_Open_Application;
 import za.ntier.models.X_ZZ_System_Access_Application;
 
 public class CalloutFromFactory implements IColumnCallout {
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
-		/* if (mTab.getTableName().equals(X_ZZ_Petty_Cash_Claim_Hdr.Table_Name) && mField.getColumnName().equals(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Credit_Card_No)) {
-			int ids[] = PO.getAllIDs(X_ZZ_Petty_Cash_Advance_Hdr.Table_Name, "ZZ_Petty_Cash_Advance_Hdr.ZZ_Credit_Card_No = '" + value + "'"  
-					+ " and not exists (Select 'x' from ZZ_Petty_Cash_Claim_Hdr cl where cl.ZZ_Credit_Card_No = '" + value + "' order BY created desc)",null);
-			if (ids != null && ids.length > 0) {
-				mTab.setValue(X_ZZ_Petty_Cash_Claim_Hdr.COLUMNNAME_ZZ_Petty_Cash_Advance_Hdr_ID, ids[0]);
+		if (mTab.getTableName().equals(X_ZZ_Open_Application.Table_Name) && 
+				mField.getColumnName().equals(X_ZZ_Open_Application.COLUMNNAME_ZZ_Programs)) {
+			String programs = (String) value;
+			if (programs == null || programs.trim().isEmpty())
+				return "";
+			java.util.LinkedHashSet<Integer> programIds = new java.util.LinkedHashSet<>();
+			for (String s : programs.split("\\s*,\\s*")) {
+				if (s == null || s.trim().isEmpty())
+					continue;
+				try {
+					programIds.add(Integer.parseInt(s.trim()));
+				} catch (NumberFormatException nfe) {
+					Object[] args = new Object[] { s.trim() };
+					//throw new AdempiereException(Msg.getMsg(ctx, "INVALIDPROGRAMID", args));
+					return Msg.getMsg(ctx, "INVALIDPROGRAMID", args);
+				}
 			}
-		}	*/	
+			if (programIds.isEmpty())
+		        return "";
+			OpenAppOverlapInput openAppOverlapInput = new OpenAppOverlapInput(ctx, 
+																				null, 
+																				(int)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_C_Year_ID), 
+																				(int)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_ZZ_Open_Application_ID), 
+																				(Timestamp)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_StartDate), 
+																				(Timestamp)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_EndDate));
+			 java.util.List<Integer> overlappingIds = MZZOpenApplication.overlapping(programIds,openAppOverlapInput);
+			 if (!overlappingIds.isEmpty()) {
+			        String programNamesCsv = MZZOpenApplication.getProgramNamesCsv(overlappingIds,null);
+			        Object[] args = new Object[] { programNamesCsv };
+			        return(Msg.getMsg(ctx, "OVERLAPPINGOPENAPP", args));
+			    }
+		   
+		}
 		if (mTab.getTableName().equals(X_M_InventoryLine.Table_Name) && 
 				mField.getColumnName().equals(X_M_InventoryLine.COLUMNNAME_M_Product_ID)) {
 			if (value != null) {

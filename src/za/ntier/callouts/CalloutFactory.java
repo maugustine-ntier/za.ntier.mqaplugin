@@ -8,6 +8,7 @@ import org.adempiere.base.IColumnCalloutFactory;
 import org.compiere.model.X_M_InventoryLine;
 import org.osgi.service.component.annotations.Component;
 
+import za.ntier.models.X_ZZ_Open_Application;
 import za.ntier.models.X_ZZ_System_Access_Application;
 
 @Component(
@@ -21,7 +22,10 @@ public class CalloutFactory implements IColumnCalloutFactory {
 	@Override
 	public IColumnCallout[] getColumnCallouts(String tableName, String columnName) {
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-		if (tableName.equals(X_M_InventoryLine.Table_Name) || tableName.equals(X_ZZ_System_Access_Application.Table_Name))
+		if (tableName.equals(X_M_InventoryLine.Table_Name) || 
+			tableName.equals(X_ZZ_System_Access_Application.Table_Name) ||
+			tableName.equals(X_ZZ_Open_Application.Table_Name)
+			)
 		{
 			list.add(new CalloutFromFactory());
 		}

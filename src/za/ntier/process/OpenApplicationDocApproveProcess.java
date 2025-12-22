@@ -209,11 +209,11 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_LP_OPS);
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_LP_PROJECTS);
 		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SPU);
-		//broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SRU);  // Does not exist.  Need to be created on Idempiere
-		//broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_QA);   // Does not exist.  Need to be created on Idempiere
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SRU); 
+		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_QA); 
 		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
-		//broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_QA);// Does not exist.  Need to be created on Idempiere
-		//broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_SRU);// Does not exist.  Need to be created on Idempiere
+		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_QA);
+		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_SRU);
 	}
 	
 	

@@ -2,11 +2,14 @@ package za.ntier.models;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.compiere.model.I_AD_User;
 import org.compiere.model.MTable;
-import org.compiere.model.MUser;
+import org.compiere.util.DB;
 import org.compiere.util.Msg;
 
 import za.co.ntier.fa.process.api.IDocApprove;
@@ -78,9 +81,29 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 
 	    if (programIds.isEmpty())
 	        return super.beforeSave(newRecord);
+	    List<Integer> overlaps = overlapping(programIds,
+	            new OpenAppOverlapInput(getCtx(), get_TrxName(), getC_Year_ID(), getZZ_Open_Application_ID(), getStartDate(), getEndDate()));
+
+	    if (!overlaps.isEmpty()) {
+	        String programNamesCsv = getProgramNamesCsv(overlaps,get_TrxName());
+	        Object[] args = new Object[] { programNamesCsv };
+	        log.saveError("Error", Msg.getMsg(getCtx(), "OVERLAPPINGOPENAPP", args));
+	        return false;
+	    }
+
+	    return super.beforeSave(newRecord);
+	}
+
+	public static List<Integer> overlapping(LinkedHashSet<Integer> programIds, OpenAppOverlapInput in) {
+
+	    if (programIds == null || programIds.isEmpty())
+	        return java.util.Collections.emptyList();
+
+	    if (in.getC_Year_ID() <= 0 || in.getStartDate() == null || in.getEndDate() == null)
+	        return java.util.Collections.emptyList();
 
 	    // Overlap check per program
-	    String sql =
+	    final String sql =
 	        "SELECT COUNT(1) " +
 	        "FROM ZZ_Open_Application oa " +
 	        "WHERE oa.IsActive='Y' " +
@@ -90,19 +113,22 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        "  AND oa.StartDate <= ? " +   // other.start <= this.end
 	        "  AND oa.EndDate >= ?";       // other.end   >= this.start
 
-	    java.util.List<Integer> overlappingIds = new java.util.ArrayList<>();
+	    List<Integer> overlappingIds = new ArrayList<>();
 
 	    for (Integer progId : programIds) {
+	        if (progId == null)
+	            continue;
+
 	        String like = "%," + progId + ",%";
 
-	        int cnt = org.compiere.util.DB.getSQLValueEx(
-	            get_TrxName(),
-	            sql,
-	            getC_Year_ID(),
-	            getZZ_Open_Application_ID(),
-	            like,
-	            getEndDate(),
-	            getStartDate()
+	        int cnt = DB.getSQLValueEx(
+	                in.getTrxName(),
+	                sql,
+	                in.getC_Year_ID(),
+	                in.getZZ_Open_Application_ID(),
+	                like,
+	                in.getEndDate(),
+	                in.getStartDate()
 	        );
 
 	        if (cnt > 0) {
@@ -110,20 +136,12 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        }
 	    }
 
-	    if (!overlappingIds.isEmpty()) {
-	        String programNamesCsv = getProgramNamesCsv(overlappingIds);
-
-	        Object[] args = new Object[] { programNamesCsv };
-	        // Your AD_Message "OVERLAPPINGOPENAPP" should have a token like: "@1@" where you want the names to appear
-	        log.saveError("Error", Msg.getMsg(getCtx(), "OVERLAPPINGOPENAPP", args));
-	        return false;
-	    }
-
-	    return super.beforeSave(newRecord);
+	    // Keep this method focused: return ids only.
+	    // If you still want the error message here, pass in a "name resolver" callback (see below).
+	    return overlappingIds;
 	}
-
 	
-	private String getProgramNamesCsv(java.util.List<Integer> programIds) {
+	public static String getProgramNamesCsv(java.util.List<Integer> programIds,String trxName) {
 
 	    // Fallback if something is odd
 	    if (programIds == null || programIds.isEmpty())
@@ -151,7 +169,7 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	    java.sql.ResultSet rs = null;
 
 	    try {
-	        pstmt = org.compiere.util.DB.prepareStatement(sql, get_TrxName());
+	        pstmt = org.compiere.util.DB.prepareStatement(sql, trxName);
 	        for (int i = 0; i < params.size(); i++) {
 	            pstmt.setObject(i + 1, params.get(i));
 	        }
