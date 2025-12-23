@@ -39,12 +39,15 @@ public class CalloutFromFactory implements IColumnCallout {
 			}
 			if (programIds.isEmpty())
 		        return "";
-			OpenAppOverlapInput openAppOverlapInput = new OpenAppOverlapInput(ctx, 
-																				null, 
-																				(int)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_C_Year_ID), 
-																				(int)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_ZZ_Open_Application_ID), 
-																				(Timestamp)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_StartDate), 
-																				(Timestamp)mTab.getValue(X_ZZ_Open_Application.COLUMNNAME_EndDate));
+			OpenAppOverlapInput openAppOverlapInput = new OpenAppOverlapInput(
+			        ctx,
+			        null,
+			        tabInt(mTab, X_ZZ_Open_Application.COLUMNNAME_C_Year_ID),
+			        tabInt(mTab, X_ZZ_Open_Application.COLUMNNAME_ZZ_Open_Application_ID), // null -> 0
+			        tabTs(mTab, X_ZZ_Open_Application.COLUMNNAME_StartDate),
+			        tabTs(mTab, X_ZZ_Open_Application.COLUMNNAME_EndDate)
+			);
+
 			 java.util.List<Integer> overlappingIds = MZZOpenApplication.overlapping(programIds,openAppOverlapInput);
 			 if (!overlappingIds.isEmpty()) {
 			        String programNamesCsv = MZZOpenApplication.getProgramNamesCsv(overlappingIds,null);
@@ -105,5 +108,18 @@ public class CalloutFromFactory implements IColumnCallout {
 	public String toString() {
 		return "CalloutFromFactory [toString()=" + super.toString() + "]";
 	}
+	
+	private static int tabInt(org.compiere.model.GridTab tab, String columnName) {
+	    Object v = tab.getValue(columnName);
+	    if (v == null) return 0;
+	    if (v instanceof Number) return ((Number) v).intValue();
+	    return Integer.parseInt(v.toString().trim());
+	}
+
+	private static Timestamp tabTs(org.compiere.model.GridTab tab, String columnName) {
+	    Object v = tab.getValue(columnName);
+	    return (v instanceof Timestamp) ? (Timestamp) v : null;
+	}
+
 
 }

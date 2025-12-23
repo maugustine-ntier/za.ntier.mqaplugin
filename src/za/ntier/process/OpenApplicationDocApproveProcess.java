@@ -19,7 +19,7 @@ import za.ntier.models.MZZOpenApplication;
 public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<MZZOpenApplication> {
 
 	// Convenience recipient buckets
-	private final List<Integer> broadcastRoleIds = new ArrayList<>();
+	private final List<String> broadcastRoleUUs = new ArrayList<>();
 
 	@Override
 	protected void initDocApproveObj() {
@@ -105,7 +105,8 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		if (docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 		// Notify recommender
-		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, IDocApprove.ROLE_SNR_MGR_SPU, getTable_ID(), getRecord_ID(),
+		int roleId = RoleIdResolver.roleIdFromUU(get_TrxName(), RoleUUIDs.ROLE_SNR_MGR_SPU_UU);
+		AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleId, getTable_ID(), getRecord_ID(),
 				docApprove.getZZMailRequestLine());
 	}
 
@@ -142,9 +143,10 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 
 			// Broadcast: all Managers LP, Snr Managers (LP, SPU), Comms
 			collectBroadcastAudience();
-			for (int roleID : broadcastRoleIds) {
-				AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleID, getTable_ID(), getRecord_ID(),
-						docApprove.getZZMailLineApproved());
+			for (String roleUU : broadcastRoleUUs) {
+			    int roleId = RoleIdResolver.roleIdFromUU(get_TrxName(), roleUU);
+			    AbstractDocApproveProcess.queueNotifyForRole(queueNotifis, roleId, getTable_ID(), getRecord_ID(),
+			            docApprove.getZZMailLineApproved());
 			}
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApproved);
@@ -200,21 +202,29 @@ public class OpenApplicationDocApproveProcess extends AbstractDocApproveProcess<
 		}
 	}
 
-	/** Gather LP Managers, Snr Managers (LP, SPU), Comms */
-	private void collectBroadcastAudience() {
-		//final int ROLE_COMMS            = 0;  // TODO
 
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP_OPS);
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_LP_PROJECTS);
-		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_LP_OPS);
-		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_LP_PROJECTS);
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SPU);
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_SRU); 
-		broadcastRoleIds.add(IDocApprove.ROLE_MANAGER_QA); 
-		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MGR_SPU);
-		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_QA);
-		broadcastRoleIds.add(IDocApprove.ROLE_SNR_MANAGER_SRU);
+	
+	private void collectBroadcastAudience() {
+	    broadcastRoleUUs.clear();
+
+	    // Managers
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_LP_OPS_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_LP_PROJECTS_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_SPU_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_SRU_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_QA_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_MGR_COMMS_UU);
+
+	    // Senior Managers
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_LP_OPS_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_LP_PROJECTS_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_SPU_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_SRU_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_QA_UU);
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_ME_UU);	   
+	    broadcastRoleUUs.add(RoleUUIDs.ROLE_SNR_MGR_COMMS_UU);
 	}
+
 	
 	
 	
