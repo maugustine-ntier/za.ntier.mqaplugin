@@ -107,6 +107,7 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	        "SELECT COUNT(1) " +
 	        "FROM ZZ_Open_Application oa " +
 	        "WHERE oa.IsActive='Y' " +
+	        "  AND oa.ZZ_DocStatus = 'AP'" +
 	        "  AND oa.C_Year_ID=? " +
 	        "  AND oa.ZZ_Open_Application_ID<>? " +
 	        "  AND (',' || COALESCE(oa.ZZ_Programs,'') || ',') LIKE ? " +
@@ -155,7 +156,7 @@ public class MZZOpenApplication extends X_ZZ_Open_Application implements IDocApp
 	    }
 
 	    String sql =
-	        "SELECT Description " +
+	        "SELECT Title " +
 	        "FROM ZZ_Program_Master_Data " +
 	        "WHERE ZZ_Program_Master_Data_ID IN (" + in + ") " +
 	        "ORDER BY Name";
