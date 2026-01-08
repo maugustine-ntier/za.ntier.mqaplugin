@@ -8,12 +8,12 @@ import org.adempiere.exceptions.AdempiereException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.util.IOUtils;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.Query;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
-import org.compiere.util.Util;
 
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
@@ -64,6 +64,9 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 		int totalImported = 0;
 		for (X_ZZ_WSP_ATR_Lookup_Mapping mapHeader : headers) {
 			if (mapHeader.getAD_Table_ID() <= 0) {
+				continue;
+			}
+			if (mapHeader.getZZ_WSP_ATR_Lookup_Mapping_ID() != 1000007) {
 				continue;
 			}
 			boolean isColumns = mapHeader.get_ValueAsBoolean("ZZ_Is_Columns");  // Y=column mode, N=row mode
@@ -124,6 +127,7 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 				throw new AdempiereException(
 						"Could not open attachment stream for file " + selectedEntry.getName());
 			}
+			IOUtils.setByteArrayMaxOverride(200 * 1024 * 1024);
 			return WorkbookFactory.create(is);
 		}
 	}

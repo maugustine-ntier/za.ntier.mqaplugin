@@ -189,10 +189,15 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
                     detail.setZZ_Header_Name(headerText);
                     isNewDetail = true;
                 }
+                if (Util.isEmpty(detail.getZZ_Column_Letter(), true)) {
+                    String colLetter = toExcelColumnLetter(headerCell.getColumnIndex());
+                    detail.setZZ_Column_Letter(colLetter);
+                }
+
 
                 // Try to guess reference table name from header
                 Integer adTableId = findReferenceTableIdForHeader(headerText);
-                if (adTableId != null && adTableId > 0) {
+                if (adTableId != null && adTableId > 0 && detail.getAD_Table_ID() <= 0) {
                     detail.setAD_Table_ID(adTableId);
                     addLog("Header '" + headerText + "' on sheet '" + sheetName
                             + "' mapped to AD_Table_ID=" + adTableId);
@@ -325,5 +330,26 @@ public class PopulateLookupMappingFromTemplate extends SvrProcess {
         // Fallback if nothing matched
         return 0;
     }
+    
+    /**
+     * Convert zero-based column index to Excel column letters.
+     * 0  -> A
+     * 25 -> Z
+     * 26 -> AA
+     * 27 -> AB
+     * 55 -> BC
+     */
+    private String toExcelColumnLetter(int columnIndex) {
+        StringBuilder column = new StringBuilder();
+        int index = columnIndex;
+
+        while (index >= 0) {
+            column.insert(0, (char) ('A' + (index % 26)));
+            index = (index / 26) - 1;
+        }
+
+        return column.toString();
+    }
+
 
 }
