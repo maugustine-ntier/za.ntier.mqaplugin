@@ -157,19 +157,24 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
         // Safe values (no nulls)
         String contactName = getContactName() != null ? getContactName() : "";
         String orgName     = getZZ_Organisation_Name() != null ? getZZ_Organisation_Name() : "";
-        String sdlNo       = getZZ_SDL_No() != null ? getZZ_SDL_No() : "";
+        //String sdlNo       = getZZ_SDL_No() != null ? getZZ_SDL_No() : "";
+        String searchKey = getValue() != null ? getValue() : "";
 
         // Replace tokens
         message = message.replace("@ContactName@", contactName)
                       .replace("@OrganisationName@", orgName)
-                      .replace("@SDLNo@", sdlNo);
+                      .replace("@SearchKey@", searchKey);
+                     // .replace("@SDLNo@", sdlNo);
 
         // -------------------------------
         // NEW: Dynamic email subject
         // -------------------------------
-        String subject = "Temporary Registration Complete: @OrganisationName@ - SDL No: @SDLNo@";
-        subject = subject.replace("@OrganisationName@", getZZ_Organisation_Name())
-                         .replace("@SDLNo@", getZZ_SDL_No());
+        String subject = "Temporary Registration Complete: @OrganisationName@ - Reference: @SearchKey@";
+        subject = subject.replace("@OrganisationName@", orgName)
+                         .replace("@SearchKey@", searchKey);
+        //String subject = "Temporary Registration Complete: @OrganisationName@ - SDL No: @SDLNo@";
+        //subject = subject.replace("@OrganisationName@", getZZ_Organisation_Name())
+        //                 .replace("@SDLNo@", getZZ_SDL_No());
 
         // Send email
         boolean sent = client.sendEMail(to, subject, message, null, true);
