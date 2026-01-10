@@ -73,8 +73,8 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 
 
 			IWspAtrSheetImporter importer = isColumns
-					? new ColumnModeSheetImporter(refService)
-							: new RowModeSheetImporter(refService);
+					? new ColumnModeSheetImporter(refService,this)
+							: new RowModeSheetImporter(refService,this);
 
 			int count = importer.importData(ctx, wb, submitted, mapHeader, trxName, this, formatter);
 			totalImported += count;

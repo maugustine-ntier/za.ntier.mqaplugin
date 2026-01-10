@@ -19,8 +19,8 @@ public class RowModeSheetImporter extends AbstractMappingSheetImporter {
     // Default to column B if ZZ_Column_Letter is empty
     private static final String DEFAULT_VALUE_COLUMN_LETTER = "B";
 
-    public RowModeSheetImporter(ReferenceLookupService refService) {
-        super(refService);
+    public RowModeSheetImporter(ReferenceLookupService refService,SvrProcess svrProcess) {
+        super(refService,svrProcess);
     }
 
     @Override

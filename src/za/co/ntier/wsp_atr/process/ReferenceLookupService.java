@@ -33,7 +33,8 @@ public class ReferenceLookupService {
 
         text = text.trim();
         int displayType = column.getAD_Reference_ID();
-        if (displayType != DisplayType.Table && displayType != DisplayType.TableDir) {
+        if (displayType != DisplayType.Table && displayType != DisplayType.TableDir &&
+        		displayType != DisplayType.Search) {
             throw new AdempiereException("Column " + column.getColumnName()
                     + " is not a Table/TableDir reference (AD_Reference_ID="
                     + displayType + ")");

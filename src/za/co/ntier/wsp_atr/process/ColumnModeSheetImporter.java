@@ -39,8 +39,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
     // Data usually starts at row 7 (Excel 1-based) => index 6 (0-based)
     private static final int DEFAULT_DATA_START_ROW = 6;
 
-    public ColumnModeSheetImporter(ReferenceLookupService refService) {
-        super(refService);
+    public ColumnModeSheetImporter(ReferenceLookupService refService,SvrProcess svrProcess) {
+        super(refService,svrProcess);
     }
 
     @Override
@@ -199,7 +199,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
         // If not a reference or we don't want to create, just delegate to existing method
         if (displayType != DisplayType.Table
-                && displayType != DisplayType.TableDir) {
+                && displayType != DisplayType.TableDir
+                && displayType != DisplayType.Search) {
             // normal numeric/string handling, including references handled by old logic
             setValueFromText(ctx, po, column, text, useValueForRef, trxName);
             return;

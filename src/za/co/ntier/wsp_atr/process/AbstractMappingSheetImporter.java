@@ -4,11 +4,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.compiere.model.MColumn;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.process.SvrProcess;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
@@ -20,9 +26,11 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImporter {
 
     protected final ReferenceLookupService refService;
+    protected final SvrProcess svrProcess;
 
-    protected AbstractMappingSheetImporter(ReferenceLookupService refService) {
+    protected AbstractMappingSheetImporter(ReferenceLookupService refService,SvrProcess svrProcess) {
         this.refService = refService;
+        this.svrProcess = svrProcess;
     }
 
     // ---------- common helpers ----------
@@ -33,6 +41,7 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
         if (sheet == null) {
             throw new org.adempiere.exceptions.AdempiereException(
                     "Sheet '" + sheetName + "' not found in workbook");
+            
         }
         return sheet;
     }
@@ -146,12 +155,17 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
         if (DisplayType.isNumeric(displayType)) {
             BigDecimal bd = parseBigDecimal(text);
             po.set_ValueOfColumn(colName, bd);
-        } else if (displayType == DisplayType.Table || displayType == DisplayType.TableDir) {
+        } else if (displayType == DisplayType.Table || displayType == DisplayType.TableDir
+        		|| displayType == DisplayType.Search) {
             Integer id = refService.lookupReferenceId(ctx, column, text, useValueForRef, trxName);
             if (id == null) {
-                throw new org.adempiere.exceptions.AdempiereException(
-                        "No reference record found for text '" + text
+               // throw new org.adempiere.exceptions.AdempiereException(
+                //        "No reference record found for text '" + text
+                 //               + "' in column " + colName);
+                svrProcess.addLog(po.get_TableName() + " - No reference record found for text '" + text
                                 + "' in column " + colName);
+                return;
+                
             }
             po.set_ValueOfColumn(colName, id);
         } else {
