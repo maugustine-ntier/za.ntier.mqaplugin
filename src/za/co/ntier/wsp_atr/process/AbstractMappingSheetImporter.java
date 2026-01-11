@@ -86,9 +86,16 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
     protected String getCellText(Row row, int colIndex, DataFormatter formatter) {
         if (row == null)
             return "";
+
         Cell cell = row.getCell(colIndex);
         if (cell == null)
             return "";
+
+        // Explicitly ignore formulas
+        if (cell.getCellType() == CellType.FORMULA) {
+            return "";
+        }
+
         try {
             return formatter.formatCellValue(cell).trim();
         } catch (Exception e) {
@@ -103,6 +110,7 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
             return "";
         }
     }
+
 
     protected BigDecimal parseBigDecimal(String txt) {
         if (Util.isEmpty(txt, true))

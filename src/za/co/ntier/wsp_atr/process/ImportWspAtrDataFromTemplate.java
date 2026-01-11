@@ -66,9 +66,9 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 			if (mapHeader.getAD_Table_ID() <= 0) {
 				continue;
 			}
-			if (mapHeader.getZZ_WSP_ATR_Lookup_Mapping_ID() != 1000007) {
-				continue;
-			}
+			//if (mapHeader.getZZ_WSP_ATR_Lookup_Mapping_ID() != 1000007) {
+			//	continue;
+			//}
 			boolean isColumns = mapHeader.get_ValueAsBoolean("ZZ_Is_Columns");  // Y=column mode, N=row mode
 
 

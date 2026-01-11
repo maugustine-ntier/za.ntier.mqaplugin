@@ -147,7 +147,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
                 boolean isRefColumn =
                         meta.column.getAD_Reference_ID() == DisplayType.Table
-                        || meta.column.getAD_Reference_ID() == DisplayType.TableDir;
+                        || meta.column.getAD_Reference_ID() == DisplayType.TableDir
+                        || meta.column.getAD_Reference_ID() == DisplayType.Search;
 
                 if (meta.createIfNotExist && isRefColumn) {
                     if (meta.valueColumnIndex != null) {
@@ -165,9 +166,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
                     setValueFromText(ctx,
                             line,
-                            meta.column,
+                            meta,
                             mainText,
-                            meta.useValueForRef,
                             true,
                             valueText,
                             nameText,
@@ -238,15 +238,17 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
      *      * if not found, creates it (using refValue/refName/mainText)
      *      * then sets the FK on the PO
      */
+   
     protected void setValueFromText(Properties ctx,
                                     PO po,
-                                    MColumn column,
+                                    ColumnMeta meta,
                                     String text,
-                                    boolean useValueForRef,
                                     boolean createIfNotExist,
                                     String refValue,
                                     String refName,
                                     String trxName) {
+    	MColumn column = meta.column;
+    	boolean useValueForRef = meta.useValueForRef;
 
         int displayType = column.getAD_Reference_ID();
 
@@ -347,6 +349,18 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
         if (valueToUse == null && nameToUse == null && mainText == null) {
             throw new AdempiereException("Cannot create reference record; no Value/Name/main text provided");
         }
+        
+     // Enforce: if a Name column is configured, it must have a value to create
+        if (meta.nameColumnIndex != null && Util.isEmpty(nameText, true)) {
+            // Do NOT create reference record. Just log and skip setting this field.
+            if (svrProcess != null) { // if you have access to the process instance
+                svrProcess.addLog("Skipping create in " + refTableName
+                        + " for column " + column.getColumnName()
+                        + " - Name column is configured but empty. Sheet value='" + (mainText != null ? mainText : "") + "'");
+            }
+            return;
+        }
+
 
         PO refPO = refTable.getPO(0, trxName);
         if (refPO == null) {
@@ -354,7 +368,7 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
         }
 
         // Ensure we always have *something* for Name
-        if (nameToUse == null) {
+        if (nameToUse == null && meta.nameColumnIndex == null) {
             if (valueToUse != null) {
                 nameToUse = valueToUse;
             } else if (mainText != null) {
