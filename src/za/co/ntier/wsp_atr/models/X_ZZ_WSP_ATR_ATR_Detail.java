@@ -21,11 +21,11 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 
-/** Generated Model for ZZ_WSP_ATR_Biodata_Detail
+/** Generated Model for ZZ_WSP_ATR_ATR_Detail
  *  @author iDempiere (generated)
  *  @version Release 12 - $Id$ */
-@org.adempiere.base.Model(table="ZZ_WSP_ATR_Biodata_Detail")
-public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biodata_Detail, I_Persistent
+@org.adempiere.base.Model(table="ZZ_WSP_ATR_ATR_Detail")
+public class X_ZZ_WSP_ATR_ATR_Detail extends PO implements I_ZZ_WSP_ATR_ATR_Detail, I_Persistent
 {
 
 	/**
@@ -34,47 +34,47 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 	private static final long serialVersionUID = 20260111L;
 
     /** Standard Constructor */
-    public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, int ZZ_WSP_ATR_Biodata_Detail_ID, String trxName)
+    public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, int ZZ_WSP_ATR_ATR_Detail_ID, String trxName)
     {
-      super (ctx, ZZ_WSP_ATR_Biodata_Detail_ID, trxName);
-      /** if (ZZ_WSP_ATR_Biodata_Detail_ID == 0)
+      super (ctx, ZZ_WSP_ATR_ATR_Detail_ID, trxName);
+      /** if (ZZ_WSP_ATR_ATR_Detail_ID == 0)
         {
-			setZZ_WSP_ATR_Biodata_Detail_ID (0);
+			setZZ_WSP_ATR_ATR_Detail_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, int ZZ_WSP_ATR_Biodata_Detail_ID, String trxName, String ... virtualColumns)
+    public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, int ZZ_WSP_ATR_ATR_Detail_ID, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_WSP_ATR_Biodata_Detail_ID, trxName, virtualColumns);
-      /** if (ZZ_WSP_ATR_Biodata_Detail_ID == 0)
+      super (ctx, ZZ_WSP_ATR_ATR_Detail_ID, trxName, virtualColumns);
+      /** if (ZZ_WSP_ATR_ATR_Detail_ID == 0)
         {
-			setZZ_WSP_ATR_Biodata_Detail_ID (0);
+			setZZ_WSP_ATR_ATR_Detail_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, String ZZ_WSP_ATR_Biodata_Detail_UU, String trxName)
+    public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, String ZZ_WSP_ATR_ATR_Detail_UU, String trxName)
     {
-      super (ctx, ZZ_WSP_ATR_Biodata_Detail_UU, trxName);
-      /** if (ZZ_WSP_ATR_Biodata_Detail_UU == null)
+      super (ctx, ZZ_WSP_ATR_ATR_Detail_UU, trxName);
+      /** if (ZZ_WSP_ATR_ATR_Detail_UU == null)
         {
-			setZZ_WSP_ATR_Biodata_Detail_ID (0);
+			setZZ_WSP_ATR_ATR_Detail_ID (0);
         } */
     }
 
     /** Standard Constructor */
-    public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, String ZZ_WSP_ATR_Biodata_Detail_UU, String trxName, String ... virtualColumns)
+    public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, String ZZ_WSP_ATR_ATR_Detail_UU, String trxName, String ... virtualColumns)
     {
-      super (ctx, ZZ_WSP_ATR_Biodata_Detail_UU, trxName, virtualColumns);
-      /** if (ZZ_WSP_ATR_Biodata_Detail_UU == null)
+      super (ctx, ZZ_WSP_ATR_ATR_Detail_UU, trxName, virtualColumns);
+      /** if (ZZ_WSP_ATR_ATR_Detail_UU == null)
         {
-			setZZ_WSP_ATR_Biodata_Detail_ID (0);
+			setZZ_WSP_ATR_ATR_Detail_ID (0);
         } */
     }
 
     /** Load Constructor */
-    public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, ResultSet rs, String trxName)
+    public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, ResultSet rs, String trxName)
     {
       super (ctx, rs, trxName);
     }
@@ -96,7 +96,7 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 
     public String toString()
     {
-      StringBuilder sb = new StringBuilder ("X_ZZ_WSP_ATR_Biodata_Detail[")
+      StringBuilder sb = new StringBuilder ("X_ZZ_WSP_ATR_ATR_Detail[")
         .append(get_ID()).append("]");
       return sb.toString();
     }
@@ -119,41 +119,41 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 		return ii.intValue();
 	}
 
-	/** Set WSP/ATR Biodata Detail.
-		@param ZZ_WSP_ATR_Biodata_Detail_ID WSP/ATR Biodata Detail
+	/** Set WSP/ATR ATR Detail.
+		@param ZZ_WSP_ATR_ATR_Detail_ID WSP/ATR ATR Detail
 	*/
-	public void setZZ_WSP_ATR_Biodata_Detail_ID (int ZZ_WSP_ATR_Biodata_Detail_ID)
+	public void setZZ_WSP_ATR_ATR_Detail_ID (int ZZ_WSP_ATR_ATR_Detail_ID)
 	{
-		if (ZZ_WSP_ATR_Biodata_Detail_ID < 1)
-			set_ValueNoCheck (COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_ID, null);
+		if (ZZ_WSP_ATR_ATR_Detail_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_ID, null);
 		else
-			set_ValueNoCheck (COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_ID, Integer.valueOf(ZZ_WSP_ATR_Biodata_Detail_ID));
+			set_ValueNoCheck (COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_ID, Integer.valueOf(ZZ_WSP_ATR_ATR_Detail_ID));
 	}
 
-	/** Get WSP/ATR Biodata Detail.
-		@return WSP/ATR Biodata Detail
+	/** Get WSP/ATR ATR Detail.
+		@return WSP/ATR ATR Detail
 	  */
-	public int getZZ_WSP_ATR_Biodata_Detail_ID()
+	public int getZZ_WSP_ATR_ATR_Detail_ID()
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
-	/** Set ZZ_WSP_ATR_Biodata_Detail_UU.
-		@param ZZ_WSP_ATR_Biodata_Detail_UU ZZ_WSP_ATR_Biodata_Detail_UU
+	/** Set ZZ_WSP_ATR_ATR_Detail_UU.
+		@param ZZ_WSP_ATR_ATR_Detail_UU ZZ_WSP_ATR_ATR_Detail_UU
 	*/
-	public void setZZ_WSP_ATR_Biodata_Detail_UU (String ZZ_WSP_ATR_Biodata_Detail_UU)
+	public void setZZ_WSP_ATR_ATR_Detail_UU (String ZZ_WSP_ATR_ATR_Detail_UU)
 	{
-		set_Value (COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_UU, ZZ_WSP_ATR_Biodata_Detail_UU);
+		set_Value (COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_UU, ZZ_WSP_ATR_ATR_Detail_UU);
 	}
 
-	/** Get ZZ_WSP_ATR_Biodata_Detail_UU.
-		@return ZZ_WSP_ATR_Biodata_Detail_UU	  */
-	public String getZZ_WSP_ATR_Biodata_Detail_UU()
+	/** Get ZZ_WSP_ATR_ATR_Detail_UU.
+		@return ZZ_WSP_ATR_ATR_Detail_UU	  */
+	public String getZZ_WSP_ATR_ATR_Detail_UU()
 	{
-		return (String)get_Value(COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_UU);
+		return (String)get_Value(COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_UU);
 	}
 
 	public I_ZZ_WSP_ATR_Submitted getZZ_WSP_ATR_Submitted() throws RuntimeException

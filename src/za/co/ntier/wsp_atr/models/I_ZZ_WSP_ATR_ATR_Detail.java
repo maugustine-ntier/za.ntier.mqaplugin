@@ -21,18 +21,18 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_WSP_ATR_Biodata_Detail
+/** Generated Interface for ZZ_WSP_ATR_ATR_Detail
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_WSP_ATR_Biodata_Detail 
+public interface I_ZZ_WSP_ATR_ATR_Detail 
 {
 
-    /** TableName=ZZ_WSP_ATR_Biodata_Detail */
-    public static final String Table_Name = "ZZ_WSP_ATR_Biodata_Detail";
+    /** TableName=ZZ_WSP_ATR_ATR_Detail */
+    public static final String Table_Name = "ZZ_WSP_ATR_ATR_Detail";
 
-    /** AD_Table_ID=1000164 */
+    /** AD_Table_ID=1000166 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -118,27 +118,27 @@ public interface I_ZZ_WSP_ATR_Biodata_Detail
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_WSP_ATR_Biodata_Detail_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_ID = "ZZ_WSP_ATR_Biodata_Detail_ID";
+    /** Column name ZZ_WSP_ATR_ATR_Detail_ID */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_ID = "ZZ_WSP_ATR_ATR_Detail_ID";
 
-	/** Set WSP/ATR Biodata Detail.
-	  * WSP/ATR Biodata Detail
+	/** Set WSP/ATR ATR Detail.
+	  * WSP/ATR ATR Detail
 	  */
-	public void setZZ_WSP_ATR_Biodata_Detail_ID (int ZZ_WSP_ATR_Biodata_Detail_ID);
+	public void setZZ_WSP_ATR_ATR_Detail_ID (int ZZ_WSP_ATR_ATR_Detail_ID);
 
-	/** Get WSP/ATR Biodata Detail.
-	  * WSP/ATR Biodata Detail
+	/** Get WSP/ATR ATR Detail.
+	  * WSP/ATR ATR Detail
 	  */
-	public int getZZ_WSP_ATR_Biodata_Detail_ID();
+	public int getZZ_WSP_ATR_ATR_Detail_ID();
 
-    /** Column name ZZ_WSP_ATR_Biodata_Detail_UU */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Biodata_Detail_UU = "ZZ_WSP_ATR_Biodata_Detail_UU";
+    /** Column name ZZ_WSP_ATR_ATR_Detail_UU */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_ATR_Detail_UU = "ZZ_WSP_ATR_ATR_Detail_UU";
 
-	/** Set ZZ_WSP_ATR_Biodata_Detail_UU	  */
-	public void setZZ_WSP_ATR_Biodata_Detail_UU (String ZZ_WSP_ATR_Biodata_Detail_UU);
+	/** Set ZZ_WSP_ATR_ATR_Detail_UU	  */
+	public void setZZ_WSP_ATR_ATR_Detail_UU (String ZZ_WSP_ATR_ATR_Detail_UU);
 
-	/** Get ZZ_WSP_ATR_Biodata_Detail_UU	  */
-	public String getZZ_WSP_ATR_Biodata_Detail_UU();
+	/** Get ZZ_WSP_ATR_ATR_Detail_UU	  */
+	public String getZZ_WSP_ATR_ATR_Detail_UU();
 
     /** Column name ZZ_WSP_ATR_Submitted_ID */
     public static final String COLUMNNAME_ZZ_WSP_ATR_Submitted_ID = "ZZ_WSP_ATR_Submitted_ID";

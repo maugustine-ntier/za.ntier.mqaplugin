@@ -1,5 +1,6 @@
 package za.co.ntier.wsp_atr.process;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.compiere.model.MTable;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Util;
 
@@ -38,6 +40,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
     // Data usually starts at row 7 (Excel 1-based) => index 6 (0-based)
     private static final int DEFAULT_DATA_START_ROW = 6;
+    private static final int DEFAULT_COMMIT_EVERY = 1000; // change as you like
+
 
     public ColumnModeSheetImporter(ReferenceLookupService refService,SvrProcess svrProcess) {
         super(refService,svrProcess);
@@ -50,16 +54,18 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
                           X_ZZ_WSP_ATR_Lookup_Mapping mappingHeader,
                           String trxName,
                           SvrProcess process,
-                          DataFormatter formatter) {
+                          DataFormatter formatter) throws IllegalStateException, SQLException {
 
         Sheet sheet = getSheetOrThrow(wb, mappingHeader);
         List<X_ZZ_WSP_ATR_Lookup_Mapping_Detail> details =
                 loadDetails(mappingHeader, trxName);
 
         if (details == null || details.isEmpty()) {
-            // No mappings for this tab = nothing to import
             return 0;
         }
+
+        // Commit strategy
+        final int commitEvery = DEFAULT_COMMIT_EVERY;
 
         // Precompute: columnIndex -> ColumnMeta
         Map<Integer, ColumnMeta> colIndexToMeta = new HashMap<>();
@@ -87,8 +93,6 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
             meta.column = column;
 
             meta.useValueForRef = det.isZZ_Use_Value();
-
-            // create-if-missing flags + value/name columns
             meta.createIfNotExist = det.isZZ_Create_If_Not_Exists();
 
             String valueColLetter = det.getZZ_Value_Column_Letter();
@@ -107,6 +111,9 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
         int lastRow = sheet.getLastRowNum();
         int imported = 0;
 
+        // Determine target table name once (needed for restartable check)
+        String targetTableName = getTargetTableNameOrThrow(ctx, mappingHeader);
+
         for (int r = DEFAULT_DATA_START_ROW; r <= lastRow; r++) {
             Row row = sheet.getRow(r);
             if (row == null)
@@ -115,7 +122,20 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
             if (isRowEmptyByMappedColumns(row, colIndexToMeta.keySet(), formatter))
                 continue;
 
+            // Excel-style row number (1-based). Change to (r) if you want 0-based.
+            int sheetRowNo = r + 1;
+
+            // Restartable: if a line already exists for this Submitted + Row_No, skip
+            if (rowAlreadyImported(ctx, targetTableName, submitted.get_ID(), sheetRowNo, trxName)) {
+                continue;
+            }
+
             PO line = newTargetPO(ctx, submitted, mappingHeader, trxName);
+
+            // Populate Row_No if the target table has it
+            if (line.get_ColumnIndex("Row_No") >= 0) {
+                line.set_ValueOfColumn("Row_No", sheetRowNo);
+            }
 
             for (Map.Entry<Integer, ColumnMeta> entry : colIndexToMeta.entrySet()) {
                 ColumnMeta meta = entry.getValue();
@@ -126,8 +146,8 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
                 String nameText  = null;
 
                 boolean isRefColumn =
-                        meta.column.getAD_Reference_ID() == org.compiere.util.DisplayType.Table
-                        || meta.column.getAD_Reference_ID() == org.compiere.util.DisplayType.TableDir;
+                        meta.column.getAD_Reference_ID() == DisplayType.Table
+                        || meta.column.getAD_Reference_ID() == DisplayType.TableDir;
 
                 if (meta.createIfNotExist && isRefColumn) {
                     if (meta.valueColumnIndex != null) {
@@ -137,26 +157,23 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
                         nameText = getCellText(row, meta.nameColumnIndex, formatter);
                     }
 
-                    // If absolutely nothing in any of the three, skip this field
                     if (Util.isEmpty(mainText, true)
                             && Util.isEmpty(valueText, true)
                             && Util.isEmpty(nameText, true)) {
                         continue;
                     }
 
-                    // Extended version: can create reference records if missing
                     setValueFromText(ctx,
                             line,
                             meta.column,
                             mainText,
                             meta.useValueForRef,
-                            true,        // createIfNotExist
+                            true,
                             valueText,
                             nameText,
                             trxName);
 
                 } else {
-                    // Normal behaviour: just use mainText
                     if (Util.isEmpty(mainText, true))
                         continue;
 
@@ -171,12 +188,48 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
             line.saveEx();
             imported++;
+
+            // Commit in batches to avoid huge transactions
+            if (commitEvery > 0 && (imported % commitEvery) == 0) {
+                DB.commit(true, trxName);
+                process.addLog("Committed after " + imported + " inserts (tab " + mappingHeader.getZZ_Tab_Name() + ")");
+            }
         }
+
+        // Final commit at end (safe)
+        DB.commit(true,trxName);
 
         process.addLog("Imported " + imported + " rows from tab " + mappingHeader.getZZ_Tab_Name());
         return imported;
     }
-    
+
+    private String getTargetTableNameOrThrow(Properties ctx, X_ZZ_WSP_ATR_Lookup_Mapping mappingHeader) {
+        int adTableId = mappingHeader.getAD_Table_ID(); // assumes your header has AD_Table_ID
+        if (adTableId <= 0) {
+            throw new AdempiereException("Mapping header " + mappingHeader.get_ID() + " has no AD_Table_ID set");
+        }
+        MTable t = MTable.get(ctx, adTableId);
+        if (t == null || t.getAD_Table_ID() <= 0) {
+            throw new AdempiereException("Target AD_Table_ID " + adTableId + " not found");
+        }
+        return t.getTableName();
+    }
+
+    /**
+     * Restartable check: row already imported if a record exists for:
+     *   Submitted_ID + Row_No
+     */
+    private boolean rowAlreadyImported(Properties ctx, String tableName, int submittedId, int rowNo, String trxName) {
+        // Assumes both columns exist on the target table:
+        //   ZZ_WSP_ATR_Submitted_ID
+        //   Row_No
+        String where = "ZZ_WSP_ATR_Submitted_ID=? AND Row_No=?";
+        int existingId = new Query(ctx, tableName, where, trxName)
+                .setParameters(submittedId, rowNo)
+                .firstId();
+        return existingId > 0;
+    }
+
     /**
      * Extended version:
      *  - If NOT a Table/TableDir, or createIfNotExist=false, just delegates to the old method.
