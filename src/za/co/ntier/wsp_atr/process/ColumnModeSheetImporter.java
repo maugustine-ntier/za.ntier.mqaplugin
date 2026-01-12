@@ -39,7 +39,7 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 
     // Data usually starts at row 7 (Excel 1-based) => index 6 (0-based)
-    private static final int DEFAULT_DATA_START_ROW = 6;
+    private static final int DEFAULT_DATA_START_ROW = 4;
     private static final int DEFAULT_COMMIT_EVERY = 1000; // change as you like
 
 
