@@ -13,6 +13,10 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
 
     // Replace with the actual UU of your mail template
     private static final String TEMP_ORG_MAILTEXT_UU = "4ace9d73-8349-44a6-8d2d-5a0838c79362";
+    public static final String COLUMNNAME_ZZ_DocStatus = "ZZ_DocStatus";
+    public static final String DOCSTATUS_Completed = "CO";
+
+
 
     public MZZSDR_Temp_Org(Properties ctx, int ZZ_SDR_Temp_Org_ID, String trxName) {
         super(ctx, ZZ_SDR_Temp_Org_ID, trxName);
@@ -53,28 +57,42 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
     }
 
     @Override
-    protected boolean afterSave(boolean newRecord, boolean success) {
+    protected boolean afterSave(boolean newRecord, boolean success)
+    {
         if (!success)
             return false;
 
-        if (newRecord) {
-            // 1) Create Business Partner and Contact
+        String newStatus = (String) get_Value("ZZ_DocStatus");
+        String oldStatus = (String) get_ValueOld("ZZ_DocStatus");
+
+        // Run only when status changes to CO
+        if ("CO".equals(newStatus) && !"CO".equals(oldStatus))
+        {
+            int existingBP = get_ValueAsInt("C_BPartner_ID");
+            if (existingBP > 0)
+            {
+                log.info("BP already exists: " + existingBP);
+                return true;
+            }
+
             int bpID = createBusinessPartner();
-            if (bpID <= 0) {
-                log.severe("Failed to create Business Partner for ZZ_SDR_Temp_Org_ID=" + getZZ_SDR_Temp_Org_ID());
+            if (bpID <= 0)
+            {
+                log.severe("Failed to create BP");
                 return false;
             }
 
-            // Store BP ID without triggering another save
-            set_ValueNoCheck("C_BPartner_ID", bpID);
+            set_ValueOfColumn("C_BPartner_ID", bpID);
+            saveEx();
 
-            // 2) Send confirmation email
             MClient client = MClient.get(getCtx());
             sendTempOrgEmail(client, bpID);
         }
 
         return true;
     }
+
+
 
     /**
      * Creates Business Partner and Contact for this Temp Org
@@ -118,6 +136,7 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
 
     /**
      * Sends email to the contact after temporary organisation registration
+     * 
      */
     private void sendTempOrgEmail(MClient client, int bpID) {
 
