@@ -62,31 +62,37 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
         if (!success)
             return false;
 
-        String newStatus = (String) get_Value("ZZ_DocStatus");
-        String oldStatus = (String) get_ValueOld("ZZ_DocStatus");
-
-        // Run only when status changes to CO
-        if ("CO".equals(newStatus) && !"CO".equals(oldStatus))
+        if (is_ValueChanged(COLUMNNAME_ZZ_DocStatus)
+                && DOCSTATUS_Completed.equals(getZZ_DocStatus()))
         {
-            int existingBP = get_ValueAsInt("C_BPartner_ID");
-            if (existingBP > 0)
+            Object oldStatus = get_ValueOld(COLUMNNAME_ZZ_DocStatus);
+
+            if (oldStatus == null || !DOCSTATUS_Completed.equals(oldStatus))
             {
-                log.info("BP already exists: " + existingBP);
-                return true;
+                // Safety: prevent duplicate BP creation
+                if (getC_BPartner_ID() > 0)
+                {
+                    log.info("Business Partner already created: " + getC_BPartner_ID());
+                    return true;
+                }
+
+                // 1) Create BP + Contact
+                int bpID = createBusinessPartner();
+                if (bpID <= 0)
+                {
+                    log.severe("Failed to create BP for ZZ_SDR_Temp_Org_ID="
+                            + getZZ_SDR_Temp_Org_ID());
+                    return false;
+                }
+
+                // 2) Persist BP ID
+                setC_BPartner_ID(bpID);
+                saveEx();
+
+                // 3) Send confirmation email
+                MClient client = MClient.get(getCtx());
+                sendTempOrgEmail(client, bpID);
             }
-
-            int bpID = createBusinessPartner();
-            if (bpID <= 0)
-            {
-                log.severe("Failed to create BP");
-                return false;
-            }
-
-            set_ValueOfColumn("C_BPartner_ID", bpID);
-            saveEx();
-
-            MClient client = MClient.get(getCtx());
-            sendTempOrgEmail(client, bpID);
         }
 
         return true;

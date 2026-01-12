@@ -31,7 +31,7 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251203L;
+	private static final long serialVersionUID = 20260112L;
 
     /** Standard Constructor */
     public X_ZZ_SDR_Temp_Org (Properties ctx, int ZZ_SDR_Temp_Org_ID, String trxName)
@@ -40,6 +40,8 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
       /** if (ZZ_SDR_Temp_Org_ID == 0)
         {
 			setName (null);
+			setZZ_DocStatus (null);
+// DR
 			setZZ_SDR_Temp_Org_ID (0);
         } */
     }
@@ -51,6 +53,8 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
       /** if (ZZ_SDR_Temp_Org_ID == 0)
         {
 			setName (null);
+			setZZ_DocStatus (null);
+// DR
 			setZZ_SDR_Temp_Org_ID (0);
         } */
     }
@@ -62,6 +66,8 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
       /** if (ZZ_SDR_Temp_Org_UU == null)
         {
 			setName (null);
+			setZZ_DocStatus (null);
+// DR
 			setZZ_SDR_Temp_Org_ID (0);
         } */
     }
@@ -73,6 +79,8 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
       /** if (ZZ_SDR_Temp_Org_UU == null)
         {
 			setName (null);
+			setZZ_DocStatus (null);
+// DR
 			setZZ_SDR_Temp_Org_ID (0);
         } */
     }
@@ -104,6 +112,34 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
         .append(get_ID()).append(",Name=").append(getName()).append("]");
       return sb.toString();
     }
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_ID)
+			.getPO(getC_BPartner_ID(), get_TrxName());
+	}
+
+	/** Set Business Partner.
+		@param C_BPartner_ID Identifies a Business Partner
+	*/
+	public void setC_BPartner_ID (int C_BPartner_ID)
+	{
+		if (C_BPartner_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+	}
+
+	/** Get Business Partner.
+		@return Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	/** Set Cellphonenumber.
 		@param Cellphonenumber Cellphonenumber
@@ -214,6 +250,78 @@ public class X_ZZ_SDR_Temp_Org extends PO implements I_ZZ_SDR_Temp_Org, I_Persis
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
+	}
+
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
+	/** Approved = AP */
+	public static final String ZZ_DOCSTATUS_Approved = "AP";
+	/** Completed = CO */
+	public static final String ZZ_DOCSTATUS_Completed = "CO";
+	/** Draft = DR */
+	public static final String ZZ_DOCSTATUS_Draft = "DR";
+	/** In Progress = IP */
+	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCEO = "N5";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_DOCSTATUS_NotApprovedByITManager = "NI";
+	/** Not Approved by LM = NL */
+	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	/** Not Recommended = NR */
+	public static final String ZZ_DOCSTATUS_NotRecommended = "NR";
+	/** Not Approved by Snr Admin Finance = NS */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Pending = PE */
+	public static final String ZZ_DOCSTATUS_Pending = "PE";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_DOCSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCFO = "R3";
+	/** Recommended = RC */
+	public static final String ZZ_DOCSTATUS_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ZZ_DOCSTATUS_RecommendedBySeniorMgrSDR = "RD";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_DOCSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_DOCSTATUS_SubmittedToITAdmin = "ST";
+	/** Submitted = SU */
+	public static final String ZZ_DOCSTATUS_Submitted = "SU";
+	/** Set Document Status.
+		@param ZZ_DocStatus Document Status
+	*/
+	public void setZZ_DocStatus (String ZZ_DocStatus)
+	{
+
+		set_Value (COLUMNNAME_ZZ_DocStatus, ZZ_DocStatus);
+	}
+
+	/** Get Document Status.
+		@return Document Status	  */
+	public String getZZ_DocStatus()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
 	}
 
 	/** Set Landline No.

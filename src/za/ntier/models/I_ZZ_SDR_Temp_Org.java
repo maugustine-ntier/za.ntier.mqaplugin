@@ -64,6 +64,21 @@ public interface I_ZZ_SDR_Temp_Org
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner.
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner.
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
+
     /** Column name Cellphonenumber */
     public static final String COLUMNNAME_Cellphonenumber = "Cellphonenumber";
 
@@ -195,6 +210,15 @@ public interface I_ZZ_SDR_Temp_Org
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
+
+    /** Column name ZZ_DocStatus */
+    public static final String COLUMNNAME_ZZ_DocStatus = "ZZ_DocStatus";
+
+	/** Set Document Status	  */
+	public void setZZ_DocStatus (String ZZ_DocStatus);
+
+	/** Get Document Status	  */
+	public String getZZ_DocStatus();
 
     /** Column name ZZ_Landline_No */
     public static final String COLUMNNAME_ZZ_Landline_No = "ZZ_Landline_No";
