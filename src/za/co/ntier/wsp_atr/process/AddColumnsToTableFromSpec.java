@@ -17,6 +17,8 @@ import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
 
+@org.adempiere.base.annotation.Process(
+		name = "za.co.ntier.wsp_atr.process.AddColumnsToTableFromSpec")
 public class AddColumnsToTableFromSpec extends SvrProcess {
 
     @Parameter(name = "AD_Table_ID")
@@ -37,12 +39,12 @@ public class AddColumnsToTableFromSpec extends SvrProcess {
     @Parameter(name = "CreateDBColumns")
     private String createDBColumnsStr; // Y/N, default Y
 
-    private boolean createDBColumns = true;
+    private boolean createDBColumns = false;
 
     @Override
     protected void prepare() {
         if (Util.isEmpty(entityType, true)) entityType = "U";
-        createDBColumns = !"N".equalsIgnoreCase(createDBColumnsStr);
+        //createDBColumns = !"N".equalsIgnoreCase(createDBColumnsStr);
     }
 
     @Override
@@ -134,22 +136,27 @@ public class AddColumnsToTableFromSpec extends SvrProcess {
     }
 
     private List<ColDef> parseSpec(String spec) {
+    	spec = spec.replace(";", " ");
+
         List<ColDef> out = new ArrayList<>();
 
-        // Very tolerant line parser: "Name type ...", ignores commas and COLLATE
-        // examples:
-        //   LPOtherDone nvarchar(500) ... NULL,
-        //   Male int NOT NULL,
-        Pattern p = Pattern.compile("^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s+([^,]+)", Pattern.CASE_INSENSITIVE);
+        // 1) Split into items by commas, but ignore commas inside (...) e.g. varchar(500)
+        List<String> items = splitByCommasOutsideParentheses(spec);
 
-        String[] lines = spec.split("\\r?\\n");
-        for (String line : lines) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            if (line.endsWith(",")) line = line.substring(0, line.length() - 1).trim();
-            if (line.isEmpty()) continue;
+        // 2) Parse each item: <Name> <Type ...> [NULL|NOT NULL]
+        Pattern p = Pattern.compile("^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s+(.+?)\\s*$", Pattern.CASE_INSENSITIVE);
 
-            Matcher m = p.matcher(line);
+        for (String item : items) {
+            String s = item.trim();
+            if (s.isEmpty())
+                continue;
+
+            // strip trailing comma if any (defensive)
+            if (s.endsWith(",")) s = s.substring(0, s.length() - 1).trim();
+            if (s.isEmpty())
+                continue;
+
+            Matcher m = p.matcher(s);
             if (!m.find())
                 continue;
 
@@ -163,19 +170,54 @@ public class AddColumnsToTableFromSpec extends SvrProcess {
 
             d.notNull = restUpper.contains("NOT NULL");
 
-            // detect nvarchar(500) / varchar(500) / char etc
-            if (restUpper.contains("NVARCHAR") || restUpper.contains("VARCHAR") || restUpper.contains("CHAR")) {
+            // Determine type
+            if (restUpper.contains("NVARCHAR") || restUpper.contains("VARCHAR") || restUpper.contains("NCHAR") || restUpper.contains("CHAR")) {
                 d.isString = true;
                 d.length = extractLength(restUpper, 500);
             } else {
+                // Treat everything else like int/numeric for your use case
                 d.isString = false;
                 d.length = 0;
             }
 
             out.add(d);
         }
+
         return out;
     }
+
+    /**
+     * Splits a string by commas that are NOT inside parentheses.
+     * Example: "A nvarchar(500), B int" -> ["A nvarchar(500)", "B int"]
+     */
+    private List<String> splitByCommasOutsideParentheses(String input) {
+        List<String> parts = new ArrayList<>();
+        if (input == null) return parts;
+
+        StringBuilder current = new StringBuilder();
+        int depth = 0;
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (c == '(') depth++;
+            if (c == ')' && depth > 0) depth--;
+
+            if (c == ',' && depth == 0) {
+                parts.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+
+        if (current.length() > 0) {
+            parts.add(current.toString());
+        }
+
+        return parts;
+    }
+
 
     private int extractLength(String s, int def) {
         Matcher m = Pattern.compile("\\((\\d+)\\)").matcher(s);
