@@ -31,7 +31,7 @@ public class X_ZZ_Recognition_of_Prior_Learning_Ref extends PO implements I_ZZ_R
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Recognition_of_Prior_Learning_Ref (Properties ctx, int ZZ_Recognition_of_Prior_Learning_Ref_ID, String trxName)

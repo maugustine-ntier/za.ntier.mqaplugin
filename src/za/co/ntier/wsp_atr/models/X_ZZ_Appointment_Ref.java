@@ -31,7 +31,7 @@ public class X_ZZ_Appointment_Ref extends PO implements I_ZZ_Appointment_Ref, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Appointment_Ref (Properties ctx, int ZZ_Appointment_Ref_ID, String trxName)

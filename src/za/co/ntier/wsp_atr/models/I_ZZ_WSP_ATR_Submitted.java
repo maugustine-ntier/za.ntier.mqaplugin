@@ -157,6 +157,15 @@ public interface I_ZZ_WSP_ATR_Submitted
 	  */
 	public int getUpdatedBy();
 
+    /** Column name ZZ_Import_Submitted_Data */
+    public static final String COLUMNNAME_ZZ_Import_Submitted_Data = "ZZ_Import_Submitted_Data";
+
+	/** Set Import Submitted Data	  */
+	public void setZZ_Import_Submitted_Data (String ZZ_Import_Submitted_Data);
+
+	/** Get Import Submitted Data	  */
+	public String getZZ_Import_Submitted_Data();
+
     /** Column name ZZ_WSP_ATR_Submitted_ID */
     public static final String COLUMNNAME_ZZ_WSP_ATR_Submitted_ID = "ZZ_WSP_ATR_Submitted_ID";
 

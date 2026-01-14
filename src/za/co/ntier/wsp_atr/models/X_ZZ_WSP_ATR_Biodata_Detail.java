@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Biodata_Detail extends PO implements I_ZZ_WSP_ATR_Biod
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20260111L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Biodata_Detail (Properties ctx, int ZZ_WSP_ATR_Biodata_Detail_ID, String trxName)

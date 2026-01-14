@@ -31,7 +31,7 @@ public class X_ZZ_Target_Beneficiary_Ref extends PO implements I_ZZ_Target_Benef
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Target_Beneficiary_Ref (Properties ctx, int ZZ_Target_Beneficiary_Ref_ID, String trxName)

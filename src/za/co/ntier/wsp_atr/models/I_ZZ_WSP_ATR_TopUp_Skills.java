@@ -21,25 +21,25 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_WSP_ATR_Lookup_Mapping
+/** Generated Interface for ZZ_WSP_ATR_TopUp_Skills
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_WSP_ATR_Lookup_Mapping 
+public interface I_ZZ_WSP_ATR_TopUp_Skills 
 {
 
-    /** TableName=ZZ_WSP_ATR_Lookup_Mapping */
-    public static final String Table_Name = "ZZ_WSP_ATR_Lookup_Mapping";
+    /** TableName=ZZ_WSP_ATR_TopUp_Skills */
+    public static final String Table_Name = "ZZ_WSP_ATR_TopUp_Skills";
 
-    /** AD_Table_ID=1000148 */
+    /** AD_Table_ID=1000172 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 4 - System 
+    /** AccessLevel = 3 - Client - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(4);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -64,20 +64,18 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name AD_Table_ID */
-    public static final String COLUMNNAME_AD_Table_ID = "AD_Table_ID";
+    /** Column name Comments */
+    public static final String COLUMNNAME_Comments = "Comments";
 
-	/** Set Table.
-	  * Database Table information
+	/** Set Comments.
+	  * Comments or additional information
 	  */
-	public void setAD_Table_ID (int AD_Table_ID);
+	public void setComments (String Comments);
 
-	/** Get Table.
-	  * Database Table information
+	/** Get Comments.
+	  * Comments or additional information
 	  */
-	public int getAD_Table_ID();
-
-	public org.compiere.model.I_AD_Table getAD_Table() throws RuntimeException;
+	public String getComments();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -108,6 +106,15 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public boolean isActive();
 
+    /** Column name Row_No */
+    public static final String COLUMNNAME_Row_No = "Row_No";
+
+	/** Set Row No	  */
+	public void setRow_No (int Row_No);
+
+	/** Get Row No	  */
+	public int getRow_No();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -124,39 +131,58 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Is_Columns */
-    public static final String COLUMNNAME_ZZ_Is_Columns = "ZZ_Is_Columns";
+    /** Column name ZZ_OFO_Specialisation_ID */
+    public static final String COLUMNNAME_ZZ_OFO_Specialisation_ID = "ZZ_OFO_Specialisation_ID";
 
-	/** Set Is Columns	  */
-	public void setZZ_Is_Columns (boolean ZZ_Is_Columns);
+	/** Set Specialisation/Occupation Title	  */
+	public void setZZ_OFO_Specialisation_ID (int ZZ_OFO_Specialisation_ID);
 
-	/** Get Is Columns	  */
-	public boolean isZZ_Is_Columns();
+	/** Get Specialisation/Occupation Title	  */
+	public int getZZ_OFO_Specialisation_ID();
 
-    /** Column name ZZ_Tab_Name */
-    public static final String COLUMNNAME_ZZ_Tab_Name = "ZZ_Tab_Name";
+	public I_ZZ_Occupations_Ref getZZ_OFO_Specialisation() throws RuntimeException;
 
-	/** Set Tab Name	  */
-	public void setZZ_Tab_Name (String ZZ_Tab_Name);
+    /** Column name ZZ_TopUpSkill_ID */
+    public static final String COLUMNNAME_ZZ_TopUpSkill_ID = "ZZ_TopUpSkill_ID";
 
-	/** Get Tab Name	  */
-	public String getZZ_Tab_Name();
+	/** Set Top-up Skills	  */
+	public void setZZ_TopUpSkill_ID (int ZZ_TopUpSkill_ID);
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_ID = "ZZ_WSP_ATR_Lookup_Mapping_ID";
+	/** Get Top-up Skills	  */
+	public int getZZ_TopUpSkill_ID();
 
-	/** Set WSP ATR Lookup Mapping	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_ID (int ZZ_WSP_ATR_Lookup_Mapping_ID);
+	public I_ZZ_Topup_Skills_Ref getZZ_TopUpSkill() throws RuntimeException;
 
-	/** Get WSP ATR Lookup Mapping	  */
-	public int getZZ_WSP_ATR_Lookup_Mapping_ID();
+    /** Column name ZZ_WSP_ATR_Submitted_ID */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_Submitted_ID = "ZZ_WSP_ATR_Submitted_ID";
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_UU */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_UU = "ZZ_WSP_ATR_Lookup_Mapping_UU";
+	/** Set WSP/ATR Submitted File.
+	  * WSP/ATR Submitted File
+	  */
+	public void setZZ_WSP_ATR_Submitted_ID (int ZZ_WSP_ATR_Submitted_ID);
 
-	/** Set ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_UU (String ZZ_WSP_ATR_Lookup_Mapping_UU);
+	/** Get WSP/ATR Submitted File.
+	  * WSP/ATR Submitted File
+	  */
+	public int getZZ_WSP_ATR_Submitted_ID();
 
-	/** Get ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public String getZZ_WSP_ATR_Lookup_Mapping_UU();
+	public I_ZZ_WSP_ATR_Submitted getZZ_WSP_ATR_Submitted() throws RuntimeException;
+
+    /** Column name ZZ_WSP_ATR_TopUp_Skills_ID */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_TopUp_Skills_ID = "ZZ_WSP_ATR_TopUp_Skills_ID";
+
+	/** Set WSP ATR  TopUp Skills	  */
+	public void setZZ_WSP_ATR_TopUp_Skills_ID (int ZZ_WSP_ATR_TopUp_Skills_ID);
+
+	/** Get WSP ATR  TopUp Skills	  */
+	public int getZZ_WSP_ATR_TopUp_Skills_ID();
+
+    /** Column name ZZ_WSP_ATR_TopUp_Skills_UU */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_TopUp_Skills_UU = "ZZ_WSP_ATR_TopUp_Skills_UU";
+
+	/** Set ZZ_WSP_ATR_TopUp_Skills_UU	  */
+	public void setZZ_WSP_ATR_TopUp_Skills_UU (String ZZ_WSP_ATR_TopUp_Skills_UU);
+
+	/** Get ZZ_WSP_ATR_TopUp_Skills_UU	  */
+	public String getZZ_WSP_ATR_TopUp_Skills_UU();
 }

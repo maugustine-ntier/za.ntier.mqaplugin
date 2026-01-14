@@ -31,7 +31,7 @@ public class X_ZZ_Gender_Ref extends PO implements I_ZZ_Gender_Ref, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Gender_Ref (Properties ctx, int ZZ_Gender_Ref_ID, String trxName)

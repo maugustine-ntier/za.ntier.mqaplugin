@@ -21,25 +21,25 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_WSP_ATR_Lookup_Mapping
+/** Generated Interface for ZZ_WSP_Non_Employee_Status_Ref
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_WSP_ATR_Lookup_Mapping 
+public interface I_ZZ_WSP_Non_Employee_Status_Ref 
 {
 
-    /** TableName=ZZ_WSP_ATR_Lookup_Mapping */
-    public static final String Table_Name = "ZZ_WSP_ATR_Lookup_Mapping";
+    /** TableName=ZZ_WSP_Non_Employee_Status_Ref */
+    public static final String Table_Name = "ZZ_WSP_Non_Employee_Status_Ref";
 
-    /** AD_Table_ID=1000148 */
+    /** AD_Table_ID=1000175 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 4 - System 
+    /** AccessLevel = 3 - Client - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(4);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -63,21 +63,6 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
-
-    /** Column name AD_Table_ID */
-    public static final String COLUMNNAME_AD_Table_ID = "AD_Table_ID";
-
-	/** Set Table.
-	  * Database Table information
-	  */
-	public void setAD_Table_ID (int AD_Table_ID);
-
-	/** Get Table.
-	  * Database Table information
-	  */
-	public int getAD_Table_ID();
-
-	public org.compiere.model.I_AD_Table getAD_Table() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -108,6 +93,19 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public boolean isActive();
 
+    /** Column name Name */
+    public static final String COLUMNNAME_Name = "Name";
+
+	/** Set Name.
+	  * Alphanumeric identifier of the entity
+	  */
+	public void setName (String Name);
+
+	/** Get Name.
+	  * Alphanumeric identifier of the entity
+	  */
+	public String getName();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -124,39 +122,38 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Is_Columns */
-    public static final String COLUMNNAME_ZZ_Is_Columns = "ZZ_Is_Columns";
+    /** Column name Value */
+    public static final String COLUMNNAME_Value = "Value";
 
-	/** Set Is Columns	  */
-	public void setZZ_Is_Columns (boolean ZZ_Is_Columns);
+	/** Set Search Key.
+	  * Search key for the record in the format required - must be unique
+	  */
+	public void setValue (String Value);
 
-	/** Get Is Columns	  */
-	public boolean isZZ_Is_Columns();
+	/** Get Search Key.
+	  * Search key for the record in the format required - must be unique
+	  */
+	public String getValue();
 
-    /** Column name ZZ_Tab_Name */
-    public static final String COLUMNNAME_ZZ_Tab_Name = "ZZ_Tab_Name";
+    /** Column name ZZ_WSP_Non_Employee_Status_Ref_ID */
+    public static final String COLUMNNAME_ZZ_WSP_Non_Employee_Status_Ref_ID = "ZZ_WSP_Non_Employee_Status_Ref_ID";
 
-	/** Set Tab Name	  */
-	public void setZZ_Tab_Name (String ZZ_Tab_Name);
+	/** Set ZZ_WSP_Non_Employee_Status_Ref.
+	  * ZZ_WSP_Non_Employee_Status_Ref reference table
+	  */
+	public void setZZ_WSP_Non_Employee_Status_Ref_ID (int ZZ_WSP_Non_Employee_Status_Ref_ID);
 
-	/** Get Tab Name	  */
-	public String getZZ_Tab_Name();
+	/** Get ZZ_WSP_Non_Employee_Status_Ref.
+	  * ZZ_WSP_Non_Employee_Status_Ref reference table
+	  */
+	public int getZZ_WSP_Non_Employee_Status_Ref_ID();
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_ID = "ZZ_WSP_ATR_Lookup_Mapping_ID";
+    /** Column name ZZ_WSP_Non_Employee_Status_Ref_UU */
+    public static final String COLUMNNAME_ZZ_WSP_Non_Employee_Status_Ref_UU = "ZZ_WSP_Non_Employee_Status_Ref_UU";
 
-	/** Set WSP ATR Lookup Mapping	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_ID (int ZZ_WSP_ATR_Lookup_Mapping_ID);
+	/** Set ZZ_WSP_Non_Employee_Status_Ref_UU	  */
+	public void setZZ_WSP_Non_Employee_Status_Ref_UU (String ZZ_WSP_Non_Employee_Status_Ref_UU);
 
-	/** Get WSP ATR Lookup Mapping	  */
-	public int getZZ_WSP_ATR_Lookup_Mapping_ID();
-
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_UU */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_UU = "ZZ_WSP_ATR_Lookup_Mapping_UU";
-
-	/** Set ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_UU (String ZZ_WSP_ATR_Lookup_Mapping_UU);
-
-	/** Get ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public String getZZ_WSP_ATR_Lookup_Mapping_UU();
+	/** Get ZZ_WSP_Non_Employee_Status_Ref_UU	  */
+	public String getZZ_WSP_Non_Employee_Status_Ref_UU();
 }

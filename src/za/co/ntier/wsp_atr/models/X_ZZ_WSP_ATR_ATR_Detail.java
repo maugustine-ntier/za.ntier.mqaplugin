@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_ATR_Detail extends PO implements I_ZZ_WSP_ATR_ATR_Deta
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20260111L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_ATR_Detail (Properties ctx, int ZZ_WSP_ATR_ATR_Detail_ID, String trxName)

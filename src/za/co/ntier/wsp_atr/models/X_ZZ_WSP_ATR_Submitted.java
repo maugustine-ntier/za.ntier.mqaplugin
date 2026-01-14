@@ -32,7 +32,7 @@ public class X_ZZ_WSP_ATR_Submitted extends PO implements I_ZZ_WSP_ATR_Submitted
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Submitted (Properties ctx, int ZZ_WSP_ATR_Submitted_ID, String trxName)
@@ -163,6 +163,21 @@ public class X_ZZ_WSP_ATR_Submitted extends PO implements I_ZZ_WSP_ATR_Submitted
 	public Timestamp getSubmittedDate()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_SubmittedDate);
+	}
+
+	/** Set Import Submitted Data.
+		@param ZZ_Import_Submitted_Data Import Submitted Data
+	*/
+	public void setZZ_Import_Submitted_Data (String ZZ_Import_Submitted_Data)
+	{
+		set_Value (COLUMNNAME_ZZ_Import_Submitted_Data, ZZ_Import_Submitted_Data);
+	}
+
+	/** Get Import Submitted Data.
+		@return Import Submitted Data	  */
+	public String getZZ_Import_Submitted_Data()
+	{
+		return (String)get_Value(COLUMNNAME_ZZ_Import_Submitted_Data);
 	}
 
 	/** Set WSP/ATR Submitted File.

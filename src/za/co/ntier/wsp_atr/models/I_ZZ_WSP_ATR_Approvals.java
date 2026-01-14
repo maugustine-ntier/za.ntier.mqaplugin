@@ -21,25 +21,25 @@ import java.sql.Timestamp;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for ZZ_WSP_ATR_Lookup_Mapping
+/** Generated Interface for ZZ_WSP_ATR_Approvals
  *  @author iDempiere (generated) 
  *  @version Release 12
  */
 @SuppressWarnings("all")
-public interface I_ZZ_WSP_ATR_Lookup_Mapping 
+public interface I_ZZ_WSP_ATR_Approvals 
 {
 
-    /** TableName=ZZ_WSP_ATR_Lookup_Mapping */
-    public static final String Table_Name = "ZZ_WSP_ATR_Lookup_Mapping";
+    /** TableName=ZZ_WSP_ATR_Approvals */
+    public static final String Table_Name = "ZZ_WSP_ATR_Approvals";
 
-    /** AD_Table_ID=1000148 */
+    /** AD_Table_ID=1000045 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 4 - System 
+    /** AccessLevel = 3 - Client - Org 
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(4);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -64,20 +64,20 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name AD_Table_ID */
-    public static final String COLUMNNAME_AD_Table_ID = "AD_Table_ID";
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
 
-	/** Set Table.
-	  * Database Table information
+	/** Set Business Partner.
+	  * Identifies a Business Partner
 	  */
-	public void setAD_Table_ID (int AD_Table_ID);
+	public void setC_BPartner_ID (int C_BPartner_ID);
 
-	/** Get Table.
-	  * Database Table information
+	/** Get Business Partner.
+	  * Identifies a Business Partner
 	  */
-	public int getAD_Table_ID();
+	public int getC_BPartner_ID();
 
-	public org.compiere.model.I_AD_Table getAD_Table() throws RuntimeException;
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -108,6 +108,19 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public boolean isActive();
 
+    /** Column name ProcessedOn */
+    public static final String COLUMNNAME_ProcessedOn = "ProcessedOn";
+
+	/** Set Processed On.
+	  * The date+time (expressed in decimal format) when the document has been processed
+	  */
+	public void setProcessedOn (Timestamp ProcessedOn);
+
+	/** Get Processed On.
+	  * The date+time (expressed in decimal format) when the document has been processed
+	  */
+	public Timestamp getProcessedOn();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -124,39 +137,39 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping
 	  */
 	public int getUpdatedBy();
 
-    /** Column name ZZ_Is_Columns */
-    public static final String COLUMNNAME_ZZ_Is_Columns = "ZZ_Is_Columns";
+    /** Column name ZZ_Financial_Year */
+    public static final String COLUMNNAME_ZZ_Financial_Year = "ZZ_Financial_Year";
 
-	/** Set Is Columns	  */
-	public void setZZ_Is_Columns (boolean ZZ_Is_Columns);
+	/** Set Financial Year	  */
+	public void setZZ_Financial_Year (String ZZ_Financial_Year);
 
-	/** Get Is Columns	  */
-	public boolean isZZ_Is_Columns();
+	/** Get Financial Year	  */
+	public String getZZ_Financial_Year();
 
-    /** Column name ZZ_Tab_Name */
-    public static final String COLUMNNAME_ZZ_Tab_Name = "ZZ_Tab_Name";
+    /** Column name ZZ_Grant_Status */
+    public static final String COLUMNNAME_ZZ_Grant_Status = "ZZ_Grant_Status";
 
-	/** Set Tab Name	  */
-	public void setZZ_Tab_Name (String ZZ_Tab_Name);
+	/** Set Grant Status	  */
+	public void setZZ_Grant_Status (String ZZ_Grant_Status);
 
-	/** Get Tab Name	  */
-	public String getZZ_Tab_Name();
+	/** Get Grant Status	  */
+	public String getZZ_Grant_Status();
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_ID */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_ID = "ZZ_WSP_ATR_Lookup_Mapping_ID";
+    /** Column name ZZ_WSP_ATR_Approvals_ID */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_Approvals_ID = "ZZ_WSP_ATR_Approvals_ID";
 
-	/** Set WSP ATR Lookup Mapping	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_ID (int ZZ_WSP_ATR_Lookup_Mapping_ID);
+	/** Set WSP ATR Approvals	  */
+	public void setZZ_WSP_ATR_Approvals_ID (int ZZ_WSP_ATR_Approvals_ID);
 
-	/** Get WSP ATR Lookup Mapping	  */
-	public int getZZ_WSP_ATR_Lookup_Mapping_ID();
+	/** Get WSP ATR Approvals	  */
+	public int getZZ_WSP_ATR_Approvals_ID();
 
-    /** Column name ZZ_WSP_ATR_Lookup_Mapping_UU */
-    public static final String COLUMNNAME_ZZ_WSP_ATR_Lookup_Mapping_UU = "ZZ_WSP_ATR_Lookup_Mapping_UU";
+    /** Column name ZZ_WSP_ATR_Approvals_UU */
+    public static final String COLUMNNAME_ZZ_WSP_ATR_Approvals_UU = "ZZ_WSP_ATR_Approvals_UU";
 
-	/** Set ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public void setZZ_WSP_ATR_Lookup_Mapping_UU (String ZZ_WSP_ATR_Lookup_Mapping_UU);
+	/** Set ZZ_WSP_ATR_Approvals_UU	  */
+	public void setZZ_WSP_ATR_Approvals_UU (String ZZ_WSP_ATR_Approvals_UU);
 
-	/** Get ZZ_WSP_ATR_Lookup_Mapping_UU	  */
-	public String getZZ_WSP_ATR_Lookup_Mapping_UU();
+	/** Get ZZ_WSP_ATR_Approvals_UU	  */
+	public String getZZ_WSP_ATR_Approvals_UU();
 }

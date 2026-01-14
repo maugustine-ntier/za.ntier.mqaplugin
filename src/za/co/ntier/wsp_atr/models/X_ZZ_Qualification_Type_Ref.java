@@ -31,7 +31,7 @@ public class X_ZZ_Qualification_Type_Ref extends PO implements I_ZZ_Qualificatio
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Qualification_Type_Ref (Properties ctx, int ZZ_Qualification_Type_Ref_ID, String trxName)

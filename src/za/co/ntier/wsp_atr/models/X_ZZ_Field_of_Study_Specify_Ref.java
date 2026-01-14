@@ -31,7 +31,7 @@ public class X_ZZ_Field_of_Study_Specify_Ref extends PO implements I_ZZ_Field_of
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20260109L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Field_of_Study_Specify_Ref (Properties ctx, int ZZ_Field_of_Study_Specify_Ref_ID, String trxName)

@@ -31,7 +31,7 @@ public class X_ZZ_NQF_Level_Ref extends PO implements I_ZZ_NQF_Level_Ref, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_NQF_Level_Ref (Properties ctx, int ZZ_NQF_Level_Ref_ID, String trxName)

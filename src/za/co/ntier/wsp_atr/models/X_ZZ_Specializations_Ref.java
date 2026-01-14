@@ -31,7 +31,7 @@ public class X_ZZ_Specializations_Ref extends PO implements I_ZZ_Specializations
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Specializations_Ref (Properties ctx, int ZZ_Specializations_Ref_ID, String trxName)

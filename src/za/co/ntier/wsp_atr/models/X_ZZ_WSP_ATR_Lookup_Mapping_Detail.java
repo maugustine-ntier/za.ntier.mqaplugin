@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251126L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Lookup_Mapping_Detail (Properties ctx, int ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, String trxName)

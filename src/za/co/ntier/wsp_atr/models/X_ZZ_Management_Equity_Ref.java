@@ -31,7 +31,7 @@ public class X_ZZ_Management_Equity_Ref extends PO implements I_ZZ_Management_Eq
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Management_Equity_Ref (Properties ctx, int ZZ_Management_Equity_Ref_ID, String trxName)

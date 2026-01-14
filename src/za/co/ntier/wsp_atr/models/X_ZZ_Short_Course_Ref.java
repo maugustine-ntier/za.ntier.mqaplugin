@@ -31,7 +31,7 @@ public class X_ZZ_Short_Course_Ref extends PO implements I_ZZ_Short_Course_Ref, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_Short_Course_Ref (Properties ctx, int ZZ_Short_Course_Ref_ID, String trxName)

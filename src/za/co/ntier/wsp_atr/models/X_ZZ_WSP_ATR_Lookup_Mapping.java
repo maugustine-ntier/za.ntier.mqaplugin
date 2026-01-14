@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251124L;
+	private static final long serialVersionUID = 20260114L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Lookup_Mapping (Properties ctx, int ZZ_WSP_ATR_Lookup_Mapping_ID, String trxName)
@@ -39,6 +39,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_ID, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_ID == 0)
         {
+			setZZ_Is_Columns (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_ID (0);
         } */
     }
@@ -49,6 +51,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_ID, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_ID == 0)
         {
+			setZZ_Is_Columns (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_ID (0);
         } */
     }
@@ -59,6 +63,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_UU, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_UU == null)
         {
+			setZZ_Is_Columns (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_ID (0);
         } */
     }
@@ -69,6 +75,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_UU, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_UU == null)
         {
+			setZZ_Is_Columns (false);
+// N
 			setZZ_WSP_ATR_Lookup_Mapping_ID (0);
         } */
     }
@@ -127,6 +135,28 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping extends PO implements I_ZZ_WSP_ATR_Look
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Is Columns.
+		@param ZZ_Is_Columns Is Columns
+	*/
+	public void setZZ_Is_Columns (boolean ZZ_Is_Columns)
+	{
+		set_Value (COLUMNNAME_ZZ_Is_Columns, Boolean.valueOf(ZZ_Is_Columns));
+	}
+
+	/** Get Is Columns.
+		@return Is Columns	  */
+	public boolean isZZ_Is_Columns()
+	{
+		Object oo = get_Value(COLUMNNAME_ZZ_Is_Columns);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Tab Name.
