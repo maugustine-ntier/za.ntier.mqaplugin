@@ -10,7 +10,7 @@ import org.compiere.model.MLocation;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
-import za.ntier.models.MBPartner_New;
+import za.co.ntier.api.model.MBPartner_New;
 
 @org.adempiere.base.annotation.Process(name="za.ntier.process.ProcessDHET_File")
 public class ProcessDHET_File extends SvrProcess {
