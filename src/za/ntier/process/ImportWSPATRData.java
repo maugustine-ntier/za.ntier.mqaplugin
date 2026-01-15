@@ -25,7 +25,7 @@ import org.compiere.model.MUser;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 
-import za.ntier.models.MBPartner_New;
+import za.co.ntier.api.model.MBPartner_New;
 import za.ntier.models.X_ZZ_WSP_ATR_Approvals;
 
 
