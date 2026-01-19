@@ -24,6 +24,6 @@ public interface IWspAtrSheetImporter {
                    X_ZZ_WSP_ATR_Submitted submitted,
                    X_ZZ_WSP_ATR_Lookup_Mapping mappingHeader,
                    String trxName,
-                   SvrProcess process,
+                   ImportWspAtrDataFromTemplate process,
                    DataFormatter formatter) throws IllegalStateException, SQLException;
 }

@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.util.IOUtils;
@@ -25,6 +26,8 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 	private int p_ZZ_WSP_ATR_Submitted_ID;
 
 	private final ReferenceLookupService refService = new ReferenceLookupService();
+	
+	private FormulaEvaluator evaluator = null;
 
 	@Override
 	protected void prepare() {
@@ -46,6 +49,7 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 
 		Workbook wb = loadWorkbook(submitted);
 		DataFormatter formatter = new DataFormatter();
+		evaluator = wb.getCreationHelper().createFormulaEvaluator();
 
 		// Load all mapping headers for this process (you can filter by TabName if needed)
 		List<X_ZZ_WSP_ATR_Lookup_Mapping> headers = new Query(
@@ -130,5 +134,13 @@ public class ImportWspAtrDataFromTemplate extends SvrProcess {
 			IOUtils.setByteArrayMaxOverride(200 * 1024 * 1024);
 			return WorkbookFactory.create(is);
 		}
+	}
+
+	public FormulaEvaluator getEvaluator() {
+		return evaluator;
+	}
+
+	public void setEvaluator(FormulaEvaluator evaluator) {
+		this.evaluator = evaluator;
 	}
 }

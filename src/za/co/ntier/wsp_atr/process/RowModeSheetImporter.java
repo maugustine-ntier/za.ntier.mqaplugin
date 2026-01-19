@@ -29,7 +29,7 @@ public class RowModeSheetImporter extends AbstractMappingSheetImporter {
                           X_ZZ_WSP_ATR_Submitted submitted,
                           X_ZZ_WSP_ATR_Lookup_Mapping mappingHeader,
                           String trxName,
-                          SvrProcess process,
+                          ImportWspAtrDataFromTemplate process,
                           DataFormatter formatter) {
 
         Sheet sheet = getSheetOrThrow(wb, mappingHeader);
@@ -74,7 +74,7 @@ public class RowModeSheetImporter extends AbstractMappingSheetImporter {
             }
 
             int colIndex = columnLetterToIndex(letter);
-            String txt = getCellText(row, colIndex, formatter);
+            String txt = getCellText(row, colIndex, formatter,process.getEvaluator());
             if (Util.isEmpty(txt, true))
                 continue;
 
