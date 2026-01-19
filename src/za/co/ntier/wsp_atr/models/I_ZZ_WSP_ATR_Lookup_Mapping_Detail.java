@@ -123,6 +123,19 @@ public interface I_ZZ_WSP_ATR_Lookup_Mapping_Detail
 	  */
 	public boolean isActive();
 
+    /** Column name IsMandatory */
+    public static final String COLUMNNAME_IsMandatory = "IsMandatory";
+
+	/** Set Mandatory.
+	  * Data entry is required in this column
+	  */
+	public void setIsMandatory (boolean IsMandatory);
+
+	/** Get Mandatory.
+	  * Data entry is required in this column
+	  */
+	public boolean isMandatory();
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 

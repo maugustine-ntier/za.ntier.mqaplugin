@@ -31,7 +31,7 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20260114L;
+	private static final long serialVersionUID = 20260119L;
 
     /** Standard Constructor */
     public X_ZZ_WSP_ATR_Lookup_Mapping_Detail (Properties ctx, int ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, String trxName)
@@ -39,6 +39,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setIsMandatory (false);
+// N
 			setZZ_Create_If_Not_Exists (false);
 // N
 			setZZ_Use_Value (false);
@@ -53,6 +55,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_ID, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_ID == 0)
         {
+			setIsMandatory (false);
+// N
 			setZZ_Create_If_Not_Exists (false);
 // N
 			setZZ_Use_Value (false);
@@ -67,6 +71,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setIsMandatory (false);
+// N
 			setZZ_Create_If_Not_Exists (false);
 // N
 			setZZ_Use_Value (false);
@@ -81,6 +87,8 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
       super (ctx, ZZ_WSP_ATR_Lookup_Mapping_Detail_UU, trxName, virtualColumns);
       /** if (ZZ_WSP_ATR_Lookup_Mapping_Detail_UU == null)
         {
+			setIsMandatory (false);
+// N
 			setZZ_Create_If_Not_Exists (false);
 // N
 			setZZ_Use_Value (false);
@@ -171,6 +179,29 @@ public class X_ZZ_WSP_ATR_Lookup_Mapping_Detail extends PO implements I_ZZ_WSP_A
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Mandatory.
+		@param IsMandatory Data entry is required in this column
+	*/
+	public void setIsMandatory (boolean IsMandatory)
+	{
+		set_Value (COLUMNNAME_IsMandatory, Boolean.valueOf(IsMandatory));
+	}
+
+	/** Get Mandatory.
+		@return Data entry is required in this column
+	  */
+	public boolean isMandatory()
+	{
+		Object oo = get_Value(COLUMNNAME_IsMandatory);
+		if (oo != null)
+		{
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Column Letter.
