@@ -120,6 +120,8 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
         bp.setReferenceNo(getZZ_Organisation_Reg_No());
         bp.setIsCustomer(true);
         bp.setIsVendor(false);
+     // IMPORTANT: mark as SDR user
+        bp.set_ValueOfColumn("zz_issdruser", "Y");
 
         if (!bp.save()) {
             log.severe("Failed to save Business Partner.");
