@@ -455,58 +455,7 @@ public class ColumnModeSheetImporter extends AbstractMappingSheetImporter {
 		po.set_ValueOfColumn(column.getColumnName(), id);
 	}
 
-	private Integer tryResolveRefId(Properties ctx, MColumn column, String text, boolean useValueForRef, String trxName) {
-		if (Util.isEmpty(text, true))
-			return null;
-
-		int adRefTableId = column.getAD_Reference_Value_ID();
-		if (adRefTableId <= 0)
-			return null;
-
-		MRefTable refTableCfg = MRefTable.get(ctx, adRefTableId, trxName);
-		if (refTableCfg == null || refTableCfg.getAD_Table_ID() <= 0)
-			return null;
-
-		MTable refTable = MTable.get(ctx, refTableCfg.getAD_Table_ID());
-		if (refTable == null || refTable.getAD_Table_ID() <= 0)
-			return null;
-
-		String refTableName = refTable.getTableName();
-		String trimmed = text.trim();
-
-		// Prefer Value if configured, else Name (same spirit as your logic)
-		Integer foundId = null;
-		if (useValueForRef) {
-			foundId = findIdByColumn(ctx, refTableName, "Value", trimmed, trxName);
-			if (foundId == null || foundId <= 0)
-				foundId = findIdByColumn(ctx, refTableName, "Name", trimmed, trxName);
-		} else {
-			foundId = findIdByColumn(ctx, refTableName, "Name", trimmed, trxName);
-			if (foundId == null || foundId <= 0)
-				foundId = findIdByColumn(ctx, refTableName, "Value", trimmed, trxName);
-		}
-
-		return foundId;
-	}
-
-	/**
-	 * Helper: case-insensitive lookup by a single column (Value or Name)
-	 */
-	private Integer findIdByColumn(Properties ctx,
-			String tableName,
-			String columnName,
-			String text,
-			String trxName) {
-		if (Util.isEmpty(text, true))
-			return null;
-
-		String where = "UPPER(TRIM(" + columnName + "))=UPPER(?)";
-		int id = new Query(ctx, tableName, where, trxName)
-				.setParameters(text.trim())
-				.firstId();
-
-		return (id > 0) ? id : null;
-	}
+	
 
 
 	/**

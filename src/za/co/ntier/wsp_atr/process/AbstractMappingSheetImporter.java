@@ -24,6 +24,9 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping_Detail;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
+
+import org.compiere.model.MRefTable;
+
 public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImporter {
 
 	protected final ReferenceLookupService refService;
@@ -194,6 +197,51 @@ public abstract class AbstractMappingSheetImporter implements IWspAtrSheetImport
 			int len = column.getFieldLength();
 			po.set_ValueOfColumn(colName, truncate(text, len > 0 ? len : 200));
 		}
+	}
+	
+	protected Integer tryResolveRefId(Properties ctx, MColumn column, String text, boolean useValueForRef, String trxName) {
+	    if (Util.isEmpty(text, true))
+	        return null;
+
+	    int adRefTableId = column.getAD_Reference_Value_ID();
+	    if (adRefTableId <= 0)
+	        return null;
+
+	    MRefTable refTableCfg = MRefTable.get(ctx, adRefTableId, trxName);
+	    if (refTableCfg == null || refTableCfg.getAD_Table_ID() <= 0)
+	        return null;
+
+	    MTable refTable = MTable.get(ctx, refTableCfg.getAD_Table_ID());
+	    if (refTable == null || refTable.getAD_Table_ID() <= 0)
+	        return null;
+
+	    String refTableName = refTable.getTableName();
+	    String trimmed = text.trim();
+
+	    Integer foundId;
+	    if (useValueForRef) {
+	        foundId = findIdByColumn(ctx, refTableName, "Value", trimmed, trxName);
+	        if (foundId == null || foundId <= 0)
+	            foundId = findIdByColumn(ctx, refTableName, "Name", trimmed, trxName);
+	    } else {
+	        foundId = findIdByColumn(ctx, refTableName, "Name", trimmed, trxName);
+	        if (foundId == null || foundId <= 0)
+	            foundId = findIdByColumn(ctx, refTableName, "Value", trimmed, trxName);
+	    }
+
+	    return foundId;
+	}
+
+	protected Integer findIdByColumn(Properties ctx, String tableName, String columnName, String text, String trxName) {
+	    if (Util.isEmpty(text, true))
+	        return null;
+
+	    String where = "UPPER(TRIM(" + columnName + "))=UPPER(?)";
+	    int id = new Query(ctx, tableName, where, trxName)
+	            .setParameters(text.trim())
+	            .firstId();
+
+	    return (id > 0) ? id : null;
 	}
 }
 
