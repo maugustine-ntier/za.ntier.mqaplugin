@@ -2,6 +2,7 @@ package za.co.ntier.wsp_atr.process;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,6 +19,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
+import java.util.Date;
 
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
@@ -79,7 +81,10 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
 	        if (totalErrors > 0) {
 	            // write workbook to bytes + attach as error file
-	            attachErrorWorkbook(submitted, wb, "ERROR_" + safeFileName(submitted) + ".xlsm");
+	        	String errName = buildErrorFileName(submitted);
+	        	attachErrorWorkbook(submitted, wb, errName);
+
+	           // attachErrorWorkbook(submitted, wb, "ERROR_" + safeFileName(submitted) + ".xlsm");
 	            throw new AdempiereException("Template has " + totalErrors
 	                    + " validation errors. Download the attached error file, fix highlighted cells, and try again.");
 	        }
@@ -127,18 +132,34 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 			MAttachmentEntry[] entries = attachment.getEntries();
 			MAttachmentEntry selectedEntry = null;
 
-			/*
-	        for (MAttachmentEntry entry : entries) {
-	            if (entry != null && fileName.equalsIgnoreCase(entry.getName())) {
-	                selectedEntry = entry;
-	                break;
-	            }
-	        }
-			 */
+			// Prefer a non-error file that matches the original filename (if used)
+			for (MAttachmentEntry entry : entries) {
+			    if (entry == null)
+			        continue;
 
-			// If not found by name, fall back to the first entry
+			    String name = entry.getName();
+			    if (Util.isEmpty(name, true))
+			        continue;
+
+			    // Skip error files
+			    if (name.toUpperCase().startsWith("ERROR"))
+			        continue;
+
+			    
+
+			    // Otherwise remember the first valid non-error file
+			    if (selectedEntry == null) {
+			        selectedEntry = entry;
+			    }
+			}
+
+			// Safety fallback
+			if (selectedEntry == null && entries.length > 0) {
+			    selectedEntry = entries[0];
+			}
+
 			if (selectedEntry == null) {
-				selectedEntry = entries[0];
+			    throw new AdempiereException("No valid (non-error) attachment found.");
 			}
 
 			if (selectedEntry == null) {
@@ -182,6 +203,19 @@ import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 	        }
 
 	        return name;
+	    }
+	    
+	    private String buildErrorFileName(X_ZZ_WSP_ATR_Submitted submitted) {
+	        String baseName = safeFileName(submitted);
+
+	        // Remove extension
+	        if (baseName.toLowerCase().endsWith(".xlsm")) {
+	            baseName = baseName.substring(0, baseName.length() - 5);
+	        }
+
+	        String ts = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+	        return "ERROR_" + baseName + "_" + ts + ".xlsm";
 	    }
 
 	}

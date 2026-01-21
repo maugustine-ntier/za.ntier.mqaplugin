@@ -13,6 +13,9 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelErrorMarker {
 
@@ -58,9 +61,26 @@ public class ExcelErrorMarker {
     }
 
     private void addOrReplaceComment(Workbook wb, Sheet sheet, Cell cell, String text) {
-        // Only XSSF supports rich comment handling nicely; .xlsm is XSSF-based
-        Drawing<?> drawing = sheet.createDrawingPatriarch();
+        // .xlsm is XSSF-based; keep it safe
+        if (!(wb instanceof XSSFWorkbook) || !(sheet instanceof XSSFSheet) || !(cell instanceof XSSFCell)) {
+            return;
+        }
+
+        XSSFCell xcell = (XSSFCell) cell;
+        XSSFSheet xsheet = (XSSFSheet) sheet;
+
         CreationHelper factory = wb.getCreationHelper();
+
+        // If comment already exists, just update it (no orphaning)
+        Comment existing = xcell.getCellComment();
+        if (existing != null) {
+            existing.setString(factory.createRichTextString(text));
+            existing.setAuthor("WSP/ATR Validator");
+            return;
+        }
+
+        // Create a new comment
+        Drawing<?> drawing = xsheet.createDrawingPatriarch();
 
         ClientAnchor anchor = factory.createClientAnchor();
         anchor.setCol1(cell.getColumnIndex());
@@ -72,8 +92,7 @@ public class ExcelErrorMarker {
         comment.setString(factory.createRichTextString(text));
         comment.setAuthor("WSP/ATR Validator");
 
-        cell.removeCellComment();
-        cell.setCellComment(comment);
+        xcell.setCellComment(comment);
     }
 }
 
