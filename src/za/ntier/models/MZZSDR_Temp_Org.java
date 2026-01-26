@@ -120,6 +120,12 @@ public class MZZSDR_Temp_Org extends X_ZZ_SDR_Temp_Org {
         bp.setReferenceNo(getZZ_Organisation_Reg_No());
         bp.setIsCustomer(true);
         bp.setIsVendor(false);
+     // Default BP Group = UNKNOWN
+        int bpGroupID = DB.getSQLValueEx(
+                get_TrxName(),
+                "SELECT c_bp_group_id FROM adempiere.c_bp_group WHERE value = 'UNKNOWN'"
+        );
+        bp.setC_BP_Group_ID(bpGroupID);
      // IMPORTANT: mark as SDR user
         bp.set_ValueOfColumn("zz_issdruser", "Y");
 
