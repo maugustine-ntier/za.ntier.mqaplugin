@@ -78,6 +78,9 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
         buildNorth();
         buildList();
         refreshList();
+        this.addEventListener("onDownloadError", this);
+        this.addEventListener("onRunProcess", this);
+
     }
 
     private void buildNorth() {
