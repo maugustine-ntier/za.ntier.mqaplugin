@@ -15,14 +15,22 @@ import java.util.stream.Collectors;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.webui.component.Borderlayout;
 import org.adempiere.webui.component.Label;
+import org.adempiere.webui.component.ListCell;
+import org.adempiere.webui.component.ListHead;
+import org.adempiere.webui.component.ListHeader;
+import org.adempiere.webui.component.ListItem;
 import org.adempiere.webui.component.Listbox;
 import org.adempiere.webui.panel.ADForm;
 import org.adempiere.webui.util.ZKUpdateUtil;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
+import org.compiere.model.MPInstance;
+import org.compiere.model.MProcess;
+import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.process.ProcessInfo;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 import org.compiere.util.Util;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.event.Event;
@@ -32,10 +40,6 @@ import org.zkoss.zul.Center;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Hbox;
-import org.zkoss.zul.Listcell;
-import org.zkoss.zul.Listhead;
-import org.zkoss.zul.Listheader;
-import org.zkoss.zul.Listitem;
 import org.zkoss.zul.North;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Toolbarbutton;
@@ -48,7 +52,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
     private static final long serialVersionUID = 1L;
 
     // TODO: set to AD_Process_ID of ValidateAndImportWspAtrDataFromTemplate
-    private static final int PROCESS_VALIDATE_IMPORT_ID = 1000000;
+    private static final String PROCESS_VALIDATE_IMPORT_UU = "09da67a2-963d-4663-8484-f0b1d4fc6820";
 
     private Borderlayout layout = new Borderlayout();
     private North north = new North();
@@ -104,15 +108,15 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
         list.setHflex("1");
         list.setMultiple(false);
 
-        Listhead head = new Listhead();
+        ListHead head = new ListHead();
         list.appendChild(head);
 
-        head.appendChild(new Listheader("ID"));
-        head.appendChild(new Listheader("Submitted Date"));
-        head.appendChild(new Listheader("Uploaded File"));
-        head.appendChild(new Listheader("Latest Error File"));
-        head.appendChild(new Listheader("Status"));
-        head.appendChild(new Listheader("Actions"));
+        head.appendChild(new ListHeader("ID"));
+        head.appendChild(new ListHeader("Submitted Date"));
+        head.appendChild(new ListHeader("Uploaded File"));
+        head.appendChild(new ListHeader("Latest Error File"));
+        head.appendChild(new ListHeader("Status"));
+        head.appendChild(new ListHeader("Actions"));
     }
 
     @Override
@@ -186,7 +190,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
     }
 
     private Integer getSelectedId() {
-        Listitem sel = list.getSelectedItem();
+    	ListItem sel = list.getSelectedItem();
         if (sel == null)
             return null;
         return (Integer) sel.getValue();
@@ -195,52 +199,57 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
     private void refreshList() {
         list.getItems().clear();
 
-        List<X_ZZ_WSP_ATR_Submitted> records = new Query(
+        List<PO> records = new Query(
                 Env.getCtx(),
                 X_ZZ_WSP_ATR_Submitted.Table_Name,
                 null,
                 null)
-                .setOrderBy("ZZ_WSP_ATR_Submitted_ID DESC")
-                .list();
+            .setOrderBy("ZZ_WSP_ATR_Submitted_ID DESC")
+            .list();
 
-        for (X_ZZ_WSP_ATR_Submitted r : records) {
-            addRow(r);
+        for (PO po : records) {
+            int id = po.get_ID();
+            Timestamp submittedDate = (Timestamp) po.get_Value("SubmittedDate");
+            String fileName = (String) po.get_Value("FileName"); // optional display
+            String importedFlag = (String) po.get_Value("ZZ_Import_Submitted_Data");
+
+            String uploaded = findUploadedFileName(id);       // non-ERROR attachment
+            String latestError = findLatestErrorFileName(id); // latest ERROR_*.xlsm
+
+            String status;
+            if ("Y".equalsIgnoreCase(importedFlag)) status = "Imported";
+            else if (!Util.isEmpty(latestError, true)) status = "Has Errors";
+            else status = "Pending";
+
+            addRow(id, submittedDate, uploaded, latestError, status);
         }
+
     }
 
-    private void addRow(X_ZZ_WSP_ATR_Submitted r) {
-        int id = r.get_ID();
-        String uploaded = findUploadedFileName(id);
-        String latestError = findLatestErrorFileName(id);
+    private void addRow(int id, Timestamp submittedDate, String uploaded, String latestError, String status) {
 
-        String status;
-        if ("Y".equalsIgnoreCase(r.getZZ_Import_Submitted_Data())) status = "Imported";
-        else if (!Util.isEmpty(latestError, true)) status = "Has Errors";
-        else status = "Pending";
+        ListItem item = new ListItem();
+        item.setValue(Integer.valueOf(id));
 
-        Listitem item = new Listitem();
-        item.setValue(id);
+        item.appendChild(new ListCell(String.valueOf(id)));
+        item.appendChild(new ListCell(submittedDate != null ? submittedDate.toString() : ""));
+        item.appendChild(new ListCell(uploaded != null ? uploaded : ""));
+        item.appendChild(new ListCell(latestError != null ? latestError : ""));
+        item.appendChild(new ListCell(status));
 
-        item.appendChild(new Listcell(String.valueOf(id)));
-        item.appendChild(new Listcell(r.getSubmittedDate() != null ? r.getSubmittedDate().toString() : ""));
-        item.appendChild(new Listcell(uploaded != null ? uploaded : ""));
-        item.appendChild(new Listcell(latestError != null ? latestError : ""));
-        item.appendChild(new Listcell(status));
-
-        // actions cell
-        Listcell actions = new Listcell();
+        ListCell actions = new ListCell();
         Hbox hb = new Hbox();
         hb.setSpacing("8px");
 
         Toolbarbutton runBtn = new Toolbarbutton("Run");
         runBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
-                Events.postEvent(new Event("onRunProcess", this, id)));
+                Events.postEvent(new Event("onRunProcess", this, Integer.valueOf(id))));
         hb.appendChild(runBtn);
 
         if (!Util.isEmpty(latestError, true)) {
             Toolbarbutton dlBtn = new Toolbarbutton("Download Error");
             dlBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
-                    Events.postEvent(new Event("onDownloadError", this, id)));
+                    Events.postEvent(new Event("onDownloadError", this, Integer.valueOf(id))));
             hb.appendChild(dlBtn);
         }
 
@@ -250,20 +259,27 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
         list.appendChild(item);
     }
 
+
     // ---------------- Background Process ----------------
 
     private void runValidateImportInBackground(final int submittedId) {
         new Thread(() -> {
             try {
                 Properties ctx = Env.getCtx();
-                ProcessInfo pi = new ProcessInfo("Validate & Import WSP/ATR", PROCESS_VALIDATE_IMPORT_ID);
+                MProcess mProcess = MProcess.get(ctx, PROCESS_VALIDATE_IMPORT_UU);
+                ProcessInfo pi = new ProcessInfo("Validate & Import WSP/ATR", mProcess.getAD_Process_ID());
+                pi.setClassName(mProcess.getClassname());
+                MPInstance instance = new MPInstance(Env.getCtx(), pi.getAD_Process_ID(), 0, 0, null);
+        		instance.saveEx();
+        		pi.setAD_PInstance_ID(instance.getAD_PInstance_ID()); 
                 pi.setRecord_ID(submittedId);
                 pi.setAD_User_ID(Env.getAD_User_ID(ctx));
                 pi.setAD_Client_ID(Env.getAD_Client_ID(ctx));
                 //pi.setAD_Org_ID(Env.getAD_Org_ID(ctx));
 
                 // Start via iDempiere process engine
-                org.adempiere.util.ProcessUtil.startJavaProcess(ctx, pi, null);
+                String trxName = Trx.createTrxName("WebWSPATR_Submit");
+                org.adempiere.util.ProcessUtil.startJavaProcess(ctx, pi, Trx.get(trxName, true), false, null);
 
             } catch (Exception ex) {
                 // process should attach ERROR file itself
