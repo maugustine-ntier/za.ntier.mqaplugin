@@ -138,7 +138,8 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 		ListHead head = new ListHead();
 		list.appendChild(head);
 
-		head.appendChild(new ListHeader("ID"));
+		
+		head.appendChild(new ListHeader("Organisation"));
 		head.appendChild(new ListHeader("Submitted Date"));
 		head.appendChild(new ListHeader("Uploaded File"));
 		head.appendChild(new ListHeader("Latest Error File"));
@@ -264,36 +265,54 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	        throw new AdempiereException("Please upload an .xlsm file");
 
 	    byte[] data = getMediaBytes(media);
-	    
-	    
 
 	    String trxName = Trx.createTrxName("WSPATRUpload");
 	    Trx trx = Trx.get(trxName, true);
 
-	    int submittedId;
+	    int submittedId = 0;
 
 	    try {
-	        X_ZZ_WSP_ATR_Submitted submitted =
-	                new X_ZZ_WSP_ATR_Submitted(Env.getCtx(), 0, trxName);
+	        // 1) Find existing record for org (if any)
+	        int existingId = findExistingSubmittedIdForOrg(org.zzSdfOrganisationId, trxName);
 
-	        submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-	        submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
-	        submitted.setFileName(filename);
-	        submitted.setZZ_Import_Submitted_Data("N");
-	        submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+	        X_ZZ_WSP_ATR_Submitted submitted;
+	        if (existingId > 0) {
+	            // REUSE
+	            submitted = new X_ZZ_WSP_ATR_Submitted(Env.getCtx(), existingId, trxName);
 
-	        submitted.saveEx();
-	        submittedId = submitted.get_ID();
+	            // 2) Clear old attachments + related records
+	            deleteAllAttachmentsForSubmitted(existingId, trxName);
+	            deleteRelatedRecordsBeforeProcessing(existingId, trxName);
 
-	        // attach inside SAME trx so it commits with the row
-	        MAttachment att = MAttachment.get(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId);
-	        if (att == null)
-	            att = new MAttachment(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId, null, trxName);
+	            // 3) Update the row fields (optional but recommended)
+	            submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
+	            submitted.setFileName(filename);
+	            submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+	            submitted.setZZ_Import_Submitted_Data("N");
+	            submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+	            submitted.saveEx();
 
+	            submittedId = existingId;
+	        } else {
+	            // CREATE NEW
+	            submitted = new X_ZZ_WSP_ATR_Submitted(Env.getCtx(), 0, trxName);
+	            submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+	            submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
+	            submitted.setFileName(filename);
+	            submitted.setZZ_Import_Submitted_Data("N");
+	            submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+	            submitted.saveEx();
+
+	            submittedId = submitted.get_ID();
+	        }
+
+	        // 4) Recreate attachment and attach the new file (same trx)
+	        MAttachment att = new MAttachment(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId, null, trxName);
 	        att.addEntry(filename, data);
 	        att.saveEx();
 
 	        trx.commit(true);
+
 	    } catch (Exception e) {
 	        trx.rollback();
 	        throw e;
@@ -307,6 +326,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 
 	    runValidateImportInBackground(submittedId);
 	}
+
 
 
 
@@ -354,68 +374,74 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 		return (Integer) sel.getValue();
 	}
 
+		
 	private void refreshList() {
-		list.getItems().clear();
+	    list.getItems().clear();
 
-		List<PO> records = new Query(
-				Env.getCtx(),
-				X_ZZ_WSP_ATR_Submitted.Table_Name,
-				null,
-				null)
-				.setOrderBy("ZZ_WSP_ATR_Submitted_ID DESC")
-				.list();
+	    String sql =
+	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
+	        "       s.ZZ_Import_Submitted_Data, v.orgname " +
+	        "FROM ZZ_WSP_ATR_Submitted s " +
+	        "LEFT JOIN adempiere.zzsdforganisation_v v " +
+	        "  ON v.zzsdforganisation_v_id = s.ZZSDFOrganisation_ID " +
+	        "ORDER BY s.ZZ_WSP_ATR_Submitted_ID DESC";
 
-		for (PO po : records) {
-			int id = po.get_ID();
-			Timestamp submittedDate = (Timestamp) po.get_Value("SubmittedDate");
-			String fileName = (String) po.get_Value("FileName"); // optional display
-			String importedFlag = (String) po.get_Value("ZZ_Import_Submitted_Data");
+	    List<List<Object>> rows = org.compiere.util.DB.getSQLArrayObjectsEx(null, sql);
 
-			String uploaded = findUploadedFileName(id);       // non-ERROR attachment
-			String latestError = findLatestErrorFileName(id); // latest ERROR_*.xlsm
+	    for (List<Object> r : rows) {
+	        int id = ((Number) r.get(0)).intValue();
+	        Timestamp submittedDate = (Timestamp) r.get(1);
+	        String fileName = (String) r.get(2);
+	        String importedFlag = (String) r.get(3);
+	        String orgName = (String) r.get(4);
 
-			String status;
-			if ("Y".equalsIgnoreCase(importedFlag)) status = "Imported";
-			else if (!Util.isEmpty(latestError, true)) status = "Has Errors";
-			else status = "Pending";
+	        String uploaded = findUploadedFileName(id);
+	        String latestError = findLatestErrorFileName(id);
 
-			addRow(id, submittedDate, uploaded, latestError, status);
-		}
+	        String status;
+	        if ("Y".equalsIgnoreCase(importedFlag)) status = "Imported";
+	        else if (!Util.isEmpty(latestError, true)) status = "Has Errors";
+	        else status = "Pending";
 
+	        addRow(id, orgName, submittedDate, uploaded, latestError, status);
+	    }
 	}
 
-	private void addRow(int id, Timestamp submittedDate, String uploaded, String latestError, String status) {
 
-		ListItem item = new ListItem();
-		item.setValue(Integer.valueOf(id));
+	private void addRow(int id, String orgName, Timestamp submittedDate, String uploaded, String latestError, String status) {
 
-		item.appendChild(new ListCell(String.valueOf(id)));
-		item.appendChild(new ListCell(submittedDate != null ? submittedDate.toString() : ""));
-		item.appendChild(new ListCell(uploaded != null ? uploaded : ""));
-		item.appendChild(new ListCell(latestError != null ? latestError : ""));
-		item.appendChild(new ListCell(status));
+	    ListItem item = new ListItem();
+	    item.setValue(Integer.valueOf(id)); // keep ID as row value for actions
 
-		ListCell actions = new ListCell();
-		Hbox hb = new Hbox();
-		hb.setSpacing("8px");
+	    item.appendChild(new ListCell(!Util.isEmpty(orgName, true) ? orgName : ""));
+	    item.appendChild(new ListCell(submittedDate != null ? submittedDate.toString() : ""));
+	    item.appendChild(new ListCell(uploaded != null ? uploaded : ""));
+	    item.appendChild(new ListCell(latestError != null ? latestError : ""));
+	    item.appendChild(new ListCell(status));
 
-		Toolbarbutton runBtn = new Toolbarbutton("Run");
-		runBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
-		Events.postEvent(new Event("onRunProcess", this, Integer.valueOf(id))));
-		hb.appendChild(runBtn);
+	    // actions cell stays the same...
+	    ListCell actions = new ListCell();
+	    Hbox hb = new Hbox();
+	    hb.setSpacing("8px");
 
-		if (!Util.isEmpty(latestError, true)) {
-			Toolbarbutton dlBtn = new Toolbarbutton("Download Error");
-			dlBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
-			Events.postEvent(new Event("onDownloadError", this, Integer.valueOf(id))));
-			hb.appendChild(dlBtn);
-		}
+	    Toolbarbutton runBtn = new Toolbarbutton("Run");
+	    runBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
+	        Events.postEvent(new Event("onRunProcess", this, Integer.valueOf(id))));
+	    hb.appendChild(runBtn);
 
-		actions.appendChild(hb);
-		item.appendChild(actions);
+	    if (!Util.isEmpty(latestError, true)) {
+	        Toolbarbutton dlBtn = new Toolbarbutton("Download Error");
+	        dlBtn.addEventListener(Events.ON_CLICK, (EventListener<Event>) e ->
+	            Events.postEvent(new Event("onDownloadError", this, Integer.valueOf(id))));
+	        hb.appendChild(dlBtn);
+	    }
 
-		list.appendChild(item);
+	    actions.appendChild(hb);
+	    item.appendChild(actions);
+
+	    list.appendChild(item);
 	}
+
 
 
 	// ---------------- Background Process ----------------
@@ -579,5 +605,60 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	        return orgName;
 	    }
 	}
+	
+	private int findExistingSubmittedIdForOrg(int zzSdfOrganisationId, String trxName) {
+	    // Prefer a draft/not imported record
+	    int id = org.compiere.util.DB.getSQLValueEx(
+	            trxName,
+	            "SELECT ZZ_WSP_ATR_Submitted_ID " +
+	            "FROM ZZ_WSP_ATR_Submitted " +
+	            "WHERE ZZSDFOrganisation_ID=? " +
+	            "AND COALESCE(ZZ_Import_Submitted_Data,'N')='N' " +
+	            "ORDER BY SubmittedDate DESC NULLS LAST, ZZ_WSP_ATR_Submitted_ID DESC " +
+	            "FETCH FIRST 1 ROWS ONLY",
+	            zzSdfOrganisationId
+	    );
+
+	    if (id > 0)
+	        return id;
+
+	    // Fallback: any latest record for the org
+	    return org.compiere.util.DB.getSQLValueEx(
+	            trxName,
+	            "SELECT ZZ_WSP_ATR_Submitted_ID " +
+	            "FROM ZZ_WSP_ATR_Submitted " +
+	            "WHERE ZZSDFOrganisation_ID=? " +
+	            "ORDER BY SubmittedDate DESC NULLS LAST, ZZ_WSP_ATR_Submitted_ID DESC " +
+	            "FETCH FIRST 1 ROWS ONLY",
+	            zzSdfOrganisationId
+	    );
+	}
+	
+	private void deleteAllAttachmentsForSubmitted(int submittedId, String trxName) {
+	    MAttachment att = MAttachment.get(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId);
+	    if (att != null) {
+	        att.delete(true); // deletes AD_Attachment and its entries
+	    }
+	}
+	
+	private void deleteRelatedRecordsBeforeProcessing(int submittedId, String trxName) {
+	    // TODO: add deletes for tables created by your import/validate process.
+	    // Example pattern (replace table/column names):
+	    //
+	    // DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Line WHERE ZZ_WSP_ATR_Submitted_ID=?", trxName, submittedId);
+	    // DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Header WHERE ZZ_WSP_ATR_Submitted_ID=?", trxName, submittedId);
+	    //
+	    // If the process creates a ZZ_WSP_ATR master record linked to submitted:
+	    // Integer wspAtrId = DB.getSQLValueEx(trxName,
+	    //      "SELECT ZZ_WSP_ATR_ID FROM ZZ_WSP_ATR WHERE ZZ_WSP_ATR_Submitted_ID=?",
+	    //      submittedId);
+	    // if (wspAtrId != null && wspAtrId > 0) {
+	    //      DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Child WHERE ZZ_WSP_ATR_ID=?", trxName, wspAtrId);
+	    //      DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR WHERE ZZ_WSP_ATR_ID=?", trxName, wspAtrId);
+	    // }
+	}
+
+
+
 
 }
