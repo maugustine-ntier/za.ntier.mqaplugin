@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.webui.AdempiereWebUI;
+import org.adempiere.webui.ISupportMask;
+import org.adempiere.webui.LayoutUtils;
 import org.adempiere.webui.component.Borderlayout;
 import org.adempiere.webui.component.Label;
 import org.adempiere.webui.component.ListCell;
@@ -21,6 +23,8 @@ import org.adempiere.webui.component.ListHead;
 import org.adempiere.webui.component.ListHeader;
 import org.adempiere.webui.component.ListItem;
 import org.adempiere.webui.component.Listbox;
+import org.adempiere.webui.component.Window;
+import org.adempiere.webui.event.DialogEvents;
 import org.adempiere.webui.panel.ADForm;
 import org.adempiere.webui.util.ZKUpdateUtil;
 import org.compiere.model.MAttachment;
@@ -34,6 +38,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
 import org.zkoss.util.media.Media;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -45,6 +50,7 @@ import org.zkoss.zul.Hbox;
 import org.zkoss.zul.North;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Toolbarbutton;
+import org.zkoss.zul.Vlayout;
 
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
@@ -65,6 +71,10 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	private Toolbarbutton btnSubmit = new Toolbarbutton("Submit");
 	private Toolbarbutton btnRefresh = new Toolbarbutton("Refresh");
 	private Label lblInfo = new Label("");
+	private Label lblSelectedOrg = new Label("");
+	private Media pendingUploadMedia;
+
+
 
 	private Listbox list = new Listbox();
 
@@ -87,32 +97,36 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	}
 
 	private void buildNorth() {
-		north.setSplittable(false);
-		north.setCollapsible(false);
-		north.setSize("90px");
+	    north.setSplittable(false);
+	    north.setCollapsible(false);
+	    north.setSize("110px"); // a bit taller
 
-		Div northDiv = new Div();
-		north.appendChild(northDiv);
+	    Div northDiv = new Div();
+	    north.appendChild(northDiv);
 
-		actions.setSpacing("12px");
-		actions.appendChild(btnUpload);
-		actions.appendChild(btnSubmit);
-		actions.appendChild(btnRefresh);
-		
-		btnUpload.setUpload(AdempiereWebUI.getUploadSetting());
-		btnUpload.addEventListener(Events.ON_UPLOAD, this);
+	    actions.setSpacing("12px");
+	    actions.appendChild(btnUpload);
+	    actions.appendChild(btnSubmit);
+	    actions.appendChild(btnRefresh);
 
+	    // IMPORTANT: use ON_UPLOAD for upload button if you're using UploadEvent
+	    btnUpload.setUpload(AdempiereWebUI.getUploadSetting());
+	    btnUpload.addEventListener(Events.ON_UPLOAD, this);
 
-		
+	    btnSubmit.addEventListener(Events.ON_CLICK, this);
+	    btnRefresh.addEventListener(Events.ON_CLICK, this);
 
-		// Other buttons stay ON_CLICK
-		btnSubmit.addEventListener(Events.ON_CLICK, this);
-		btnRefresh.addEventListener(Events.ON_CLICK, this);
+	    northDiv.appendChild(actions);
+	    northDiv.appendChild(new Separator());
 
-		northDiv.appendChild(actions);
-		northDiv.appendChild(new Separator());
-		northDiv.appendChild(lblInfo);
+	    // show selected org
+	    northDiv.appendChild(lblSelectedOrg);
+	    northDiv.appendChild(new Separator());
+
+	    // your info label
+	    northDiv.appendChild(lblInfo);
 	}
+
 
 
 	private void buildList() {
@@ -133,22 +147,19 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	}
 
 	@Override
-	public void onEvent(Event event) throws Exception {
+	public void onEvent(Event event) throws Exception {				
+		
+		if (event instanceof UploadEvent && event.getTarget() == btnUpload) {
+	        UploadEvent ue = (UploadEvent) event;
 
-		if (event.getTarget() == btnUpload && event instanceof UploadEvent) {
-			UploadEvent ue = (UploadEvent) event;
+	        Media media = ue.getMedia(); // single upload
+	        if (media == null)
+	            return;
 
-			Media media = ue.getMedia();          // single upload
-			// or: for (Media m : ue.getMedias())  // multiple upload
-
-			if (media == null)
-				return;
-
-			doUpload(media); // change method signature
-			return;
-		}
-
-
+	        pendingUploadMedia = media;   // STORE IT
+	        promptForOrganisationThenUpload();
+	        return;
+	    }
 
 		if (event.getTarget() == btnSubmit) {
 			doSubmitSelected();
@@ -174,6 +185,130 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 
 
 	// ---------------- UI Actions ----------------
+	private void promptForOrganisationThenUpload() {
+
+	    List<SdfOrgRow> orgs = getSdfOrganisationsForUser();
+	    if (orgs.isEmpty())
+	        throw new AdempiereException("No organisations are linked to your user.");
+
+	    Window win = new Window();
+	    win.setTitle("Select Organisation");
+	    win.setBorder("normal");
+	    win.setClosable(true);
+	    win.setSizable(false);
+
+	    // IMPORTANT: use highlighted, not modal
+	    win.setAttribute(Window.MODE_KEY, Window.MODE_HIGHLIGHTED);
+
+	    Vlayout body = new Vlayout();
+	    body.setSpacing("10px");
+	    body.setStyle("padding:12px; min-width:360px;");
+	    win.appendChild(body);
+
+	    // Combo
+	    Listbox lb = new Listbox();
+	    lb.setMold("select");
+	    lb.setRows(0);
+	    ZKUpdateUtil.setHflex(lb, "1");
+	    body.appendChild(lb);
+
+	    for (SdfOrgRow r : orgs) {
+	        // iDempiere ListItem(label,value)
+	        org.adempiere.webui.component.ListItem li =
+	                new org.adempiere.webui.component.ListItem(r.orgName, r);
+	        lb.appendChild(li);
+	    }
+	    lb.setSelectedIndex(0);
+
+	    // Buttons below combo
+	    Hbox buttons = new Hbox();
+	    buttons.setSpacing("10px");
+	    buttons.setPack("end");
+	    body.appendChild(buttons);
+
+	    org.adempiere.webui.component.Button ok = new org.adempiere.webui.component.Button("OK");
+	    org.adempiere.webui.component.Button cancel = new org.adempiere.webui.component.Button("Cancel");
+	    buttons.appendChild(ok);
+	    buttons.appendChild(cancel);
+
+	    // Show with mask (pseudo-modal)
+	    final ISupportMask mask = LayoutUtils.showWindowWithMask(win, (Component) this, LayoutUtils.OVERLAP_PARENT);
+
+	    // Ensure mask removed when window closes
+	    win.addEventListener(DialogEvents.ON_WINDOW_CLOSE, e -> mask.hideMask());
+
+	    ok.addEventListener(Events.ON_CLICK, e -> {
+	        org.adempiere.webui.component.ListItem sel =
+	                (org.adempiere.webui.component.ListItem) lb.getSelectedItem();
+	        if (sel == null)
+	            throw new AdempiereException("Please select an organisation.");
+
+	        SdfOrgRow chosen = (SdfOrgRow) sel.getValue();
+
+	        win.detach();        // triggers ON_WINDOW_CLOSE -> hides mask
+
+	        doUploadWithOrganisation(chosen, pendingUploadMedia);
+	        pendingUploadMedia = null;
+	    });
+
+	    cancel.addEventListener(Events.ON_CLICK, e -> win.detach());
+	}
+
+
+	private void doUploadWithOrganisation(SdfOrgRow org, Media media) throws Exception {
+	    if (media == null)
+	        return;
+
+	    String filename = media.getName();
+	    if (!filename.toLowerCase().endsWith(".xlsm"))
+	        throw new AdempiereException("Please upload an .xlsm file");
+
+	    byte[] data = getMediaBytes(media);
+	    
+	    
+
+	    String trxName = Trx.createTrxName("WSPATRUpload");
+	    Trx trx = Trx.get(trxName, true);
+
+	    int submittedId;
+
+	    try {
+	        X_ZZ_WSP_ATR_Submitted submitted =
+	                new X_ZZ_WSP_ATR_Submitted(Env.getCtx(), 0, trxName);
+
+	        submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+	        submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
+	        submitted.setFileName(filename);
+	        submitted.setZZ_Import_Submitted_Data("N");
+	        submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+
+	        submitted.saveEx();
+	        submittedId = submitted.get_ID();
+
+	        // attach inside SAME trx so it commits with the row
+	        MAttachment att = MAttachment.get(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId);
+	        if (att == null)
+	            att = new MAttachment(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId, null, trxName);
+
+	        att.addEntry(filename, data);
+	        att.saveEx();
+
+	        trx.commit(true);
+	    } catch (Exception e) {
+	        trx.rollback();
+	        throw e;
+	    } finally {
+	        trx.close();
+	    }
+
+	    lblSelectedOrg.setValue("Organisation: " + org.orgName);
+	    lblInfo.setValue("Uploaded: " + filename + " (ID " + submittedId + ")");
+	    refreshList();
+
+	    runValidateImportInBackground(submittedId);
+	}
+
+
 
 	
 	private void doUpload(Media media) {
@@ -406,4 +541,43 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 		}
 		return bos.toByteArray();
 	}
+	
+	private List<SdfOrgRow> getSdfOrganisationsForUser() {
+	    int adUserId = Env.getAD_User_ID(Env.getCtx());
+
+	    String sql =
+	        "SELECT zzsdforganisation_v_id, orgname " +
+	        "FROM adempiere.zzsdforganisation_v " +
+	        "WHERE ad_user_id = ? " +
+	        "AND isactive = 'Y' " +
+	        "ORDER BY orgname";
+
+	    List<List<Object>> rows =
+	            org.compiere.util.DB.getSQLArrayObjectsEx(null, sql, adUserId);
+
+	    return rows.stream()
+	    	    .map(r -> new SdfOrgRow(
+	    	            ((Number) r.get(0)).intValue(),
+	    	            (String) r.get(1)))
+	    	    .collect(Collectors.toList());
+
+	}
+
+	
+	
+	private static class SdfOrgRow {
+	    final int zzSdfOrganisationId;
+	    final String orgName;
+
+	    SdfOrgRow(int id, String name) {
+	        this.zzSdfOrganisationId = id;
+	        this.orgName = name;
+	    }
+
+	    @Override
+	    public String toString() {
+	        return orgName;
+	    }
+	}
+
 }
