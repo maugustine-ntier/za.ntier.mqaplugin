@@ -359,6 +359,8 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	private void refreshList() {
 	    list.getItems().clear();
 
+	    int adUserId = Env.getAD_User_ID(Env.getCtx());
+
 	    String sql =
 	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
 	        "       s.ZZ_Import_Submitted_Data, v.orgname, s.ZZ_WSP_ATR_Status " +
@@ -366,9 +368,14 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	        "FROM ZZ_WSP_ATR_Submitted s " +
 	        "LEFT JOIN adempiere.zzsdforganisation_v v " +
 	        "  ON v.zzsdforganisation_v_id = s.ZZSDFOrganisation_ID " +
+	        "WHERE v.ad_user_id = ? " +
 	        "ORDER BY s.ZZ_WSP_ATR_Submitted_ID DESC";
 
-	    List<List<Object>> rows = org.compiere.util.DB.getSQLArrayObjectsEx(null, sql);
+	    
+	    List<List<Object>> rows = org.compiere.util.DB.getSQLArrayObjectsEx(null, sql, adUserId);
+
+	    if (rows == null)
+	        return;
 
 	    for (List<Object> r : rows) {
 	        int id = ((Number) r.get(0)).intValue();
