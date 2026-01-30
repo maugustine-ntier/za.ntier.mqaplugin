@@ -4,12 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -31,9 +35,11 @@ import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MPInstance;
 import org.compiere.model.MProcess;
-import org.compiere.model.PO;
+import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.process.ProcessInfo;
+import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
@@ -52,6 +58,7 @@ import org.zkoss.zul.Separator;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vlayout;
 
+import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
 
 @org.idempiere.ui.zk.annotation.Form(name = "za.co.ntier.wsp_atr.form.WspAtrSubmittedADForm")
@@ -73,6 +80,9 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	private Label lblInfo = new Label("");
 	private Label lblSelectedOrg = new Label("");
 	private Media pendingUploadMedia;
+	
+	private static final CLogger log = CLogger.getCLogger(WspAtrSubmittedADForm.class);
+
 
 
 
@@ -289,7 +299,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	            submitted.setFileName(filename);
 	            submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 	            submitted.setZZ_Import_Submitted_Data("N");
-	            submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+	            submitted.setZZSdfOrganisation_ID(org.zzSdfOrganisationId);
 	            submitted.saveEx();
 
 	            submittedId = existingId;
@@ -300,7 +310,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	            submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
 	            submitted.setFileName(filename);
 	            submitted.setZZ_Import_Submitted_Data("N");
-	            submitted.set_ValueOfColumn("ZZSDFOrganisation_ID", org.zzSdfOrganisationId);
+	            submitted.setZZSdfOrganisation_ID(org.zzSdfOrganisationId);
 	            submitted.saveEx();
 
 	            submittedId = submitted.get_ID();
@@ -326,36 +336,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 
 	    runValidateImportInBackground(submittedId);
 	}
-
-
-
-
 	
-	private void doUpload(Media media) {
-	    String filename = media.getName();
-	    if (Util.isEmpty(filename, true) || !filename.toLowerCase().endsWith(".xlsm")) {
-	        throw new AdempiereException("Please upload an .xlsm file");
-	    }
-
-	    byte[] data = getMediaBytes(media);
-
-	    // create + save record (commit happens here because you used saveEx with trx null)
-	    Properties ctx = Env.getCtx();
-	    X_ZZ_WSP_ATR_Submitted submitted = new X_ZZ_WSP_ATR_Submitted(ctx, 0, null);
-	    submitted.setSubmittedDate(new Timestamp(System.currentTimeMillis()));
-	    submitted.setFileName(filename);
-	    submitted.setName("WSP/ATR " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-	    submitted.setZZ_Import_Submitted_Data("N");
-	    submitted.saveEx();
-
-	    attachToSubmitted(submitted.get_ID(), filename, data);
-
-	    lblInfo.setValue("Uploaded: " + filename + " (ID " + submitted.get_ID() + "). Validation/Import started.");
-	    refreshList();
-
-	    runValidateImportInBackground(submitted.get_ID());
-	}
-
 
 
 	private void doSubmitSelected() {
@@ -381,6 +362,9 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	    String sql =
 	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
 	        "       s.ZZ_Import_Submitted_Data, v.orgname " +
+	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
+	        "       s.ZZ_Import_Submitted_Data, v.orgname, s.ZZ_WSP_ATR_Status " +
+
 	        "FROM ZZ_WSP_ATR_Submitted s " +
 	        "LEFT JOIN adempiere.zzsdforganisation_v v " +
 	        "  ON v.zzsdforganisation_v_id = s.ZZSDFOrganisation_ID " +
@@ -391,21 +375,32 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	    for (List<Object> r : rows) {
 	        int id = ((Number) r.get(0)).intValue();
 	        Timestamp submittedDate = (Timestamp) r.get(1);
-	        String fileName = (String) r.get(2);
-	        String importedFlag = (String) r.get(3);
-	        String orgName = (String) r.get(4);
 
 	        String uploaded = findUploadedFileName(id);
 	        String latestError = findLatestErrorFileName(id);
 
-	        String status;
-	        if ("Y".equalsIgnoreCase(importedFlag)) status = "Imported";
-	        else if (!Util.isEmpty(latestError, true)) status = "Has Errors";
-	        else status = "Pending";
+	        String orgName = (String) r.get(4);
+	        String statusCode = (String) r.get(5);
+
+	        String status = statusLabel(statusCode);
 
 	        addRow(id, orgName, submittedDate, uploaded, latestError, status);
 	    }
 	}
+	
+	private String statusLabel(String code) {
+	    if (Util.isEmpty(code, true)) return "Draft";
+	    switch (code) {
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Draft: return "Draft";
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Validating: return "Validating";
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ValidationError: return "Validation Error";
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Importing: return "Importing";
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Imported: return "Imported";
+	        case X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ErrorImporting: return "Error Importing";
+	        default:   return code;
+	    }
+	}
+
 
 
 	private void addRow(int id, String orgName, Timestamp submittedDate, String uploaded, String latestError, String status) {
@@ -495,14 +490,7 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 
 	// ---------------- Attachments Helpers ----------------
 
-	private void attachToSubmitted(int submittedId, String filename, byte[] data) {
-		MAttachment att = MAttachment.get(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId);
-		if (att == null)
-			att = new MAttachment(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId,null,null);
-
-		att.addEntry(filename, data);
-		att.saveEx();
-	}
+	
 
 	private String findUploadedFileName(int submittedId) {
 		MAttachment att = MAttachment.get(Env.getCtx(), X_ZZ_WSP_ATR_Submitted.Table_ID, submittedId);
@@ -642,21 +630,101 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 	}
 	
 	private void deleteRelatedRecordsBeforeProcessing(int submittedId, String trxName) {
-	    // TODO: add deletes for tables created by your import/validate process.
-	    // Example pattern (replace table/column names):
-	    //
-	    // DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Line WHERE ZZ_WSP_ATR_Submitted_ID=?", trxName, submittedId);
-	    // DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Header WHERE ZZ_WSP_ATR_Submitted_ID=?", trxName, submittedId);
-	    //
-	    // If the process creates a ZZ_WSP_ATR master record linked to submitted:
-	    // Integer wspAtrId = DB.getSQLValueEx(trxName,
-	    //      "SELECT ZZ_WSP_ATR_ID FROM ZZ_WSP_ATR WHERE ZZ_WSP_ATR_Submitted_ID=?",
-	    //      submittedId);
-	    // if (wspAtrId != null && wspAtrId > 0) {
-	    //      DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR_Child WHERE ZZ_WSP_ATR_ID=?", trxName, wspAtrId);
-	    //      DB.executeUpdateEx("DELETE FROM ZZ_WSP_ATR WHERE ZZ_WSP_ATR_ID=?", trxName, wspAtrId);
-	    // }
+
+	    // 1) Load mapped tables
+	    List<X_ZZ_WSP_ATR_Lookup_Mapping> headers = new Query(
+	            Env.getCtx(),
+	            X_ZZ_WSP_ATR_Lookup_Mapping.Table_Name,
+	            null,
+	            trxName)
+	        .setOnlyActiveRecords(true)
+	        .list();
+
+	    if (headers == null || headers.isEmpty())
+	        return; // nothing to delete
+
+	    // 2) Build unique table list
+	    Set<Integer> tableIds = new HashSet<>();
+	    for (X_ZZ_WSP_ATR_Lookup_Mapping h : headers) {
+	        if (h.getAD_Table_ID() > 0)
+	            tableIds.add(h.getAD_Table_ID());
+	    }
+
+	    // 3) Create delete jobs for tables that have ZZ_WSP_ATR_Submitted_ID
+	    class DelJob {
+	        final String tableName;
+	        DelJob(String t) { tableName = t; }
+	    }
+
+	    List<DelJob> jobs = new ArrayList<>();
+
+	    for (Integer adTableId : tableIds) {
+	        MTable t = MTable.get(Env.getCtx(), adTableId);
+	        if (t == null) continue;
+
+	        String tableName = t.getTableName();
+	        if (Util.isEmpty(tableName, true))
+	            continue;
+
+	        // Safety: never delete from these
+	        if (X_ZZ_WSP_ATR_Submitted.Table_Name.equalsIgnoreCase(tableName)
+	                || X_ZZ_WSP_ATR_Lookup_Mapping.Table_Name.equalsIgnoreCase(tableName))
+	            continue;
+
+	        // Only delete if table is designed to link back to submittedId
+	        if (columnExists(tableName, "ZZ_WSP_ATR_Submitted_ID", trxName)) {
+	            jobs.add(new DelJob(tableName));
+	        }
+	    }
+
+	    if (jobs.isEmpty())
+	        return;
+
+	    // 4) Run deletes in retry passes to handle FK order
+	    List<DelJob> remaining = new ArrayList<>(jobs);
+
+	    for (int pass = 1; pass <= 4 && !remaining.isEmpty(); pass++) {
+	        List<DelJob> failed = new ArrayList<>();
+
+	        for (DelJob job : remaining) {
+	            try {
+	                DB.executeUpdateEx(
+	                    "DELETE FROM " + job.tableName + " WHERE ZZ_WSP_ATR_Submitted_ID=?",
+	                    trxName,
+	                    submittedId
+	                );
+	            } catch (Exception ex) {
+	                failed.add(job);
+	            }
+	        }
+
+	        remaining = failed;
+	    }
+
+	    // If some still remain, log them (usually means those tables link differently)
+	    if (!remaining.isEmpty()) {
+	        for (DelJob job : remaining) {
+	            log.log(Level.WARNING,
+	                "Could not delete from mapped table " + job.tableName +
+	                " for ZZ_WSP_ATR_Submitted_ID=" + submittedId +
+	                " (likely FK order or different link column).");
+	        }
+	    }
 	}
+
+	
+	private boolean columnExists(String tableName, String columnName, String trxName) {
+	    int cnt = DB.getSQLValueEx(
+	        trxName,
+	        "SELECT COUNT(1) " +
+	        "FROM AD_Column c " +
+	        "JOIN AD_Table t ON t.AD_Table_ID=c.AD_Table_ID " +
+	        "WHERE t.TableName=? AND c.ColumnName=? AND c.IsActive='Y'",
+	        tableName, columnName
+	    );
+	    return cnt > 0;
+	}
+
 
 
 
