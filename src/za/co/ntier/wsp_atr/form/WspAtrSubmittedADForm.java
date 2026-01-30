@@ -361,8 +361,6 @@ public class WspAtrSubmittedADForm extends ADForm implements EventListener<Event
 
 	    String sql =
 	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
-	        "       s.ZZ_Import_Submitted_Data, v.orgname " +
-	        "SELECT s.ZZ_WSP_ATR_Submitted_ID, s.SubmittedDate, s.FileName, " +
 	        "       s.ZZ_Import_Submitted_Data, v.orgname, s.ZZ_WSP_ATR_Status " +
 
 	        "FROM ZZ_WSP_ATR_Submitted s " +

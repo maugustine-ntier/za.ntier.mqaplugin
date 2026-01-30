@@ -3,6 +3,7 @@ package za.co.ntier.wsp_atr.process;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,10 +17,10 @@ import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.Query;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
-import java.util.Date;
 
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Lookup_Mapping;
 import za.co.ntier.wsp_atr.models.X_ZZ_WSP_ATR_Submitted;
@@ -41,7 +42,7 @@ public class ValidateAndImportWspAtrDataFromTemplate extends SvrProcess {
 		if (p_ZZ_WSP_ATR_Submitted_ID <= 0)
 			throw new AdempiereException("No WSP/ATR Submitted record selected");
 
-		updateSubmittedStatus(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Validating);
+		updateSubmittedStatusCommitted(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Validating);
 
 
 		Properties ctx = Env.getCtx();
@@ -86,7 +87,7 @@ public class ValidateAndImportWspAtrDataFromTemplate extends SvrProcess {
 			// write workbook to bytes + attach as error file
 			String errName = buildErrorFileName(submitted);
 			attachErrorWorkbook(submitted, wb, errName);
-			updateSubmittedStatus(p_ZZ_WSP_ATR_Submitted_ID,X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ValidationError );
+			updateSubmittedStatusCommitted(p_ZZ_WSP_ATR_Submitted_ID,X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ValidationError );
 
 
 			// attachErrorWorkbook(submitted, wb, "ERROR_" + safeFileName(submitted) + ".xlsm");
@@ -94,17 +95,17 @@ public class ValidateAndImportWspAtrDataFromTemplate extends SvrProcess {
 					+ " validation errors. Download the attached error file, fix highlighted cells, and try again.");
 		}
 
-		updateSubmittedStatus(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Importing);
+		updateSubmittedStatusCommitted(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Importing);
 
 
 		// No errors => run import
 		try {
 			ImportWspAtrDataFromTemplate importProc = new ImportWspAtrDataFromTemplate();
 			importProc.startProcess(getCtx(), getProcessInfo(), Trx.get(get_TrxName(), false)); // OR refactor import into a service and call it directly
-			updateSubmittedStatus(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Imported);
+			updateSubmittedStatusCommitted(p_ZZ_WSP_ATR_Submitted_ID, X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_Imported);
 			return "Validation passed. Import completed.";
 		} catch (Exception ex) {
-			updateSubmittedStatus(p_ZZ_WSP_ATR_Submitted_ID,X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ErrorImporting );
+			updateSubmittedStatusCommitted(p_ZZ_WSP_ATR_Submitted_ID,X_ZZ_WSP_ATR_Submitted.ZZ_WSP_ATR_STATUS_ErrorImporting );
 			throw ex;
 		}
 
@@ -233,14 +234,26 @@ public class ValidateAndImportWspAtrDataFromTemplate extends SvrProcess {
 		return "ERROR_" + baseName + "_" + ts + ".xlsm";
 	}
 
-	private void updateSubmittedStatus(int submittedId, String status) {
-		// Use independent commit so UI can see updates while long process runs
-		org.compiere.util.DB.executeUpdateEx(
-				"UPDATE ZZ_WSP_ATR_Submitted SET ZZ_WSP_ATR_Status=? WHERE ZZ_WSP_ATR_Submitted_ID=?",
-				null,
-				status, submittedId
-				);
+
+	
+	private void updateSubmittedStatusCommitted(int submittedId, String status) throws Exception {
+	    String trxName = Trx.createTrxName("WSPATR_STATUS");
+	    Trx trx = Trx.get(trxName, true);
+	    try {
+	        DB.executeUpdateEx(
+	            "UPDATE ZZ_WSP_ATR_Submitted SET ZZ_WSP_ATR_Status=? WHERE ZZ_WSP_ATR_Submitted_ID=?",
+	            new Object[] { status, submittedId },
+	            trxName
+	        );
+	        trx.commit(true);
+	    } catch (Exception e) {
+	        trx.rollback();
+	        throw e;
+	    } finally {
+	        trx.close();
+	    }
 	}
+
 
 
 }
